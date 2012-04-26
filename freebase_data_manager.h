@@ -18,7 +18,7 @@ public:
     QString getUserEmail() {return m_strUserEmail;}
     QString getReplyStr() {return m_strReply;}
 
-    void runQuery(const QString& query, const QString& key);
+    void runReadQuery(const QString& query);
 
 signals:
     void sigErrorOccured(const QString& error);

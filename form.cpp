@@ -91,7 +91,7 @@ void Form::onBtnRunClicked()
 {
     QString query = ui->editQuery->toPlainText();
 //    query.chop(1);  //??? some additional character present: \20013 - remove it
-    m_pManager->runQuery(query,m_pOAuth2->getSimpleAPIKey());
+    m_pManager->runReadQuery(query);
 }
 
 void Form::onBtnClearClicked()

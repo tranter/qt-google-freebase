@@ -45,12 +45,11 @@
              </property>
              <property name="plainText">
               <string>[{
-	&quot;type&quot;:&quot;/language/human_language&quot;,
-	&quot;name&quot;: null,
-	&quot;writing_system&quot;: [{
-		&quot;name&quot;: null,
-		&quot;optional&quot; : true
-	}]
+	&quot;clouds&quot;: [],
+	&quot;name&quot;:   null,
+	&quot;id&quot;:     null,
+	&quot;sort&quot;:   &quot;name&quot;,
+	&quot;type&quot;:   &quot;/meteorology/cloud_classification&quot;
 }]</string>
              </property>
              <property name="tabStopWidth">
@@ -89,7 +88,7 @@
            <item>
             <widget class="QTabWidget" name="tabQuery">
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="tabTree">
               <attribute name="title">
@@ -99,7 +98,7 @@
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_4">
                  <item>
-                  <widget class="QTreeView" name="treeView"/>
+                  <widget class="QTreeView" name="treeMqlReply"/>
                  </item>
                 </layout>
                </item>

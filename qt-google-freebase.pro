@@ -32,13 +32,17 @@ SOURCES += main.cpp\
     oauth2.cpp \
     logindialog.cpp \
     form.cpp \
-    freebase_data_manager.cpp
+    freebase_data_manager.cpp \
+    treeitem.cpp \
+    treemodel.cpp
 
 HEADERS  += mainwindow.h \
     oauth2.h \
     logindialog.h \
     form.h \
-    freebase_data_manager.h
+    freebase_data_manager.h \
+    treeitem.h \
+    treemodel.h
 
 FORMS    += mainwindow.ui \
     logindialog.ui \

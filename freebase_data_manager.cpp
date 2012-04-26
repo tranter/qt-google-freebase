@@ -1,3 +1,4 @@
+#include <QDebug>
 #include <QJson/Parser>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
@@ -19,8 +20,9 @@ void freebase_data_manager::requestUserEmail(const QString& access_token)
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(query)));
 }
 
-void freebase_data_manager::runQuery(const QString& query, const QString& key)
+void freebase_data_manager::runReadQuery(const QString& query)
 {
+    qDebug() << Q_FUNC_INFO << ", query=" << query;
     QString url = QString("https://www.googleapis.com/freebase/v1/mqlread?query=%1").arg(query);
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(url)));
 }
@@ -40,6 +42,9 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
 
     // json is a QString containing the data to convert
     QVariant result = parser.parse (json.toLatin1(), &ok);
+//    qDebug() << "result type=" << result.type() << ", typeName=" << result.typeName();
+//    QVariantList list = result.toList();
+//    qDebug() << "list.size()=" << list.size();
     if (!ok) {
         emit sigErrorOccured(QString("Cannot convert to QJson object: %1").arg(json));
         return;
