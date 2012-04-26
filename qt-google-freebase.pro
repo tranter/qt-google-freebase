@@ -43,3 +43,6 @@ HEADERS  += mainwindow.h \
 FORMS    += mainwindow.ui \
     logindialog.ui \
     form.ui
+
+RESOURCES += \
+    resource.qrc

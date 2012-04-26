@@ -25,6 +25,7 @@ public:
     void setAccessToken(const QString& access_token) {m_strAccessToken = access_token;}
     QString getRefreshToken() { return m_strRefreshToken; }
     void setRefreshToken(const QString& refresh_token) {m_strRefreshToken = refresh_token;}
+    QString getSimpleAPIKey() {return m_strSimpleAPIKey;}
 
     void setSettings(QSettings* p) {m_pSettings = p;}
 

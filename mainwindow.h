@@ -8,6 +8,7 @@ namespace Ui {
 }
 
 class Form;
+class QLabel;
 
 class MainWindow : public QMainWindow
 {
@@ -18,6 +19,7 @@ public:
     ~MainWindow();
     
     void startLoginDefault();
+    void showStatusText(const QString& msg);
 
 public slots:
     void startLogin();
@@ -25,6 +27,7 @@ public slots:
 private:
     Ui::MainWindow *ui;
     Form* m_pForm;
+    QLabel* m_pStatusLabel;
 };
 
 #endif // MAINWINDOW_H

@@ -11,6 +11,7 @@ namespace Ui {
 
 class QSettings;
 class OAuth2;
+class MainWindow;
 
 class Form : public QWidget
 {
@@ -26,9 +27,14 @@ private slots:
     void onLoginDone();
     void onErrorOccured(const QString& error);
     void onUserEmailReady();
+    void onMqlReplyReady();
+
+    void onBtnRunClicked();
+    void onBtnClearClicked();
 
 private:
     Ui::Form *ui;
+    MainWindow* m_pMain;
     OAuth2* m_pOAuth2;
     freebase_data_manager* m_pManager;
     QSettings* m_pSettings;

@@ -1,17 +1,23 @@
 #include <QSettings>
 #include <QMessageBox>
+#include <QStatusBar>
 
 #include "form.h"
 #include "ui_form.h"
 #include "oauth2.h"
+#include "mainwindow.h"
 
 Form::Form(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Form)
 {
     ui->setupUi(this);
+    ui->tabQuery->setCurrentIndex(0);
 
+    m_pMain = (MainWindow*)parent;
+    m_pMain->showStatusText("Uknown user email");
     m_pOAuth2 = new OAuth2(this);
+
     m_strCompanyName = "YOU_COMPANY_NAME_HERE";
     m_strAppName = "QtFreebase";
 
@@ -26,6 +32,16 @@ Form::Form(QWidget *parent) :
 
     m_pManager = new freebase_data_manager(this);
     connect(m_pManager, SIGNAL(sigUserEmailReady()),this,SLOT(onUserEmailReady()));
+    connect(m_pManager, SIGNAL(sigMqlReplyReady()),this,SLOT(onMqlReplyReady()));
+
+    QList<int> sizes;
+    sizes << 150;
+    sizes << 400;
+    ui->splitter->setSizes(sizes);
+
+    connect(m_pManager, SIGNAL(sigErrorOccured(QString)),this,SLOT(onErrorOccured(QString)));
+    connect(ui->btnRun,SIGNAL(clicked()),this,SLOT(onBtnRunClicked()));
+    connect(ui->btnClear,SIGNAL(clicked()),this,SLOT(onBtnClearClicked()));
 }
 
 Form::~Form()
@@ -52,7 +68,7 @@ void Form::onErrorOccured(const QString& error)
  */
 void Form::onLoginDone()
 {
-    m_pManager->getUserEmail(m_pOAuth2->accessToken());
+    m_pManager->requestUserEmail(m_pOAuth2->accessToken());
 }
 
 void Form::saveSettings()
@@ -63,5 +79,22 @@ void Form::saveSettings()
 
 void Form::onUserEmailReady()
 {
-    ui->userEmail->setText(m_pManager->userEmail());
+    m_pMain->showStatusText(m_pManager->getUserEmail());
+}
+
+void Form::onMqlReplyReady()
+{
+    ui->textMqlReply->setPlainText(m_pManager->getReplyStr());
+}
+
+void Form::onBtnRunClicked()
+{
+    QString query = ui->editQuery->toPlainText();
+//    query.chop(1);  //??? some additional character present: \20013 - remove it
+    m_pManager->runQuery(query,m_pOAuth2->getSimpleAPIKey());
+}
+
+void Form::onBtnClearClicked()
+{
+    ui->textMqlReply->clear();
 }

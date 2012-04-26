@@ -18,15 +18,10 @@ OAuth2::OAuth2(QWidget* parent)
             "+https://www.googleapis.com/auth/userinfo.email"
             ;
 
-//    m_strClientID = "YOUR_CLIENT_ID_HERE";
-//    m_strClientSecret = "YOUR_CLIENT_SECRET_HERE";
-//    m_strRedirectURI = "YOUR_REDIRECT_URI_HERE";
-//    m_strSimpleAPIKey = "YOUR_SIMPLE_API_KEY_HERE";
-
-    m_strClientID = "27044754895-l5r4bjbfsc7l0a8es0426up885cl5l3u.apps.googleusercontent.com";
-    m_strClientSecret = "5XgCvHoaY7qXGS5TWC4Vn7z1";
-    m_strRedirectURI = "http://yandex.ru";
-    m_strSimpleAPIKey = "AIzaSyAoHAXWHsnO6EOMLe_7ioDu9beguMpOAPU";
+    m_strClientID = "YOUR_CLIENT_ID_HERE";
+    m_strClientSecret = "YOUR_CLIENT_SECRET_HERE";
+    m_strRedirectURI = "YOUR_REDIRECT_URI_HERE";
+    m_strSimpleAPIKey = "YOUR_SIMPLE_API_KEY_HERE";
 
     m_pNetworkAccessManager = new QNetworkAccessManager(this);
     connect(m_pNetworkAccessManager, SIGNAL(finished(QNetworkReply*)),
