@@ -36,8 +36,15 @@ void freebase_data_manager::runSearchQuery(const QString& query)
 void freebase_data_manager::runWriteQuery(const QString& query, const QString& access_token)
 {
     qDebug() << Q_FUNC_INFO << ", query=" << query;
-    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?query=%1&indent=true&access_token=%2").arg(query,access_token);
-    m_pNetworkAccessManager->get(QNetworkRequest(QUrl(s)));
+//    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?query=%1&indent=true&access_token=%2").arg(query,access_token);
+    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?query=%1&indent=true").arg(query);
+
+    QNetworkRequest request;
+    request.setUrl(QUrl(s));
+    request.setRawHeader("GData-Version", "3.0");
+    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
+
+    m_pNetworkAccessManager->get(request);
 }
 
 void freebase_data_manager::replyFinished(QNetworkReply *reply)
@@ -46,6 +53,7 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
     QString url = reply->url().toString();
 
     qDebug() << "url:\n" << url;
+    qDebug() << "json:\n" << json;
 
     if (json.length() == 0) {
         return;
