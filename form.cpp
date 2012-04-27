@@ -13,6 +13,13 @@ Form::Form(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->tabQuery->setCurrentIndex(0);
+    ui->tabReply->setCurrentIndex(1);
+    ui->tabReply->setTabEnabled(0,false);
+
+    QList<int> sizes;
+    sizes << 200;
+    sizes << 350;
+    ui->splitter->setSizes(sizes);
 
     m_pMain = (MainWindow*)parent;
     m_pMain->showStatusText("Uknown user email");
@@ -33,13 +40,8 @@ Form::Form(QWidget *parent) :
     m_pManager = new freebase_data_manager(this);
     connect(m_pManager, SIGNAL(sigUserEmailReady()),this,SLOT(onUserEmailReady()));
     connect(m_pManager, SIGNAL(sigMqlReplyReady()),this,SLOT(onMqlReplyReady()));
-
-    QList<int> sizes;
-    sizes << 150;
-    sizes << 400;
-    ui->splitter->setSizes(sizes);
-
     connect(m_pManager, SIGNAL(sigErrorOccured(QString)),this,SLOT(onErrorOccured(QString)));
+
     connect(ui->btnRun,SIGNAL(clicked()),this,SLOT(onBtnRunClicked()));
     connect(ui->btnClear,SIGNAL(clicked()),this,SLOT(onBtnClearClicked()));
 }
@@ -85,16 +87,21 @@ void Form::onUserEmailReady()
 void Form::onMqlReplyReady()
 {
     ui->textMqlReply->setPlainText(m_pManager->getReplyStr());
+//    m_pModel->newTreeData(m_pManager->getJsonData());
 }
 
 void Form::onBtnRunClicked()
 {
-    QString query = ui->editQuery->toPlainText();
-//    query.chop(1);  //??? some additional character present: \20013 - remove it
-    m_pManager->runReadQuery(query);
+    if (ui->tabQuery->currentIndex() == 0) {
+        m_pManager->runMqlQuery(ui->editMqlQuery->toPlainText());
+    } else if (ui->tabQuery->currentIndex() == 1) {
+        QString query = QString("%1&%2").arg(ui->editSearchQuery->toPlainText(),ui->editSearchFilter->toPlainText());
+        m_pManager->runSearchQuery(query);
+    }
 }
 
 void Form::onBtnClearClicked()
 {
     ui->textMqlReply->clear();
+//    m_pModel->clear();
 }

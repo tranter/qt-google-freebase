@@ -8,7 +8,6 @@
 freebase_data_manager::freebase_data_manager(QObject* parent) : QObject(parent)
 {
     m_pNetworkAccessManager = new QNetworkAccessManager(this);
-
     connect(m_pNetworkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
 }
 
@@ -20,17 +19,28 @@ void freebase_data_manager::requestUserEmail(const QString& access_token)
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(query)));
 }
 
-void freebase_data_manager::runReadQuery(const QString& query)
+void freebase_data_manager::runMqlQuery(const QString& query)
 {
     qDebug() << Q_FUNC_INFO << ", query=" << query;
-    QString url = QString("https://www.googleapis.com/freebase/v1/mqlread?query=%1").arg(query);
+    QString url = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlread?query=%1").arg(query);
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(url)));
+}
+
+void freebase_data_manager::runSearchQuery(const QString& query)
+{
+    qDebug() << Q_FUNC_INFO << ", query=" << query;
+    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/search?query=%1&indent=true").arg(query);
+//    QUrl url;
+//    url.setEncodedUrl(s.toLatin1());
+    m_pNetworkAccessManager->get(QNetworkRequest(QUrl(s)));
 }
 
 void freebase_data_manager::replyFinished(QNetworkReply *reply)
 {
     QString json = reply->readAll();
     QString url = reply->url().toString();
+
+    qDebug() << "url:\n" << url;
 
     if (json.length() == 0) {
         return;
@@ -43,8 +53,25 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
     // json is a QString containing the data to convert
     QVariant result = parser.parse (json.toLatin1(), &ok);
 //    qDebug() << "result type=" << result.type() << ", typeName=" << result.typeName();
-//    QVariantList list = result.toList();
-//    qDebug() << "list.size()=" << list.size();
+
+//    QVariant res = result.toMap()["result"];
+//    qDebug() << "result type=" << res.type();
+
+//    res = result.toMap()["result"].toList()[0];
+//    qDebug() << "result[0] type=" << res.type();
+
+//    res = result.toMap()["result"].toList()[0].toMap();
+//    qDebug() << "result[0].toMap() type=" << res.type();
+
+//    res = result.toMap()["result"].toList()[0].toMap()["clouds"];
+//    qDebug() << "clouds type=" << res.type();
+
+//    res = result.toMap()["result"].toList()[0].toMap()["clouds"].toList()[0];
+//    qDebug() << "clouds[0] type=" << res.type();
+
+//    res = result.toMap()["result"].toList()[0].toMap()["id"];
+//    qDebug() << "id type=" << res.type();
+
     if (!ok) {
         emit sigErrorOccured(QString("Cannot convert to QJson object: %1").arg(json));
         return;
@@ -60,6 +87,11 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
         emit sigUserEmailReady();
         return;
     } else if (url.contains("mqlread")) {
+        m_strReply = modifyReply(json);
+        m_jsonReply = result;
+        emit sigMqlReplyReady();
+        return;
+    } else if (url.contains("search")) {
         m_strReply = modifyReply(json);
         m_jsonReply = result;
         emit sigMqlReplyReady();

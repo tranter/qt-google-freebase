@@ -18,7 +18,9 @@ public:
     QString getUserEmail() {return m_strUserEmail;}
     QString getReplyStr() {return m_strReply;}
 
-    void runReadQuery(const QString& query);
+    void runMqlQuery(const QString& query);
+    void runSearchQuery(const QString& query);
+    QVariant& getJsonData() {return m_jsonReply;}
 
 signals:
     void sigErrorOccured(const QString& error);
