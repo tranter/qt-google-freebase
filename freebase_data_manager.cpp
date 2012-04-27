@@ -30,8 +30,13 @@ void freebase_data_manager::runSearchQuery(const QString& query)
 {
     qDebug() << Q_FUNC_INFO << ", query=" << query;
     QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/search?query=%1&indent=true").arg(query);
-//    QUrl url;
-//    url.setEncodedUrl(s.toLatin1());
+    m_pNetworkAccessManager->get(QNetworkRequest(QUrl(s)));
+}
+
+void freebase_data_manager::runWriteQuery(const QString& query, const QString& access_token)
+{
+    qDebug() << Q_FUNC_INFO << ", query=" << query;
+    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?query=%1&indent=true&access_token=%2").arg(query,access_token);
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(s)));
 }
 
@@ -52,25 +57,6 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
 
     // json is a QString containing the data to convert
     QVariant result = parser.parse (json.toLatin1(), &ok);
-//    qDebug() << "result type=" << result.type() << ", typeName=" << result.typeName();
-
-//    QVariant res = result.toMap()["result"];
-//    qDebug() << "result type=" << res.type();
-
-//    res = result.toMap()["result"].toList()[0];
-//    qDebug() << "result[0] type=" << res.type();
-
-//    res = result.toMap()["result"].toList()[0].toMap();
-//    qDebug() << "result[0].toMap() type=" << res.type();
-
-//    res = result.toMap()["result"].toList()[0].toMap()["clouds"];
-//    qDebug() << "clouds type=" << res.type();
-
-//    res = result.toMap()["result"].toList()[0].toMap()["clouds"].toList()[0];
-//    qDebug() << "clouds[0] type=" << res.type();
-
-//    res = result.toMap()["result"].toList()[0].toMap()["id"];
-//    qDebug() << "id type=" << res.type();
 
     if (!ok) {
         emit sigErrorOccured(QString("Cannot convert to QJson object: %1").arg(json));

@@ -20,6 +20,7 @@ public:
 
     void runMqlQuery(const QString& query);
     void runSearchQuery(const QString& query);
+    void runWriteQuery(const QString& query, const QString& access_token);
     QVariant& getJsonData() {return m_jsonReply;}
 
 signals:

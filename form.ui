@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_10">
+  <layout class="QVBoxLayout" name="verticalLayout_12">
    <item>
     <widget class="QSplitter" name="splitter">
      <property name="orientation">
@@ -24,7 +24,7 @@
        <item>
         <widget class="QTabWidget" name="tabQuery">
          <property name="currentIndex">
-          <number>1</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="tabMql">
           <attribute name="title">
@@ -84,6 +84,24 @@
               <widget class="QPlainTextEdit" name="editSearchFilter">
                <property name="plainText">
                 <string>type=/people/person&amp;type=/location/citytown&amp;type_strict=any</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tabWrite">
+          <attribute name="title">
+           <string>Write Request</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_11">
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_10">
+             <item>
+              <widget class="QPlainTextEdit" name="editWriteQuery">
+               <property name="plainText">
+                <string>{&quot;create&quot;:&quot;unless_exists&quot;,&quot;type&quot;:&quot;/user/docs/music/note&quot;,&quot;name&quot;:&quot;C#&quot;,&quot;id&quot;:null}</string>
                </property>
               </widget>
              </item>

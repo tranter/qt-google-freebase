@@ -25,7 +25,8 @@ Form::Form(QWidget *parent) :
     m_pMain->showStatusText("Uknown user email");
     m_pOAuth2 = new OAuth2(this);
 
-    m_strCompanyName = "YOU_COMPANY_NAME_HERE";
+//    m_strCompanyName = "YOU_COMPANY_NAME_HERE";
+    m_strCompanyName = "ICS";
     m_strAppName = "QtFreebase";
 
     // Load settings
@@ -97,6 +98,9 @@ void Form::onBtnRunClicked()
     } else if (ui->tabQuery->currentIndex() == 1) {
         QString query = QString("%1&%2").arg(ui->editSearchQuery->toPlainText(),ui->editSearchFilter->toPlainText());
         m_pManager->runSearchQuery(query);
+    } else if (ui->tabQuery->currentIndex() == 2) {
+//        m_pManager->runWriteQuery(ui->editWriteQuery->toPlainText(),m_pOAuth2->getSimpleAPIKey());
+        m_pManager->runWriteQuery(ui->editWriteQuery->toPlainText(),m_pOAuth2->accessToken());
     }
 }
 
