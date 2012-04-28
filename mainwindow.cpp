@@ -11,6 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
     connect(ui->actionLogin, SIGNAL(triggered()), this, SLOT(startLogin()));
+    connect(ui->actionFreebaseLogin, SIGNAL(triggered()), this, SLOT(startFreebaseLogin()));
 
     QLabel* permanentWidget = new QLabel(this);
     permanentWidget->setText("Based on Freebase API: http://www.freebase.com");
@@ -30,6 +31,11 @@ MainWindow::~MainWindow()
 void MainWindow::startLogin()
 {
     m_pForm->startLogin(true);
+}
+
+void MainWindow::startFreebaseLogin()
+{
+    m_pForm->startFreebaseLogin();
 }
 
 void MainWindow::startLoginDefault()

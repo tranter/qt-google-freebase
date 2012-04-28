@@ -101,7 +101,16 @@
              <item>
               <widget class="QPlainTextEdit" name="editWriteQuery">
                <property name="plainText">
-                <string>{&quot;create&quot;:&quot;unless_exists&quot;,&quot;type&quot;:&quot;/user/docs/music/note&quot;,&quot;name&quot;:&quot;C#&quot;,&quot;id&quot;:null}</string>
+                <string>{
+ &quot;create&quot;: &quot;unless_exists&quot;,
+ &quot;name&quot;:   &quot;Test Object 1&quot;,
+ &quot;type&quot;:   &quot;/base/mqlexamples/testobject&quot;,
+ &quot;id&quot;:     null,
+ &quot;guid&quot;:   null
+}</string>
+               </property>
+               <property name="tabStopWidth">
+                <number>20</number>
                </property>
               </widget>
              </item>

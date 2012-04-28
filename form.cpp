@@ -58,6 +58,11 @@ void Form::startLogin(bool bForce)
     m_pOAuth2->startLogin(bForce); //this is a parent widget for a login dialog.
 }
 
+void Form::startFreebaseLogin()
+{
+    m_pManager->loginFreebase();
+}
+
 void Form::onErrorOccured(const QString& error)
 {
     if(error.indexOf("Invalid Credentials") != -1) {
@@ -93,6 +98,7 @@ void Form::onMqlReplyReady()
 
 void Form::onBtnRunClicked()
 {
+    ui->textMqlReply->clear();
     if (ui->tabQuery->currentIndex() == 0) {
         m_pManager->runMqlQuery(ui->editMqlQuery->toPlainText());
     } else if (ui->tabQuery->currentIndex() == 1) {
@@ -100,7 +106,8 @@ void Form::onBtnRunClicked()
         m_pManager->runSearchQuery(query);
     } else if (ui->tabQuery->currentIndex() == 2) {
 //        m_pManager->runWriteQuery(ui->editWriteQuery->toPlainText(),m_pOAuth2->getSimpleAPIKey());
-        m_pManager->runWriteQuery(ui->editWriteQuery->toPlainText(),m_pOAuth2->accessToken());
+//        m_pManager->runWriteQuery(ui->editWriteQuery->toPlainText(),m_pOAuth2->accessToken());
+        m_pManager->runWriteQuery(ui->editWriteQuery->toPlainText(),m_pOAuth2->accessToken(),m_pOAuth2->getSimpleAPIKey());
     }
 }
 

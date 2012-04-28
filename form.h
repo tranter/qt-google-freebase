@@ -22,6 +22,7 @@ public:
     ~Form();
     
     void startLogin(bool bForce); //Show login dialog even if there is gotten already access_token.
+    void startFreebaseLogin();
 
 private slots:
     void onLoginDone();

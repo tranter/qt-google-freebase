@@ -18,9 +18,11 @@ public:
     QString getUserEmail() {return m_strUserEmail;}
     QString getReplyStr() {return m_strReply;}
 
+    void loginFreebase();
+
     void runMqlQuery(const QString& query);
     void runSearchQuery(const QString& query);
-    void runWriteQuery(const QString& query, const QString& access_token);
+    void runWriteQuery(const QString& query, const QString& access_token, const QString& key);
     QVariant& getJsonData() {return m_jsonReply;}
 
 signals:

@@ -23,6 +23,7 @@ public:
 
 public slots:
     void startLogin();
+    void startFreebaseLogin();
 
 private:
     Ui::MainWindow *ui;

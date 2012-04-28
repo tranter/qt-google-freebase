@@ -19,6 +19,38 @@ void freebase_data_manager::requestUserEmail(const QString& access_token)
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(query)));
 }
 
+void freebase_data_manager::loginFreebase()
+{
+    QString url = "http://api.sandbox-freebase.com/api/account/login?username=<login>&password=<pwd>";
+
+    QNetworkRequest request;
+    request.setUrl(QUrl(url));
+//    request.setRawHeader("GData-Version", "3.0");
+//    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
+//    request.setRawHeader("Content-Type", "application/atom+xml");
+    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded'");
+//    request.setRawHeader("X-Metaweb-Request", "True");
+//    request.setRawHeader("Content-Length", QString::number(content.size()).toLatin1());
+
+//    m_pNetworkAccessManager->post(request,content);
+    m_pNetworkAccessManager->post(request,QByteArray());
+}
+
+//void freebase_data_manager::loginFreebase()
+//{
+//    QString url = "http://api.sandbox-freebase.com/api/account/login";
+
+//    QByteArray content = QString("username=<login>&password=<pwd>").toLatin1();
+//    qDebug() << "content=" << content;
+
+//    QNetworkRequest request;
+//    request.setUrl(QUrl(url));
+//    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded'");
+//    request.setRawHeader("Content-Length", QString::number(content.size()).toLatin1());
+
+//    m_pNetworkAccessManager->post(request,content);
+//}
+
 void freebase_data_manager::runMqlQuery(const QString& query)
 {
     qDebug() << Q_FUNC_INFO << ", query=" << query;
@@ -33,18 +65,78 @@ void freebase_data_manager::runSearchQuery(const QString& query)
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(s)));
 }
 
-void freebase_data_manager::runWriteQuery(const QString& query, const QString& access_token)
+//void freebase_data_manager::runWriteQuery(const QString& query, const QString& access_token)
+//{
+//    qDebug() << Q_FUNC_INFO << ", query=" << query;
+////    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?query=%1&indent=true&access_token=%2").arg(query,access_token);
+//    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?query=%1&indent=true").arg(query);
+
+//    QNetworkRequest request;
+//    request.setUrl(QUrl(s));
+//    request.setRawHeader("GData-Version", "3.0");
+//    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
+
+//    m_pNetworkAccessManager->post(request,QByteArray());
+//}
+
+//void freebase_data_manager::runWriteQuery(const QString& query, const QString& access_token)
+//{
+//    qDebug() << Q_FUNC_INFO << ", query=" << query;
+//    QString s = "https://www.googleapis.com/freebase/v1-sandbox/mqlwrite";
+////    QString s = "https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?key=%1".arg(access_token);
+//    QByteArray content = "query="+query.toLatin1();
+//    qDebug() << "content=" << content;
+
+//    QNetworkRequest request;
+//    request.setUrl(QUrl(s));
+//    request.setRawHeader("GData-Version", "3.0");
+//    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
+//    request.setRawHeader("Content-Type", "application/atom+xml");
+//    request.setRawHeader("Content-Length", QString::number(content.size()).toLatin1());
+
+//    m_pNetworkAccessManager->post(request,content);
+//}
+
+//void freebase_data_manager::runWriteQuery(const QString& query, const QString& key)
+//{
+//    qDebug() << Q_FUNC_INFO << ", query=" << query;
+//    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?key=%1").arg(key);
+//    QByteArray content = "query="+query.toLatin1();
+//    qDebug() << "content=" << content;
+
+//    QNetworkRequest request;
+//    request.setUrl(QUrl(s));
+////    request.setRawHeader("GData-Version", "3.0");
+////    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
+////    request.setRawHeader("Content-Type", "application/atom+xml");
+//    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded'");
+//    request.setRawHeader("X-Metaweb-Request", "True");
+//    request.setRawHeader("Content-Length", QString::number(content.size()).toLatin1());
+
+//    m_pNetworkAccessManager->post(request,content);
+//}
+
+void freebase_data_manager::runWriteQuery(const QString& query, const QString& access_token, const QString& key)
 {
     qDebug() << Q_FUNC_INFO << ", query=" << query;
-//    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?query=%1&indent=true&access_token=%2").arg(query,access_token);
-    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?query=%1&indent=true").arg(query);
+    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?access_token=%1").arg(access_token);
+//    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?key=%1").arg(access_token);
+//    QByteArray content = "query="+query.toLatin1();
+    QByteArray content = query.toLatin1();
+    qDebug() << "content=" << content;
 
     QNetworkRequest request;
     request.setUrl(QUrl(s));
-    request.setRawHeader("GData-Version", "3.0");
-    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
+//    request.setRawHeader("GData-Version", "3.0");
+//    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
+//    request.setRawHeader("Content-Type", "application/atom+xml");
+//    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.setRawHeader("Content-Type", "application/json");
+    request.setRawHeader("Content-Length", QString::number(content.size()).toLatin1());
+    request.setRawHeader("X-Metaweb-Request", "True");
+    request.setRawHeader("X-Requested-With", "True");
 
-    m_pNetworkAccessManager->get(request);
+    m_pNetworkAccessManager->post(request,content);
 }
 
 void freebase_data_manager::replyFinished(QNetworkReply *reply)
@@ -79,6 +171,11 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
     if (url.contains("userinfo")) {
         m_strUserEmail = result.toMap()["email"].toString();
         emit sigUserEmailReady();
+        return;
+    } else if (url.contains("login")) {
+        m_strReply = modifyReply(json);
+        m_jsonReply = result;
+        emit sigMqlReplyReady();
         return;
     } else if (url.contains("mqlread")) {
         m_strReply = modifyReply(json);
