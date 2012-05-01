@@ -119,7 +119,7 @@ void freebase_data_manager::runSearchQuery(const QString& query)
 void freebase_data_manager::runWriteQuery(const QString& query, const QString& access_token, const QString& key)
 {
     qDebug() << Q_FUNC_INFO << ", query=" << query;
-    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?access_token=%1").arg(access_token);
+    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?query=%1").arg(query);//?access_token=%1").arg(access_token);
 //    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?key=%1").arg(access_token);
 //    QByteArray content = "query="+query.toLatin1();
     QByteArray content = query.toLatin1();
@@ -131,12 +131,14 @@ void freebase_data_manager::runWriteQuery(const QString& query, const QString& a
 //    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
 //    request.setRawHeader("Content-Type", "application/atom+xml");
 //    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
-    request.setRawHeader("Content-Type", "application/json");
-    request.setRawHeader("Content-Length", QString::number(content.size()).toLatin1());
-    request.setRawHeader("X-Metaweb-Request", "True");
-    request.setRawHeader("X-Requested-With", "True");
 
-    m_pNetworkAccessManager->post(request,content);
+    request.setRawHeader("Content-Type", "application/json");
+//    request.setRawHeader("Content-Length", QString::number(content.size()).toLatin1());
+//    request.setRawHeader("X-Metaweb-Request", "True");
+//    request.setRawHeader("X-Requested-With", "True");
+    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
+
+    m_pNetworkAccessManager->get(request);//,content);
 }
 
 void freebase_data_manager::replyFinished(QNetworkReply *reply)
@@ -146,6 +148,12 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
 
     qDebug() << "url:\n" << url;
     qDebug() << "json:\n" << json;
+
+    if(reply->error())
+    {
+        qDebug() << "ERROR" << reply->error() << reply->errorString();
+        return;
+    }
 
     if (json.length() == 0) {
         return;
