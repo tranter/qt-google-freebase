@@ -12,9 +12,21 @@ Form::Form(QWidget *parent) :
     ui(new Ui::Form)
 {
     ui->setupUi(this);
+
     ui->tabQuery->setCurrentIndex(0);
+
+    int ind = indexTabQueryByName("Write Request");
+    if (ind >= 0) {
+        ui->tabQuery->removeTab(ind);
+    }
+
+    connect(ui->pushButtonTextGo,SIGNAL(clicked()),this,SLOT(onBtnTextGoClicked()));
+    connect(ui->pushButtonImageGo,SIGNAL(clicked()),this,SLOT(onBtnImageGoClicked()));
+    connect(ui->tabQuery,SIGNAL(currentChanged(int)),this,SLOT(onTabQueryTabChanged(int)));
+
     ui->tabReply->setCurrentIndex(1);
     ui->tabReply->setTabEnabled(0,false);
+    ui->tabReply->removeTab(0);
 
     QList<int> sizes;
     sizes << 200;
@@ -99,20 +111,57 @@ void Form::onMqlReplyReady()
 void Form::onBtnRunClicked()
 {
     ui->textMqlReply->clear();
-    if (ui->tabQuery->currentIndex() == 0) {
+    int index = ui->tabQuery->currentIndex();
+    if (ui->tabQuery->tabText(index) == "MQL Request") {
         m_pManager->runMqlQuery(ui->editMqlQuery->toPlainText());
-    } else if (ui->tabQuery->currentIndex() == 1) {
+    } else if (ui->tabQuery->tabText(index) == "Search Request") {
         QString query = QString("%1&%2").arg(ui->editSearchQuery->toPlainText(),ui->editSearchFilter->toPlainText());
         m_pManager->runSearchQuery(query);
-    } else if (ui->tabQuery->currentIndex() == 2) {
-//        m_pManager->runWriteQuery(ui->editWriteQuery->toPlainText(),m_pOAuth2->getSimpleAPIKey());
-//        m_pManager->runWriteQuery(ui->editWriteQuery->toPlainText(),m_pOAuth2->accessToken());
+    } else if (ui->tabQuery->tabText(index) == "Write Request") {
         m_pManager->runWriteQuery(ui->editWriteQuery->toPlainText(),m_pOAuth2->accessToken(),m_pOAuth2->getSimpleAPIKey());
     }
+}
+
+void Form::onBtnTextGoClicked()
+{
+    m_pManager->runTextQuery(ui->lineEditText->text());
+}
+
+void Form::onBtnImageGoClicked()
+{
+    m_pManager->runImageQuery(ui->lineEditImage->text());
 }
 
 void Form::onBtnClearClicked()
 {
     ui->textMqlReply->clear();
 //    m_pModel->clear();
+}
+
+void Form::listDomains()
+{
+    QString query = "[{\"id\": null,\"name\": null,\"type\": \"/type/domain\",\"!/freebase/domain_category/domains\": {\"id\": \"/category/commons\"}}]";
+    m_pManager->runMqlQuery(query);
+}
+
+void Form::onTabQueryTabChanged(int pos)
+{
+    if (pos == indexTabQueryByName("Misc Request")) {
+        ui->btnRun->setEnabled(false);
+    } else {
+        ui->btnRun->setEnabled(true);
+    }
+}
+
+int Form::indexTabQueryByName(const QString& name)
+{
+    int ret = -1;
+    int len = ui->tabQuery->count();
+    for (int i=0;i<len;i++) {
+        if (ui->tabQuery->tabText(i) == name) {
+            ret = i;
+            break;
+        }
+    }
+    return ret;
 }

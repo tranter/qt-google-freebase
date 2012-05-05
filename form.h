@@ -23,6 +23,7 @@ public:
     
     void startLogin(bool bForce); //Show login dialog even if there is gotten already access_token.
     void startFreebaseLogin();
+    void listDomains();
 
 private slots:
     void onLoginDone();
@@ -32,6 +33,10 @@ private slots:
 
     void onBtnRunClicked();
     void onBtnClearClicked();
+    void onBtnTextGoClicked();
+    void onBtnImageGoClicked();
+
+    void onTabQueryTabChanged(int pos);
 
 private:
     Ui::Form *ui;
@@ -43,6 +48,7 @@ private:
     QString m_strAppName;
 
     void saveSettings();
+    int indexTabQueryByName(const QString& name);
 };
 
 #endif // FORM_H

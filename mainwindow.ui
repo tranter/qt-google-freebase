@@ -32,7 +32,14 @@
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuMQL">
+    <property name="title">
+     <string>MQL</string>
+    </property>
+    <addaction name="actionListDomains"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuMQL"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -65,6 +72,11 @@
   <action name="actionFreebaseLogin">
    <property name="text">
     <string>Freebase Login</string>
+   </property>
+  </action>
+  <action name="actionListDomains">
+   <property name="text">
+    <string>List of Domains</string>
    </property>
   </action>
  </widget>

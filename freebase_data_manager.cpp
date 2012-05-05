@@ -36,25 +36,10 @@ void freebase_data_manager::loginFreebase()
     m_pNetworkAccessManager->post(request,QByteArray());
 }
 
-//void freebase_data_manager::loginFreebase()
-//{
-//    QString url = "http://api.sandbox-freebase.com/api/account/login";
-
-//    QByteArray content = QString("username=<login>&password=<pwd>").toLatin1();
-//    qDebug() << "content=" << content;
-
-//    QNetworkRequest request;
-//    request.setUrl(QUrl(url));
-//    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded'");
-//    request.setRawHeader("Content-Length", QString::number(content.size()).toLatin1());
-
-//    m_pNetworkAccessManager->post(request,content);
-//}
-
 void freebase_data_manager::runMqlQuery(const QString& query)
 {
     qDebug() << Q_FUNC_INFO << ", query=" << query;
-    QString url = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlread?query=%1").arg(query);
+    QString url = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlread?query=%1&cost=true").arg(query);
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(url)));
 }
 
@@ -116,29 +101,69 @@ void freebase_data_manager::runSearchQuery(const QString& query)
 //    m_pNetworkAccessManager->post(request,content);
 //}
 
+//void freebase_data_manager::runWriteQuery(const QString& query, const QString& access_token, const QString& key)
+//{
+//    qDebug() << Q_FUNC_INFO << ", query=" << query;
+//    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?query=%1").arg(query);//?access_token=%1").arg(access_token);
+////    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?key=%1").arg(access_token);
+////    QByteArray content = "query="+query.toLatin1();
+//    QByteArray content = query.toLatin1();
+//    qDebug() << "content=" << content;
+
+//    QNetworkRequest request;
+//    request.setUrl(QUrl(s));
+////    request.setRawHeader("GData-Version", "3.0");
+////    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
+////    request.setRawHeader("Content-Type", "application/atom+xml");
+////    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+
+//    request.setRawHeader("Content-Type", "application/json");
+////    request.setRawHeader("Content-Length", QString::number(content.size()).toLatin1());
+////    request.setRawHeader("X-Metaweb-Request", "True");
+////    request.setRawHeader("X-Requested-With", "True");
+//    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
+
+//    m_pNetworkAccessManager->get(request);//,content);
+//}
+
 void freebase_data_manager::runWriteQuery(const QString& query, const QString& access_token, const QString& key)
 {
     qDebug() << Q_FUNC_INFO << ", query=" << query;
-    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?query=%1").arg(query);//?access_token=%1").arg(access_token);
-//    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?key=%1").arg(access_token);
+//    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?query=%1").arg(query);//?access_token=%1").arg(access_token);
+    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?key=%1").arg(access_token);
 //    QByteArray content = "query="+query.toLatin1();
     QByteArray content = query.toLatin1();
     qDebug() << "content=" << content;
 
     QNetworkRequest request;
     request.setUrl(QUrl(s));
-//    request.setRawHeader("GData-Version", "3.0");
-//    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
-//    request.setRawHeader("Content-Type", "application/atom+xml");
-//    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
-
-    request.setRawHeader("Content-Type", "application/json");
-//    request.setRawHeader("Content-Length", QString::number(content.size()).toLatin1());
-//    request.setRawHeader("X-Metaweb-Request", "True");
-//    request.setRawHeader("X-Requested-With", "True");
+    request.setRawHeader("GData-Version", "3.0");
     request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
+//    request.setRawHeader("Content-Type", "application/atom+xml");
+    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    m_pNetworkAccessManager->get(request);//,content);
+//    request.setRawHeader("Content-Type", "application/json");
+    request.setRawHeader("Content-Length", QString::number(content.size()).toLatin1());
+    request.setRawHeader("X-Metaweb-Request", "True");
+    request.setRawHeader("X-Requested-With", "True");
+//    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
+
+//    m_pNetworkAccessManager->get(request);//,content);
+    m_pNetworkAccessManager->post(request,content);
+}
+
+void freebase_data_manager::runTextQuery(const QString& query)
+{
+    qDebug() << Q_FUNC_INFO << ", query=" << query;
+    QString url = QString("https://www.googleapis.com/freebase/v1-sandbox/text%1").arg(query);
+    m_pNetworkAccessManager->get(QNetworkRequest(QUrl(url)));
+}
+
+void freebase_data_manager::runImageQuery(const QString& query)
+{
+    qDebug() << Q_FUNC_INFO << ", query=" << query;
+    QString url = QString("https://usercontent.googleapis.com/freebase/v1-sandbox/text%1").arg(query);
+    m_pNetworkAccessManager->get(QNetworkRequest(QUrl(url)));
 }
 
 void freebase_data_manager::replyFinished(QNetworkReply *reply)
@@ -152,6 +177,7 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
     if(reply->error())
     {
         qDebug() << "ERROR" << reply->error() << reply->errorString();
+        emit sigErrorOccured(QString("reply->error(): %1").arg(json));
         return;
     }
 
@@ -176,7 +202,7 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
         return;
     }
 
-    if (url.contains("userinfo")) {
+    if (url.contains("https://www.googleapis.com/oauth2/v1/userinfo")) {
         m_strUserEmail = result.toMap()["email"].toString();
         emit sigUserEmailReady();
         return;
@@ -185,15 +211,25 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
         m_jsonReply = result;
         emit sigMqlReplyReady();
         return;
-    } else if (url.contains("mqlread")) {
+    } else if (url.contains("https://www.googleapis.com/freebase/v1-sandbox/mqlread")) {
         m_strReply = modifyReply(json);
         m_jsonReply = result;
         emit sigMqlReplyReady();
         return;
-    } else if (url.contains("search")) {
+    } else if (url.contains("https://www.googleapis.com/freebase/v1-sandbox/search")) {
         m_strReply = modifyReply(json);
         m_jsonReply = result;
         emit sigMqlReplyReady();
+        return;
+    } else if (url.contains("https://www.googleapis.com/freebase/v1-sandbox/text")) {
+        m_strReply = modifyReply(json);
+        m_jsonReply = result;
+        emit sigMqlReplyReady();
+        return;
+    } else if (url.contains("https://usercontent.googleapis.com/freebase/v1-sandbox/image")) {
+        //m_strReply = modifyReply(json);
+        //m_jsonReply = result;
+        //emit sigMqlReplyReady();
         return;
     }
 }
