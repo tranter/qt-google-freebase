@@ -12,6 +12,7 @@ namespace Ui {
 class QSettings;
 class OAuth2;
 class MainWindow;
+class QGraphicsScene;
 
 class Form : public QWidget
 {
@@ -30,6 +31,7 @@ private slots:
     void onErrorOccured(const QString& error);
     void onUserEmailReady();
     void onMqlReplyReady();
+    void onImageReady(const QPixmap& px);
 
     void onBtnRunClicked();
     void onBtnClearClicked();
@@ -46,9 +48,12 @@ private:
     QSettings* m_pSettings;
     QString m_strCompanyName;
     QString m_strAppName;
+    QGraphicsScene* m_pScene;
 
     void saveSettings();
     int indexTabQueryByName(const QString& name);
+    int indexTabReplyByName(const QString& name);
+    void clearReplyImage();
 };
 
 #endif // FORM_H

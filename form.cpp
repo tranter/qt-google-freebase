@@ -1,6 +1,9 @@
+#include <QDebug>
 #include <QSettings>
 #include <QMessageBox>
 #include <QStatusBar>
+#include <QGraphicsScene>
+#include <QGraphicsItem>
 
 #include "form.h"
 #include "ui_form.h"
@@ -51,12 +54,21 @@ Form::Form(QWidget *parent) :
     connect(m_pOAuth2, SIGNAL(sigErrorOccured(QString)),this,SLOT(onErrorOccured(QString)));
 
     m_pManager = new freebase_data_manager(this);
+    connect(m_pManager, SIGNAL(sigErrorOccured(QString)),this,SLOT(onErrorOccured(QString)));
     connect(m_pManager, SIGNAL(sigUserEmailReady()),this,SLOT(onUserEmailReady()));
     connect(m_pManager, SIGNAL(sigMqlReplyReady()),this,SLOT(onMqlReplyReady()));
-    connect(m_pManager, SIGNAL(sigErrorOccured(QString)),this,SLOT(onErrorOccured(QString)));
+    connect(m_pManager, SIGNAL(sigImageReady(QPixmap)),this,SLOT(onImageReady(QPixmap)));
 
     connect(ui->btnRun,SIGNAL(clicked()),this,SLOT(onBtnRunClicked()));
     connect(ui->btnClear,SIGNAL(clicked()),this,SLOT(onBtnClearClicked()));
+
+//    QImage img(":/images/login");
+//    QPixmap px = QPixmap::fromImage(img);
+////    QGraphicsPixmapItem *item = new QGraphicsPixmapItem(px);
+    m_pScene = new QGraphicsScene();
+////    scene->addItem(item);
+//    scene->addPixmap(px);
+    ui->graphicsViewImage->setScene(m_pScene);
 }
 
 Form::~Form()
@@ -108,9 +120,19 @@ void Form::onMqlReplyReady()
 //    m_pModel->newTreeData(m_pManager->getJsonData());
 }
 
+void Form::onImageReady(const QPixmap& px)
+{
+    qDebug() << Q_FUNC_INFO;
+//    m_pScene->addPixmap(px);
+    QGraphicsPixmapItem *item = new QGraphicsPixmapItem(px);
+    m_pScene->addItem(item);
+    ui->graphicsViewImage->fitInView(item,Qt::KeepAspectRatio);
+}
+
 void Form::onBtnRunClicked()
 {
     ui->textMqlReply->clear();
+    clearReplyImage();
     int index = ui->tabQuery->currentIndex();
     if (ui->tabQuery->tabText(index) == "MQL Request") {
         m_pManager->runMqlQuery(ui->editMqlQuery->toPlainText());
@@ -124,18 +146,24 @@ void Form::onBtnRunClicked()
 
 void Form::onBtnTextGoClicked()
 {
+    ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
+    ui->textMqlReply->clear();
     m_pManager->runTextQuery(ui->lineEditText->text());
 }
 
 void Form::onBtnImageGoClicked()
 {
-    m_pManager->runImageQuery(ui->lineEditImage->text());
+    ui->tabReply->setCurrentIndex(indexTabReplyByName("Image"));
+    clearReplyImage();
+    m_pManager->runImageQuery(ui->lineEditImage->text()
+                              ,ui->graphicsViewImage->size().height()
+                              ,ui->graphicsViewImage->size().width());
 }
 
 void Form::onBtnClearClicked()
 {
     ui->textMqlReply->clear();
-//    m_pModel->clear();
+    clearReplyImage();
 }
 
 void Form::listDomains()
@@ -164,4 +192,25 @@ int Form::indexTabQueryByName(const QString& name)
         }
     }
     return ret;
+}
+
+int Form::indexTabReplyByName(const QString& name)
+{
+    int ret = -1;
+    int len = ui->tabReply->count();
+    for (int i=0;i<len;i++) {
+        if (ui->tabReply->tabText(i) == name) {
+            ret = i;
+            break;
+        }
+    }
+    return ret;
+}
+
+void Form::clearReplyImage()
+{
+    QList<QGraphicsItem*> list = ui->graphicsViewImage->scene()->items();
+    foreach (QGraphicsItem* p, list) {
+        ui->graphicsViewImage->scene()->removeItem(p);
+    }
 }

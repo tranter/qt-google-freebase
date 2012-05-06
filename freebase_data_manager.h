@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QVariant>
+#include <QSslError>
+#include <QPixmap>
 
 class QNetworkAccessManager;
 class QNetworkReply;
@@ -24,16 +26,18 @@ public:
     void runSearchQuery(const QString& query);
     void runWriteQuery(const QString& query, const QString& access_token, const QString& key);
     void runTextQuery(const QString& query);
-    void runImageQuery(const QString& query);
+    void runImageQuery(const QString& query, int maxHeight=4096, int maxWidth=4096);
     QVariant& getJsonData() {return m_jsonReply;}
 
 signals:
     void sigErrorOccured(const QString& error);
     void sigUserEmailReady();
     void sigMqlReplyReady();
+    void sigImageReady(const QPixmap& px);
 
 private slots:
     void replyFinished(QNetworkReply*);
+    void onSslError(QNetworkReply* reply,QList<QSslError> listErr);
 
 private:
     QString modifyReply(const QString& reply);

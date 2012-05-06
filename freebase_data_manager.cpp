@@ -2,6 +2,7 @@
 #include <QJson/Parser>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
+#include <QPixmap>
 
 #include "freebase_data_manager.h"
 
@@ -9,6 +10,7 @@ freebase_data_manager::freebase_data_manager(QObject* parent) : QObject(parent)
 {
     m_pNetworkAccessManager = new QNetworkAccessManager(this);
     connect(m_pNetworkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
+    connect(m_pNetworkAccessManager,SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)),this,SLOT(onSslError(QNetworkReply*,QList<QSslError>)));
 }
 
 void freebase_data_manager::requestUserEmail(const QString& access_token)
@@ -159,25 +161,28 @@ void freebase_data_manager::runTextQuery(const QString& query)
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(url)));
 }
 
-void freebase_data_manager::runImageQuery(const QString& query)
+void freebase_data_manager::runImageQuery(const QString& query, int maxHeight, int maxWidth)
 {
-    qDebug() << Q_FUNC_INFO << ", query=" << query;
-    QString url = QString("https://usercontent.googleapis.com/freebase/v1-sandbox/text%1").arg(query);
+    qDebug() << Q_FUNC_INFO << ", query=" << query << ", maxHeight=" << maxHeight << ", maxWidth=" << maxWidth;
+    QString url = QString("https://usercontent.googleapis.com/freebase/v1-sandbox/image%1?maxheight=%2&maxwidth=%3&mode=fit")
+            .arg(query,QString::number(maxHeight),QString::number(maxWidth));
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(url)));
 }
 
 void freebase_data_manager::replyFinished(QNetworkReply *reply)
 {
-    QString json = reply->readAll();
+    QByteArray json = reply->readAll();
     QString url = reply->url().toString();
 
     qDebug() << "url:\n" << url;
     qDebug() << "json:\n" << json;
 
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    qDebug() << "statusCode=" << statusCode;
     if(reply->error())
     {
         qDebug() << "ERROR" << reply->error() << reply->errorString();
-        emit sigErrorOccured(QString("reply->error(): %1").arg(json));
+        emit sigErrorOccured(QString("reply->error()=%1,\nerrmessage=%2,\njson=%3").arg(reply->error()).arg(reply->errorString(),QString(json)));
         return;
     }
 
@@ -186,50 +191,84 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
     }
 
     QJson::Parser parser;
-
     bool ok;
-
     // json is a QString containing the data to convert
-    QVariant result = parser.parse (json.toLatin1(), &ok);
-
-    if (!ok) {
-        emit sigErrorOccured(QString("Cannot convert to QJson object: %1").arg(json));
-        return;
-    }
-
-    if (result.toMap().contains("error")) {
-        emit sigErrorOccured(result.toMap()["error"].toMap()["message"].toString());
-        return;
-    }
-
+    QVariant result;
     if (url.contains("https://www.googleapis.com/oauth2/v1/userinfo")) {
+        result = parser.parse(json,&ok);
+        if (!ok) {
+            emit sigErrorOccured(QString("Cannot convert to QJson object: %1").arg(QString(json)));
+            return;
+        }
+        if (result.toMap().contains("error")) {
+            emit sigErrorOccured(result.toMap()["error"].toMap()["message"].toString());
+            return;
+        }
         m_strUserEmail = result.toMap()["email"].toString();
         emit sigUserEmailReady();
         return;
     } else if (url.contains("login")) {
+        result = parser.parse(json,&ok);
+        if (!ok) {
+            emit sigErrorOccured(QString("Cannot convert to QJson object: %1").arg(QString(json)));
+            return;
+        }
+        if (result.toMap().contains("error")) {
+            emit sigErrorOccured(result.toMap()["error"].toMap()["message"].toString());
+            return;
+        }
         m_strReply = modifyReply(json);
         m_jsonReply = result;
         emit sigMqlReplyReady();
         return;
     } else if (url.contains("https://www.googleapis.com/freebase/v1-sandbox/mqlread")) {
+        result = parser.parse(json,&ok);
+        if (!ok) {
+            emit sigErrorOccured(QString("Cannot convert to QJson object: %1").arg(QString(json)));
+            return;
+        }
+        if (result.toMap().contains("error")) {
+            emit sigErrorOccured(result.toMap()["error"].toMap()["message"].toString());
+            return;
+        }
         m_strReply = modifyReply(json);
         m_jsonReply = result;
         emit sigMqlReplyReady();
         return;
     } else if (url.contains("https://www.googleapis.com/freebase/v1-sandbox/search")) {
+        result = parser.parse(json,&ok);
+        if (!ok) {
+            emit sigErrorOccured(QString("Cannot convert to QJson object: %1").arg(QString(json)));
+            return;
+        }
+        if (result.toMap().contains("error")) {
+            emit sigErrorOccured(result.toMap()["error"].toMap()["message"].toString());
+            return;
+        }
         m_strReply = modifyReply(json);
         m_jsonReply = result;
         emit sigMqlReplyReady();
         return;
     } else if (url.contains("https://www.googleapis.com/freebase/v1-sandbox/text")) {
+        result = parser.parse(json,&ok);
+        if (!ok) {
+            emit sigErrorOccured(QString("Cannot convert to QJson object: %1").arg(QString(json)));
+            return;
+        }
+        if (result.toMap().contains("error")) {
+            emit sigErrorOccured(result.toMap()["error"].toMap()["message"].toString());
+            return;
+        }
         m_strReply = modifyReply(json);
         m_jsonReply = result;
         emit sigMqlReplyReady();
         return;
     } else if (url.contains("https://usercontent.googleapis.com/freebase/v1-sandbox/image")) {
-        //m_strReply = modifyReply(json);
-        //m_jsonReply = result;
-        //emit sigMqlReplyReady();
+        m_strReply = "";
+        QByteArray arr(json);
+        QPixmap px;
+        px.loadFromData(arr);
+        emit sigImageReady(px);
         return;
     }
 }
@@ -264,4 +303,9 @@ QString freebase_data_manager::modifyReply(const QString& reply)
     }
 
     return ret;
+}
+
+void freebase_data_manager::onSslError(QNetworkReply* reply,QList<QSslError> listErr)
+{
+    reply->ignoreSslErrors();
 }
