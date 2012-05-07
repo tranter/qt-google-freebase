@@ -2,4 +2,8 @@
     <qresource prefix="/images">
         <file alias="login">images/login.png</file>
     </qresource>
+    <qresource prefix="/html">
+        <file alias="suggest-basic.html">suggest-basic.html</file>
+        <file alias="check.html">check.html</file>
+    </qresource>
 </RCC>

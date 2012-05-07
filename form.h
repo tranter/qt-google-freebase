@@ -1,7 +1,9 @@
 #ifndef FORM_H
 #define FORM_H
 
+#include <QDebug>
 #include <QWidget>
+#include <QWebPage>
 
 #include "freebase_data_manager.h"
 
@@ -14,6 +16,24 @@ class OAuth2;
 class MainWindow;
 class QGraphicsScene;
 
+class MyWebPage : public QWebPage
+{
+public:
+    MyWebPage() {;}
+
+    QString userAgentForUrl(const QUrl &url ) const
+    {
+        return "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0.2) Gecko/20100101 Firefox/6.0.2";
+    }
+//    void javaScriptAlert(QWebFrame* frame, const QString& msg) {
+//        qDebug() << Q_FUNC_INFO << " msg=" << msg;
+//    }
+    void javaScriptConsoleMessage(const QString& msg, int lineNumber, const QString& sourceID) {
+        qDebug() << Q_FUNC_INFO << " lineNumber=" << lineNumber << ", msg=" << msg << ", sourceID=" << sourceID;
+    }
+//    void javaScriptConsoleMessage(const QString& msg, int lineNumber, const QString& sourceID);
+};
+
 class Form : public QWidget
 {
     Q_OBJECT
@@ -24,7 +44,9 @@ public:
     
     void startLogin(bool bForce); //Show login dialog even if there is gotten already access_token.
     void startFreebaseLogin();
-    void listDomains();
+
+public slots:
+    void onSuggestData(const QString& name,const QString& id,const QString& mid);
 
 private slots:
     void onLoginDone();
@@ -37,8 +59,12 @@ private slots:
     void onBtnClearClicked();
     void onBtnTextGoClicked();
     void onBtnImageGoClicked();
+    void listDomains();
 
     void onTabQueryTabChanged(int pos);
+    void onSplitterMoved(int pos, int index);
+
+    void onNewPage();
 
 private:
     Ui::Form *ui;
@@ -50,10 +76,13 @@ private:
     QString m_strAppName;
     QGraphicsScene* m_pScene;
 
+    QList<int> m_listSplitterSave;
+
     void saveSettings();
     int indexTabQueryByName(const QString& name);
     int indexTabReplyByName(const QString& name);
     void clearReplyImage();
+    void initSuggestPage();
 };
 
 #endif // FORM_H

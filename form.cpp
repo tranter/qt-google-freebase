@@ -4,6 +4,7 @@
 #include <QStatusBar>
 #include <QGraphicsScene>
 #include <QGraphicsItem>
+#include <QWebFrame>
 
 #include "form.h"
 #include "ui_form.h"
@@ -31,17 +32,16 @@ Form::Form(QWidget *parent) :
     ui->tabReply->setTabEnabled(0,false);
     ui->tabReply->removeTab(0);
 
-    QList<int> sizes;
-    sizes << 200;
-    sizes << 350;
-    ui->splitter->setSizes(sizes);
+    m_listSplitterSave << 300;
+    m_listSplitterSave << 250;
+    ui->splitter->setSizes(m_listSplitterSave);
+    connect(ui->splitter,SIGNAL(splitterMoved(int,int)),this,SLOT(onSplitterMoved(int,int)));
 
     m_pMain = (MainWindow*)parent;
     m_pMain->showStatusText("Uknown user email");
     m_pOAuth2 = new OAuth2(this);
 
-//    m_strCompanyName = "YOU_COMPANY_NAME_HERE";
-    m_strCompanyName = "ICS";
+    m_strCompanyName = "YOU_COMPANY_NAME_HERE";
     m_strAppName = "QtFreebase";
 
     // Load settings
@@ -61,14 +61,12 @@ Form::Form(QWidget *parent) :
 
     connect(ui->btnRun,SIGNAL(clicked()),this,SLOT(onBtnRunClicked()));
     connect(ui->btnClear,SIGNAL(clicked()),this,SLOT(onBtnClearClicked()));
+    connect(ui->pushButtonDomainsList,SIGNAL(clicked()),this,SLOT(listDomains()));
 
-//    QImage img(":/images/login");
-//    QPixmap px = QPixmap::fromImage(img);
-////    QGraphicsPixmapItem *item = new QGraphicsPixmapItem(px);
     m_pScene = new QGraphicsScene();
-////    scene->addItem(item);
-//    scene->addPixmap(px);
     ui->graphicsViewImage->setScene(m_pScene);
+
+    initSuggestPage();
 }
 
 Form::~Form()
@@ -135,11 +133,14 @@ void Form::onBtnRunClicked()
     clearReplyImage();
     int index = ui->tabQuery->currentIndex();
     if (ui->tabQuery->tabText(index) == "MQL Request") {
+        ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
         m_pManager->runMqlQuery(ui->editMqlQuery->toPlainText());
     } else if (ui->tabQuery->tabText(index) == "Search Request") {
+        ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
         QString query = QString("%1&%2").arg(ui->editSearchQuery->toPlainText(),ui->editSearchFilter->toPlainText());
         m_pManager->runSearchQuery(query);
     } else if (ui->tabQuery->tabText(index) == "Write Request") {
+        ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
         m_pManager->runWriteQuery(ui->editWriteQuery->toPlainText(),m_pOAuth2->accessToken(),m_pOAuth2->getSimpleAPIKey());
     }
 }
@@ -168,6 +169,8 @@ void Form::onBtnClearClicked()
 
 void Form::listDomains()
 {
+    ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
+    ui->textMqlReply->clear();
     QString query = "[{\"id\": null,\"name\": null,\"type\": \"/type/domain\",\"!/freebase/domain_category/domains\": {\"id\": \"/category/commons\"}}]";
     m_pManager->runMqlQuery(query);
 }
@@ -175,8 +178,16 @@ void Form::listDomains()
 void Form::onTabQueryTabChanged(int pos)
 {
     if (pos == indexTabQueryByName("Misc Request")) {
+        ui->splitter->setSizes(m_listSplitterSave);
+        ui->btnRun->setEnabled(false);
+    } else if (pos == indexTabQueryByName("Suggest")) {
+//        QList<int> sizes;
+//        sizes << 500;
+//        sizes << 50;
+//        ui->splitter->setSizes(sizes);
         ui->btnRun->setEnabled(false);
     } else {
+        ui->splitter->setSizes(m_listSplitterSave);
         ui->btnRun->setEnabled(true);
     }
 }
@@ -213,4 +224,36 @@ void Form::clearReplyImage()
     foreach (QGraphicsItem* p, list) {
         ui->graphicsViewImage->scene()->removeItem(p);
     }
+}
+
+void Form::onSplitterMoved(int pos, int index)
+{
+    if (ui->tabQuery->currentIndex()!=indexTabQueryByName("Suggest")) {
+        m_listSplitterSave = ui->splitter->sizes();
+    }
+}
+
+void Form::initSuggestPage()
+{
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
+    MyWebPage* page = new MyWebPage();
+    ui->webViewSuggest->setPage((QWebPage*)page);
+    QWebFrame* frame = page->mainFrame();
+    connect(frame,SIGNAL(javaScriptWindowObjectCleared()),this,SLOT(onNewPage()));
+
+    ui->webViewSuggest->setUrl(QUrl("qrc:/html/suggest-basic.html"));
+}
+
+void Form::onNewPage()
+{
+    QWebFrame* frame = ui->webViewSuggest->page()->mainFrame();
+    frame->addToJavaScriptWindowObject("appForm",this);
+}
+
+void Form::onSuggestData(const QString& name,const QString& id,const QString& mid)
+{
+    qDebug() << Q_FUNC_INFO << "name=" << name << ", id=" << id << ", mid=" << mid;
+    ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
+    ui->textMqlReply->clear();
+    m_pManager->runSearchQuery(id);
 }

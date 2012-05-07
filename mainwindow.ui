@@ -14,6 +14,20 @@
    <string>QtFreebase</string>
   </property>
   <widget class="QWidget" name="centralWidget"/>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionLogin"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+  </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
@@ -32,28 +46,7 @@
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuMQL">
-    <property name="title">
-     <string>MQL</string>
-    </property>
-    <addaction name="actionListDomains"/>
-   </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuMQL"/>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionLogin"/>
-  </widget>
-  <widget class="QStatusBar" name="statusBar">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
   </widget>
   <action name="actionExit">
    <property name="text">
@@ -62,7 +55,7 @@
   </action>
   <action name="actionLogin">
    <property name="icon">
-    <iconset resource="resource.qrc">
+    <iconset>
      <normaloff>:/images/images/login.png</normaloff>:/images/images/login.png</iconset>
    </property>
    <property name="text">
@@ -70,19 +63,18 @@
    </property>
   </action>
   <action name="actionFreebaseLogin">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Freebase Login</string>
    </property>
-  </action>
-  <action name="actionListDomains">
-   <property name="text">
-    <string>List of Domains</string>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="resource.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

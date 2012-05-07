@@ -24,7 +24,6 @@ public:
 public slots:
     void startLogin();
     void startFreebaseLogin();
-    void onListDomains();
 
 private:
     Ui::MainWindow *ui;
