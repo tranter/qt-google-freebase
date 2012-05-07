@@ -335,7 +335,7 @@
        <item>
         <widget class="QTabWidget" name="tabReply">
          <property name="currentIndex">
-          <number>1</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="tabTree">
           <attribute name="title">
@@ -365,7 +365,7 @@
              <item>
               <widget class="QPlainTextEdit" name="textMqlReply">
                <property name="lineWrapMode">
-                <enum>QPlainTextEdit::NoWrap</enum>
+                <enum>QPlainTextEdit::WidgetWidth</enum>
                </property>
                <property name="readOnly">
                 <bool>true</bool>
