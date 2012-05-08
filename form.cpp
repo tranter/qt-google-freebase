@@ -257,6 +257,8 @@ void Form::onSuggestData(const QString& name,const QString& id,const QString& mi
     ui->textMqlReply->clear();
     m_pManager->runSearchQuery(id);
 
-//    clearReplyImage();
-    m_pManager->runImageQuery(id);
+    clearReplyImage();
+    m_pManager->runImageQuery(id
+        ,ui->graphicsViewImage->size().height()
+        ,ui->graphicsViewImage->size().width());
 }
