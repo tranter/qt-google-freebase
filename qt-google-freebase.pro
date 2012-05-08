@@ -6,7 +6,7 @@
 
 QT       += core gui webkit network
 
-TARGET = qt-google-freebase
+TARGET = qtfreebase
 TEMPLATE = app
 
 INCLUDEPATH += ../qjson/include
