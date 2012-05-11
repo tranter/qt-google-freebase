@@ -34,7 +34,7 @@
      <x>0</x>
      <y>0</y>
      <width>850</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -55,8 +55,8 @@
   </action>
   <action name="actionLogin">
    <property name="icon">
-    <iconset>
-     <normaloff>:/images/images/login.png</normaloff>:/images/images/login.png</iconset>
+    <iconset resource="resource.qrc">
+     <normaloff>:/images/login</normaloff>:/images/login</iconset>
    </property>
    <property name="text">
     <string>Login</string>
@@ -75,6 +75,8 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
  <connections/>
 </ui>
