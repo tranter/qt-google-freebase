@@ -335,7 +335,7 @@
        <item>
         <widget class="QTabWidget" name="tabReply">
          <property name="currentIndex">
-          <number>2</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="tabTree">
           <attribute name="title">
@@ -355,9 +355,9 @@
            </item>
           </layout>
          </widget>
-         <widget class="QWidget" name="tab_2">
+         <widget class="QWidget" name="tabJson">
           <attribute name="title">
-           <string>Text</string>
+           <string>Json</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <item>

@@ -10,6 +10,8 @@
 #include "ui_form.h"
 #include "oauth2.h"
 #include "mainwindow.h"
+#include "treejsonmodel.h"
+#include "treejsonitem.h"
 
 Form::Form(QWidget *parent) :
     QWidget(parent),
@@ -28,12 +30,8 @@ Form::Form(QWidget *parent) :
     connect(ui->pushButtonImageGo,SIGNAL(clicked()),this,SLOT(onBtnImageGoClicked()));
     connect(ui->tabQuery,SIGNAL(currentChanged(int)),this,SLOT(onTabQueryTabChanged(int)));
 
-    ui->tabReply->setCurrentIndex(1);
-    ui->tabReply->setTabEnabled(0,false);
-    ui->tabReply->removeTab(0);
-
-    m_listSplitterSave << 300;
     m_listSplitterSave << 250;
+    m_listSplitterSave << 300;
     ui->splitter->setSizes(m_listSplitterSave);
     connect(ui->splitter,SIGNAL(splitterMoved(int,int)),this,SLOT(onSplitterMoved(int,int)));
 
@@ -57,6 +55,7 @@ Form::Form(QWidget *parent) :
     connect(m_pManager, SIGNAL(sigErrorOccured(QString)),this,SLOT(onErrorOccured(QString)));
     connect(m_pManager, SIGNAL(sigUserEmailReady()),this,SLOT(onUserEmailReady()));
     connect(m_pManager, SIGNAL(sigMqlReplyReady()),this,SLOT(onMqlReplyReady()));
+    connect(m_pManager, SIGNAL(sigJsonReady()),this,SLOT(onJsonReady()));
     connect(m_pManager, SIGNAL(sigImageReady(QPixmap)),this,SLOT(onImageReady(QPixmap)));
 
     connect(ui->btnRun,SIGNAL(clicked()),this,SLOT(onBtnRunClicked()));
@@ -67,10 +66,16 @@ Form::Form(QWidget *parent) :
     ui->graphicsViewImage->setScene(m_pScene);
 
     initSuggestPage();
+
+    m_pModel = new TreeJsonModel(QVariant(),ui->treeMqlReply);
+    ui->treeMqlReply->setModel(m_pModel);
+    ui->treeMqlReply->setHeaderHidden(false);
+    connect(ui->treeMqlReply,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(onTreeGoToItem(QModelIndex)));
 }
 
 Form::~Form()
 {
+    delete m_pModel;
     delete ui;
 }
 
@@ -115,7 +120,11 @@ void Form::onUserEmailReady()
 void Form::onMqlReplyReady()
 {
     ui->textMqlReply->setPlainText(m_pManager->getReplyStr());
-//    m_pModel->newTreeData(m_pManager->getJsonData());
+}
+
+void Form::onJsonReady()
+{
+    m_pModel->setNewModelData(m_pManager->getJsonData());
 }
 
 void Form::onImageReady(const QPixmap& px)
@@ -232,7 +241,11 @@ void Form::onSplitterMoved(int pos, int index)
         m_listSplitterSave = ui->splitter->sizes();
     }
 }
-
+/** \brief Load MyWebPage as a current page
+ *
+ *  Main purpose: init Form object in a page's javascript context
+ *  Two stage process. First connect signal about new url changed with handler slot.
+ */
 void Form::initSuggestPage()
 {
     QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
@@ -243,7 +256,9 @@ void Form::initSuggestPage()
 
     ui->webViewSuggest->setUrl(QUrl("qrc:/html/suggest-basic.html"));
 }
-
+/** \brief On each new url add Form object to javascript context.
+ *
+ */
 void Form::onNewPage()
 {
     QWebFrame* frame = ui->webViewSuggest->page()->mainFrame();
@@ -261,4 +276,23 @@ void Form::onSuggestData(const QString& name,const QString& id,const QString& mi
     m_pManager->runImageQuery(id
         ,ui->graphicsViewImage->size().height()
         ,ui->graphicsViewImage->size().width());
+}
+
+void Form::onTreeGoToItem(const QModelIndex& index)
+{
+    if (!index.isValid()) {
+        return;
+    }
+    TreeJsonItem* pNode = static_cast<TreeJsonItem*>(index.internalPointer());
+    QString key = pNode->data(0).toString();
+    if (key == "mid") {
+        QString value = pNode->data(1).toString();
+        ui->textMqlReply->clear();
+        m_pManager->runSearchQuery(value);
+
+        clearReplyImage();
+        m_pManager->runImageQuery(value
+            ,ui->graphicsViewImage->size().height()
+            ,ui->graphicsViewImage->size().width());
+    }
 }

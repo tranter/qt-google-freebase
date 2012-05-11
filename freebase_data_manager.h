@@ -34,6 +34,7 @@ signals:
     void sigUserEmailReady();
     void sigMqlReplyReady();
     void sigImageReady(const QPixmap& px);
+    void sigJsonReady();
 
 private slots:
     void replyFinished(QNetworkReply*);

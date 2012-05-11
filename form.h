@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QWidget>
 #include <QWebPage>
+#include <QModelIndex>
 
 #include "freebase_data_manager.h"
 
@@ -15,6 +16,7 @@ class QSettings;
 class OAuth2;
 class MainWindow;
 class QGraphicsScene;
+class TreeJsonModel;
 
 class MyWebPage : public QWebPage
 {
@@ -53,6 +55,7 @@ private slots:
     void onErrorOccured(const QString& error);
     void onUserEmailReady();
     void onMqlReplyReady();
+    void onJsonReady();
     void onImageReady(const QPixmap& px);
 
     void onBtnRunClicked();
@@ -65,12 +68,14 @@ private slots:
     void onSplitterMoved(int pos, int index);
 
     void onNewPage();
+    void onTreeGoToItem(const QModelIndex& index);
 
 private:
     Ui::Form *ui;
     MainWindow* m_pMain;
     OAuth2* m_pOAuth2;
     freebase_data_manager* m_pManager;
+    TreeJsonModel* m_pModel;
     QSettings* m_pSettings;
     QString m_strCompanyName;
     QString m_strAppName;
