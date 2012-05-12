@@ -53,29 +53,28 @@ bool OAuth2::isAuthorized()
 
 void OAuth2::startLogin(bool bForce)
 {
-    if(m_strClientID == "YOUR_CLIENT_ID_HERE" || m_strRedirectURI == "YOUR_REDIRECT_URI_HERE" ||
-        m_strClientSecret == "YOUR_CLIENT_SECRET_HERE")
-    {
-        QMessageBox::warning(m_pParent, "Warning",
-                             "To work with application you need to register your own application in <b>Google</b>.\n"
-                             "Learn more from <a href='http://code.google.com/p/qt-google-freebase/wiki/HowToRegisterYourApplicationInGoogle'>here</a>");
-        return;
-    }
+//    if(m_strClientID == "YOUR_CLIENT_ID_HERE" || m_strRedirectURI == "YOUR_REDIRECT_URI_HERE" ||
+//        m_strClientSecret == "YOUR_CLIENT_SECRET_HERE")
+//    {
+//        QMessageBox::warning(m_pParent, "Warning",
+//                             "To work with application you need to register your own application in <b>Google</b>.\n"
+//                             "Learn more from <a href='http://code.google.com/p/qt-google-freebase/wiki/HowToRegisterYourApplicationInGoogle'>here</a>");
+//        return;
+//    }
 
-    if(m_strRefreshToken.isEmpty() || bForce)
-    {
-        if (m_pLoginDialog != NULL) {
-            delete m_pLoginDialog;
+    if (bForce) {
+        if(m_strRefreshToken.isEmpty() || bForce) {
+            if (m_pLoginDialog != NULL) {
+                delete m_pLoginDialog;
+            }
+            m_pLoginDialog = new LoginDialog(m_pParent);
+            connect(m_pLoginDialog, SIGNAL(accessTokenObtained()), this, SLOT(accessTokenObtained()));
+            connect(m_pLoginDialog, SIGNAL(codeObtained()), this, SLOT(codeObtained()));
+            m_pLoginDialog->setLoginUrl(permanentLoginUrl());
+            m_pLoginDialog->show();
+        } else {
+            getAccessTokenFromRefreshToken();
         }
-        m_pLoginDialog = new LoginDialog(m_pParent);
-        connect(m_pLoginDialog, SIGNAL(accessTokenObtained()), this, SLOT(accessTokenObtained()));
-        connect(m_pLoginDialog, SIGNAL(codeObtained()), this, SLOT(codeObtained()));
-        m_pLoginDialog->setLoginUrl(permanentLoginUrl());
-        m_pLoginDialog->show();
-    }
-    else
-    {
-        getAccessTokenFromRefreshToken();
     }
 }
 /*! \brief This slot called only form Google Login dialog in case of response_type=token
