@@ -1,4 +1,3 @@
-#include <QDebug>
 #include <QSettings>
 #include <QMessageBox>
 #include <QStatusBar>
@@ -67,10 +66,17 @@ Form::Form(QWidget *parent) :
 
     initSuggestPage();
 
+    ui->tabReply->setCurrentIndex(indexTabReplyByName("Json"));
+
     m_pModel = new TreeJsonModel(QVariant(),ui->treeMqlReply);
     ui->treeMqlReply->setModel(m_pModel);
     ui->treeMqlReply->setHeaderHidden(false);
     connect(ui->treeMqlReply,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(onTreeGoToItem(QModelIndex)));
+
+    ui->textBrowserText->setTabStopWidth(20);
+    ui->textBrowserText->setReadOnly(true);
+    ui->textBrowserText->setOpenLinks(false);
+    connect(ui->textBrowserText,SIGNAL(anchorClicked(QUrl)),this,SLOT(onTextBrowserAnchorClicked(QUrl)));
 }
 
 Form::~Form()
@@ -120,6 +126,7 @@ void Form::onUserEmailReady()
 void Form::onMqlReplyReady()
 {
     ui->textMqlReply->setPlainText(m_pManager->getReplyStr());
+    ui->textBrowserText->setHtml(m_pManager->getRichTextReplyStr());
 }
 
 void Form::onJsonReady()
@@ -129,8 +136,6 @@ void Form::onJsonReady()
 
 void Form::onImageReady(const QPixmap& px)
 {
-    qDebug() << Q_FUNC_INFO;
-//    m_pScene->addPixmap(px);
     QGraphicsPixmapItem *item = new QGraphicsPixmapItem(px);
     m_pScene->addItem(item);
     ui->graphicsViewImage->fitInView(item,Qt::KeepAspectRatio);
@@ -142,14 +147,14 @@ void Form::onBtnRunClicked()
     clearReplyImage();
     int index = ui->tabQuery->currentIndex();
     if (ui->tabQuery->tabText(index) == "MQL Request") {
-        ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
+        ui->tabReply->setCurrentIndex(indexTabReplyByName("Json"));
         m_pManager->runMqlQuery(ui->editMqlQuery->toPlainText());
     } else if (ui->tabQuery->tabText(index) == "Search Request") {
         ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
         QString query = QString("%1&%2").arg(ui->editSearchQuery->toPlainText(),ui->editSearchFilter->toPlainText());
         m_pManager->runSearchQuery(query);
     } else if (ui->tabQuery->tabText(index) == "Write Request") {
-        ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
+        ui->tabReply->setCurrentIndex(indexTabReplyByName("Json"));
         m_pManager->runWriteQuery(ui->editWriteQuery->toPlainText(),m_pOAuth2->accessToken(),m_pOAuth2->getSimpleAPIKey());
     }
 }
@@ -173,7 +178,9 @@ void Form::onBtnImageGoClicked()
 void Form::onBtnClearClicked()
 {
     ui->textMqlReply->clear();
+    ui->textBrowserText->clear();
     clearReplyImage();
+    clearTreeJson();
 }
 
 void Form::listDomains()
@@ -190,10 +197,6 @@ void Form::onTabQueryTabChanged(int pos)
         ui->splitter->setSizes(m_listSplitterSave);
         ui->btnRun->setEnabled(false);
     } else if (pos == indexTabQueryByName("Suggest")) {
-//        QList<int> sizes;
-//        sizes << 500;
-//        sizes << 50;
-//        ui->splitter->setSizes(sizes);
         ui->btnRun->setEnabled(false);
     } else {
         ui->splitter->setSizes(m_listSplitterSave);
@@ -235,6 +238,11 @@ void Form::clearReplyImage()
     }
 }
 
+void Form::clearTreeJson()
+{
+    m_pModel->clear();
+}
+
 void Form::onSplitterMoved(int pos, int index)
 {
     if (ui->tabQuery->currentIndex()!=indexTabQueryByName("Suggest")) {
@@ -267,7 +275,6 @@ void Form::onNewPage()
 
 void Form::onSuggestData(const QString& name,const QString& id,const QString& mid)
 {
-    qDebug() << Q_FUNC_INFO << "name=" << name << ", id=" << id << ", mid=" << mid;
     ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
     ui->textMqlReply->clear();
     m_pManager->runSearchQuery(id);
@@ -295,4 +302,16 @@ void Form::onTreeGoToItem(const QModelIndex& index)
             ,ui->graphicsViewImage->size().height()
             ,ui->graphicsViewImage->size().width());
     }
+}
+
+void Form::onTextBrowserAnchorClicked(const QUrl& url)
+{
+    QString value = url.toString();
+    ui->textMqlReply->clear();
+    m_pManager->runSearchQuery(value);
+
+    clearReplyImage();
+    m_pManager->runImageQuery(value
+        ,ui->graphicsViewImage->size().height()
+        ,ui->graphicsViewImage->size().width());
 }

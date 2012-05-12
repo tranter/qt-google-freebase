@@ -69,6 +69,7 @@ private slots:
 
     void onNewPage();
     void onTreeGoToItem(const QModelIndex& index);
+    void onTextBrowserAnchorClicked(const QUrl& url);
 
 private:
     Ui::Form *ui;
@@ -87,6 +88,7 @@ private:
     int indexTabQueryByName(const QString& name);
     int indexTabReplyByName(const QString& name);
     void clearReplyImage();
+    void clearTreeJson();
     void initSuggestPage();
 };
 

@@ -25,6 +25,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     void setNewModelData(const QVariant& newdata, const QModelIndex& index = QModelIndex());
+    void clear();
 
 private:
     void setupModelData(const QVariant& newdata, TreeJsonItem* parent);

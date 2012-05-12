@@ -19,6 +19,7 @@ public:
     void requestUserEmail(const QString& access_token);
     QString getUserEmail() {return m_strUserEmail;}
     QString getReplyStr() {return m_strReply;}
+    QString getRichTextReplyStr() {return m_strRichTextReply;}
 
     void loginFreebase();
 
@@ -42,10 +43,13 @@ private slots:
 
 private:
     QString modifyReply(const QString& reply);
+    QString modifyTextReply();
+    QString modifySearchReply();
 
 private:
     QString m_strUserEmail;
     QString m_strReply;
+    QString m_strRichTextReply;
     QVariant m_jsonReply;
     QNetworkAccessManager* m_pNetworkAccessManager;
 };

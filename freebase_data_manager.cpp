@@ -1,4 +1,3 @@
-#include <QDebug>
 #include <QJson/Parser>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
@@ -27,144 +26,49 @@ void freebase_data_manager::loginFreebase()
 
     QNetworkRequest request;
     request.setUrl(QUrl(url));
-//    request.setRawHeader("GData-Version", "3.0");
-//    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
-//    request.setRawHeader("Content-Type", "application/atom+xml");
     request.setRawHeader("Content-Type", "application/x-www-form-urlencoded'");
-//    request.setRawHeader("X-Metaweb-Request", "True");
-//    request.setRawHeader("Content-Length", QString::number(content.size()).toLatin1());
 
-//    m_pNetworkAccessManager->post(request,content);
     m_pNetworkAccessManager->post(request,QByteArray());
 }
 
 void freebase_data_manager::runMqlQuery(const QString& query)
 {
-    qDebug() << Q_FUNC_INFO << ", query=" << query;
-//    QString url = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlread?query=%1&cost=true").arg(query);
     QString url = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlread?query=%1").arg(query);
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(url)));
 }
 
 void freebase_data_manager::runSearchQuery(const QString& query)
 {
-    qDebug() << Q_FUNC_INFO << ", query=" << query;
     QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/search?query=%1&indent=true").arg(query);
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(s)));
 }
 
-//void freebase_data_manager::runWriteQuery(const QString& query, const QString& access_token)
-//{
-//    qDebug() << Q_FUNC_INFO << ", query=" << query;
-////    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?query=%1&indent=true&access_token=%2").arg(query,access_token);
-//    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?query=%1&indent=true").arg(query);
-
-//    QNetworkRequest request;
-//    request.setUrl(QUrl(s));
-//    request.setRawHeader("GData-Version", "3.0");
-//    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
-
-//    m_pNetworkAccessManager->post(request,QByteArray());
-//}
-
-//void freebase_data_manager::runWriteQuery(const QString& query, const QString& access_token)
-//{
-//    qDebug() << Q_FUNC_INFO << ", query=" << query;
-//    QString s = "https://www.googleapis.com/freebase/v1-sandbox/mqlwrite";
-////    QString s = "https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?key=%1".arg(access_token);
-//    QByteArray content = "query="+query.toLatin1();
-//    qDebug() << "content=" << content;
-
-//    QNetworkRequest request;
-//    request.setUrl(QUrl(s));
-//    request.setRawHeader("GData-Version", "3.0");
-//    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
-//    request.setRawHeader("Content-Type", "application/atom+xml");
-//    request.setRawHeader("Content-Length", QString::number(content.size()).toLatin1());
-
-//    m_pNetworkAccessManager->post(request,content);
-//}
-
-//void freebase_data_manager::runWriteQuery(const QString& query, const QString& key)
-//{
-//    qDebug() << Q_FUNC_INFO << ", query=" << query;
-//    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?key=%1").arg(key);
-//    QByteArray content = "query="+query.toLatin1();
-//    qDebug() << "content=" << content;
-
-//    QNetworkRequest request;
-//    request.setUrl(QUrl(s));
-////    request.setRawHeader("GData-Version", "3.0");
-////    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
-////    request.setRawHeader("Content-Type", "application/atom+xml");
-//    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded'");
-//    request.setRawHeader("X-Metaweb-Request", "True");
-//    request.setRawHeader("Content-Length", QString::number(content.size()).toLatin1());
-
-//    m_pNetworkAccessManager->post(request,content);
-//}
-
-//void freebase_data_manager::runWriteQuery(const QString& query, const QString& access_token, const QString& key)
-//{
-//    qDebug() << Q_FUNC_INFO << ", query=" << query;
-//    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?query=%1").arg(query);//?access_token=%1").arg(access_token);
-////    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?key=%1").arg(access_token);
-////    QByteArray content = "query="+query.toLatin1();
-//    QByteArray content = query.toLatin1();
-//    qDebug() << "content=" << content;
-
-//    QNetworkRequest request;
-//    request.setUrl(QUrl(s));
-////    request.setRawHeader("GData-Version", "3.0");
-////    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
-////    request.setRawHeader("Content-Type", "application/atom+xml");
-////    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
-
-//    request.setRawHeader("Content-Type", "application/json");
-////    request.setRawHeader("Content-Length", QString::number(content.size()).toLatin1());
-////    request.setRawHeader("X-Metaweb-Request", "True");
-////    request.setRawHeader("X-Requested-With", "True");
-//    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
-
-//    m_pNetworkAccessManager->get(request);//,content);
-//}
-
 void freebase_data_manager::runWriteQuery(const QString& query, const QString& access_token, const QString& key)
 {
-    qDebug() << Q_FUNC_INFO << ", query=" << query;
-//    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?query=%1").arg(query);//?access_token=%1").arg(access_token);
     QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?key=%1").arg(access_token);
-//    QByteArray content = "query="+query.toLatin1();
     QByteArray content = query.toLatin1();
-    qDebug() << "content=" << content;
 
     QNetworkRequest request;
     request.setUrl(QUrl(s));
     request.setRawHeader("GData-Version", "3.0");
     request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
-//    request.setRawHeader("Content-Type", "application/atom+xml");
     request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
 
-//    request.setRawHeader("Content-Type", "application/json");
     request.setRawHeader("Content-Length", QString::number(content.size()).toLatin1());
     request.setRawHeader("X-Metaweb-Request", "True");
     request.setRawHeader("X-Requested-With", "True");
-//    request.setRawHeader("Authorization", (QString("OAuth %1").arg(access_token)).toLatin1());
 
-//    m_pNetworkAccessManager->get(request);//,content);
     m_pNetworkAccessManager->post(request,content);
 }
 
 void freebase_data_manager::runTextQuery(const QString& query)
 {
-    qDebug() << Q_FUNC_INFO << ", query=" << query;
     QString url = QString("https://www.googleapis.com/freebase/v1-sandbox/text%1").arg(query);
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(url)));
 }
 
 void freebase_data_manager::runImageQuery(const QString& query, int maxHeight, int maxWidth)
 {
-    qDebug() << Q_FUNC_INFO << ", query=" << query << ", maxHeight=" << maxHeight << ", maxWidth=" << maxWidth;
     QString url = QString("https://usercontent.googleapis.com/freebase/v1-sandbox/image%1?maxheight=%2&maxwidth=%3&mode=fit")
             .arg(query,QString::number(maxHeight),QString::number(maxWidth));
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(url)));
@@ -175,14 +79,8 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
     QByteArray json = reply->readAll();
     QString url = reply->url().toString();
 
-    qDebug() << "url:\n" << url;
-    qDebug() << "json:\n" << json;
-
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    qDebug() << "statusCode=" << statusCode;
-    if(reply->error())
-    {
-        qDebug() << "ERROR" << reply->error() << reply->errorString();
+    if(reply->error()) {
         emit sigErrorOccured(QString("reply->error()=%1,\nerrmessage=%2,\njson=%3").arg(reply->error()).arg(reply->errorString(),QString(json)));
         return;
     }
@@ -218,8 +116,8 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
             emit sigErrorOccured(result.toMap()["error"].toMap()["message"].toString());
             return;
         }
-        m_strReply = modifyReply(json);
         m_jsonReply = result;
+        m_strReply = modifyReply(json);
         emit sigMqlReplyReady();
         return;
     } else if (url.contains("https://www.googleapis.com/freebase/v1-sandbox/mqlread")) {
@@ -232,8 +130,9 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
             emit sigErrorOccured(result.toMap()["error"].toMap()["message"].toString());
             return;
         }
-        m_strReply = modifyReply(json);
         m_jsonReply = result;
+        m_strReply = modifyReply(json);
+        m_strRichTextReply = modifyTextReply();
         emit sigMqlReplyReady();
         emit sigJsonReady();
         return;
@@ -247,8 +146,9 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
             emit sigErrorOccured(result.toMap()["error"].toMap()["message"].toString());
             return;
         }
-        m_strReply = modifyReply(json);
         m_jsonReply = result;
+        m_strReply = modifyReply(json);
+        m_strRichTextReply = modifySearchReply();
         emit sigMqlReplyReady();
         emit sigJsonReady();
         return;
@@ -262,8 +162,9 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
             emit sigErrorOccured(result.toMap()["error"].toMap()["message"].toString());
             return;
         }
-        m_strReply = modifyReply(json);
         m_jsonReply = result;
+        m_strReply = modifyReply(json);
+        m_strRichTextReply = modifyTextReply();
         emit sigMqlReplyReady();
         emit sigJsonReady();
         return;
@@ -283,8 +184,6 @@ QString freebase_data_manager::modifyReply(const QString& reply)
     QString copy = reply;
     int level = 0;
     bool bAdd = false;
-
-    //copy.replace("\t","");
 
     foreach (QChar ch,copy) {
         if (ch == '{' || ch == '[') {
@@ -306,6 +205,49 @@ QString freebase_data_manager::modifyReply(const QString& reply)
         }
     }
 
+    return ret;
+}
+
+QString freebase_data_manager::modifyTextReply()
+{
+    QString ret = "<b><p align='justify'>";
+    QString str = m_jsonReply.toMap()["result"].toString();
+    foreach (QChar ch, str) {
+        if (ch == '\n') {
+            ret += "</p><p align='justify'>";
+        } else {
+            ret += ch;
+        }
+    }
+
+    ret += "</p></b>";
+    return ret;
+}
+
+QString freebase_data_manager::modifySearchReply()
+{
+    QString ret = "<b><p align='justify'>";
+    QVariantList list = m_jsonReply.toMap()["result"].toList();
+    foreach (QVariant item, list) {
+        QVariantMap map = item.toMap();
+        if (map.contains("name")) {
+            ret += map.value("name").toString();
+        }
+        if (map.contains("notable")) {
+            ret += " (" + map.value("notable").toMap().value("name").toString()+")";
+        }
+        if (map.contains("lang")) {
+            ret += ", " + map.value("lang").toString();
+        }
+        if (map.contains("mid")) {
+            ret += ", <a href='" + map.value("mid").toString() + "'>" + map.value("mid").toString() + "</a>";
+        }
+//        if (map.contains("score")) {
+//            ret += ", " + map.value("score").toString();
+//        }
+        ret += "</p><p align='justify'>";
+    }
+    ret += "</p></b>";
     return ret;
 }
 

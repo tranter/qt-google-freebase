@@ -176,3 +176,10 @@ void TreeJsonModel::setupModelData(const QVariant& newdata, TreeJsonItem* parent
         }
     }
 }
+
+void TreeJsonModel::clear()
+{
+    beginResetModel();
+    m_rootItem->clearChildren();
+    endResetModel();
+}
