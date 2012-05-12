@@ -1,3 +1,4 @@
+#include <QDebug>
 #include <QSettings>
 #include <QMessageBox>
 #include <QStatusBar>
@@ -76,6 +77,7 @@ Form::Form(QWidget *parent) :
     ui->textBrowserText->setTabStopWidth(20);
     ui->textBrowserText->setReadOnly(true);
     ui->textBrowserText->setOpenLinks(false);
+    ui->textBrowserText->setUndoRedoEnabled(true);
     connect(ui->textBrowserText,SIGNAL(anchorClicked(QUrl)),this,SLOT(onTextBrowserAnchorClicked(QUrl)));
 }
 
@@ -307,11 +309,13 @@ void Form::onTreeGoToItem(const QModelIndex& index)
 void Form::onTextBrowserAnchorClicked(const QUrl& url)
 {
     QString value = url.toString();
+
     ui->textMqlReply->clear();
     m_pManager->runSearchQuery(value);
-
-    clearReplyImage();
-    m_pManager->runImageQuery(value
-        ,ui->graphicsViewImage->size().height()
-        ,ui->graphicsViewImage->size().width());
+    if (value.startsWith('/')) {
+        clearReplyImage();
+        m_pManager->runImageQuery(value
+            ,ui->graphicsViewImage->size().height()
+            ,ui->graphicsViewImage->size().width());
+    }
 }

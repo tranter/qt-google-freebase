@@ -33,7 +33,6 @@ public:
     void javaScriptConsoleMessage(const QString& msg, int lineNumber, const QString& sourceID) {
         qDebug() << Q_FUNC_INFO << " lineNumber=" << lineNumber << ", msg=" << msg << ", sourceID=" << sourceID;
     }
-//    void javaScriptConsoleMessage(const QString& msg, int lineNumber, const QString& sourceID);
 };
 
 class Form : public QWidget

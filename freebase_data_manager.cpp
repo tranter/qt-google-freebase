@@ -231,7 +231,7 @@ QString freebase_data_manager::modifySearchReply()
     foreach (QVariant item, list) {
         QVariantMap map = item.toMap();
         if (map.contains("name")) {
-            ret += map.value("name").toString();
+            ret += "<a href='" + map.value("name").toString() + "'>" + map.value("name").toString() + "</a>";
         }
         if (map.contains("notable")) {
             ret += " (" + map.value("notable").toMap().value("name").toString()+")";
@@ -242,9 +242,9 @@ QString freebase_data_manager::modifySearchReply()
         if (map.contains("mid")) {
             ret += ", <a href='" + map.value("mid").toString() + "'>" + map.value("mid").toString() + "</a>";
         }
-//        if (map.contains("score")) {
-//            ret += ", " + map.value("score").toString();
-//        }
+        if (map.contains("score")) {
+            ret += ", score=" + map.value("score").toString();
+        }
         ret += "</p><p align='justify'>";
     }
     ret += "</p></b>";
