@@ -45,6 +45,7 @@ private:
     QString modifyReply(const QString& reply);
     QString modifyTextReply();
     QString modifySearchReply();
+    QString normalyzeString(const QString& str);
 
 private:
     QString m_strUserEmail;

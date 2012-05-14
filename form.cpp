@@ -293,9 +293,29 @@ void Form::onTreeGoToItem(const QModelIndex& index)
         return;
     }
     TreeJsonItem* pNode = static_cast<TreeJsonItem*>(index.internalPointer());
+    TreeJsonItem* pParentNode = index.parent().isValid() ? static_cast<TreeJsonItem*>(index.parent().internalPointer()) : NULL;
     QString key = pNode->data(0).toString();
-    if (key == "mid") {
-        QString value = pNode->data(1).toString();
+    QString keyParent = pParentNode ? pParentNode->data(0).toString() : "";
+    QString value = pNode->data(1).toString();
+    if (value.startsWith("/m/")) {
+        ui->textMqlReply->clear();
+        m_pManager->runSearchQuery(value);
+
+        clearReplyImage();
+        m_pManager->runImageQuery(value
+            ,ui->graphicsViewImage->size().height()
+            ,ui->graphicsViewImage->size().width());
+    } else if (key == "guid" || keyParent == "guid") {
+        QString str = "/guid/";
+        str += value;
+        ui->textMqlReply->clear();
+        m_pManager->runSearchQuery(str);
+
+        clearReplyImage();
+        m_pManager->runImageQuery(str
+            ,ui->graphicsViewImage->size().height()
+            ,ui->graphicsViewImage->size().width());
+    } else if (key == "id" || keyParent == "id") {
         ui->textMqlReply->clear();
         m_pManager->runSearchQuery(value);
 
@@ -309,6 +329,7 @@ void Form::onTreeGoToItem(const QModelIndex& index)
 void Form::onTextBrowserAnchorClicked(const QUrl& url)
 {
     QString value = url.toString();
+    qDebug() << Q_FUNC_INFO << " url=" << url;
 
     ui->textMqlReply->clear();
     m_pManager->runSearchQuery(value);

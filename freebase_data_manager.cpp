@@ -1,3 +1,4 @@
+#include <QDebug>
 #include <QJson/Parser>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
@@ -33,13 +34,15 @@ void freebase_data_manager::loginFreebase()
 
 void freebase_data_manager::runMqlQuery(const QString& query)
 {
-    QString url = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlread?query=%1").arg(query);
+    QString url = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlread?query=%1")
+            .arg(normalyzeString(query));
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(url)));
 }
 
 void freebase_data_manager::runSearchQuery(const QString& query)
 {
-    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/search?query=%1&indent=true").arg(query);
+    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/search?query=%1&indent=true")
+            .arg(query);
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(s)));
 }
 
@@ -78,6 +81,8 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
 {
     QByteArray json = reply->readAll();
     QString url = reply->url().toString();
+
+    qDebug() << "URL=" << url;
 
     int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if(reply->error()) {
@@ -254,4 +259,16 @@ QString freebase_data_manager::modifySearchReply()
 void freebase_data_manager::onSslError(QNetworkReply* reply,QList<QSslError> listErr)
 {
     reply->ignoreSslErrors();
+}
+
+QString freebase_data_manager::normalyzeString(const QString& str)
+{
+    QString ret;
+    foreach (QChar ch, str) {
+        if (ch != ' ' && ch != '\t' && ch != '\r' && ch != '\n') {
+            ret += ch;
+        }
+    }
+
+    return ret;
 }
