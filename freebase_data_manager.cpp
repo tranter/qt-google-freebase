@@ -264,18 +264,34 @@ void freebase_data_manager::onSslError(QNetworkReply* reply,QList<QSslError> lis
 QString freebase_data_manager::normalyzeString(const QString& str)
 {
     QString ret;
+    QStringList lines = str.split(QRegExp("[\\r\\n]+"));
     bool inComment = false;
-    foreach (QChar ch, str) {
-        if (ch != ' ' && ch != '\t' && ch != '\r' && ch != '#') {
+    bool inQuotation = false;
+
+    foreach (QString line,lines) {
+        inComment = false;
+        inQuotation = false;
+        foreach (QChar ch, line) {
             if (!inComment) {
-                ret += ch;
+                if (ch == ' ' || ch == '\t') {
+                    if (inQuotation) {
+                        ret += ch;
+                    }
+                }
+                if (ch != ' ' && ch != '\t' && ch != '#') {
+                    ret += ch;
+                }
             }
-        }
-        if (ch == '#') {
-            inComment = true;
-        }
-        if (ch == '\n') {
-            inComment = false;
+            if (ch == '#') {
+                inComment = true;
+            }
+            if (ch == '"') {
+                if (inQuotation) {
+                    inQuotation = false;
+                } else {
+                    inQuotation = true;
+                }
+            }
         }
     }
 
