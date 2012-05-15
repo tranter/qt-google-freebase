@@ -48,6 +48,8 @@ public:
 
 public slots:
     void onSuggestData(const QString& name,const QString& id,const QString& mid);
+    void onBacwardAction();
+    void onForwardAction();
 
 private slots:
     void onLoginDone();
@@ -82,6 +84,9 @@ private:
     QGraphicsScene* m_pScene;
 
     QList<int> m_listSplitterSave;
+    QMap<QString,QList<QString> > m_history;
+    QMap<QString,int> m_historyPos;
+    int m_historyMax;
 
     void saveSettings();
     int indexTabQueryByName(const QString& name);

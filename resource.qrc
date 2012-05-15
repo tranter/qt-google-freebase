@@ -1,6 +1,8 @@
 <RCC>
     <qresource prefix="/images">
         <file alias="login">images/login.png</file>
+        <file alias="backward">images/go-backward.png</file>
+        <file alias="forward">images/go-forward.png</file>
     </qresource>
     <qresource prefix="/html">
         <file alias="suggest-basic.html">suggest-basic.html</file>

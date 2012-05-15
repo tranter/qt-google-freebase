@@ -24,6 +24,8 @@ public:
 public slots:
     void startLogin();
     void startFreebaseLogin();
+    void goBackward();
+    void goForward();
 
 private:
     Ui::MainWindow *ui;

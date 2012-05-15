@@ -79,6 +79,12 @@ Form::Form(QWidget *parent) :
     ui->textBrowserText->setOpenLinks(false);
     ui->textBrowserText->setUndoRedoEnabled(true);
     connect(ui->textBrowserText,SIGNAL(anchorClicked(QUrl)),this,SLOT(onTextBrowserAnchorClicked(QUrl)));
+
+    m_historyMax = 20;
+    m_historyPos["MQL Request"] = 0;
+    m_historyPos["Search Request"] = 0;
+    m_history["MQL Request"].insert(0,ui->editMqlQuery->toPlainText());
+    m_history["Search Request"].insert(0,ui->editSearchQuery->toPlainText()+"@"+ui->editSearchFilter->toPlainText());
 }
 
 Form::~Form()
@@ -149,11 +155,35 @@ void Form::onBtnRunClicked()
     clearReplyImage();
     int index = ui->tabQuery->currentIndex();
     if (ui->tabQuery->tabText(index) == "MQL Request") {
+        m_historyPos["MQL Request"] = 0;
+        QString curValue = ui->editMqlQuery->toPlainText();
+        QString oldValue = m_history["MQL Request"].value(0);
+        if (curValue != oldValue) {
+            m_history["MQL Request"].insert(0,curValue);
+            if (m_history["MQL Request"].size()>m_historyMax) {
+                m_history["MQL Request"].removeLast();
+            }
+        }
         ui->tabReply->setCurrentIndex(indexTabReplyByName("Json"));
-        m_pManager->runMqlQuery(ui->editMqlQuery->toPlainText());
+        m_pManager->runMqlQuery(curValue);
     } else if (ui->tabQuery->tabText(index) == "Search Request") {
+        m_historyPos["Search Request"] = 0;
+        QStringList list = m_history["Search Request"].value(0).split("@");
+        if (list.size() == 1) {
+            list << "";
+        }
+        QString curValueQuery = ui->editSearchQuery->toPlainText();
+        QString oldValueQuery = list[0];
+        QString curValueFilter = ui->editSearchFilter->toPlainText();
+        QString oldValueFilter = list[1];
+        if (curValueQuery != oldValueQuery || curValueFilter != oldValueFilter) {
+            m_history["Search Request"].insert(0,curValueQuery+"@"+curValueFilter);
+            if (m_history["Search Request"].size()>m_historyMax) {
+                m_history["Search Request"].removeLast();
+            }
+        }
         ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
-        QString query = QString("%1&%2").arg(ui->editSearchQuery->toPlainText(),ui->editSearchFilter->toPlainText());
+        QString query = QString("%1&%2").arg(curValueQuery,curValueFilter);
         m_pManager->runSearchQuery(query);
     } else if (ui->tabQuery->tabText(index) == "Write Request") {
         ui->tabReply->setCurrentIndex(indexTabReplyByName("Json"));
@@ -297,14 +327,16 @@ void Form::onTreeGoToItem(const QModelIndex& index)
     QString key = pNode->data(0).toString();
     QString keyParent = pParentNode ? pParentNode->data(0).toString() : "";
     QString value = pNode->data(1).toString();
+    int height = ui->graphicsViewImage->size().height();
+    int width = ui->graphicsViewImage->size().width();
     if (value.startsWith("/m/")) {
         ui->textMqlReply->clear();
         m_pManager->runSearchQuery(value);
 
         clearReplyImage();
         m_pManager->runImageQuery(value
-            ,ui->graphicsViewImage->size().height()
-            ,ui->graphicsViewImage->size().width());
+            ,height
+            ,width);
     } else if (key == "guid" || keyParent == "guid") {
         QString str = "/guid/";
         str += value;
@@ -313,16 +345,16 @@ void Form::onTreeGoToItem(const QModelIndex& index)
 
         clearReplyImage();
         m_pManager->runImageQuery(str
-            ,ui->graphicsViewImage->size().height()
-            ,ui->graphicsViewImage->size().width());
+            ,height
+            ,width);
     } else if (key == "id" || keyParent == "id") {
         ui->textMqlReply->clear();
         m_pManager->runSearchQuery(value);
 
         clearReplyImage();
         m_pManager->runImageQuery(value
-            ,ui->graphicsViewImage->size().height()
-            ,ui->graphicsViewImage->size().width());
+            ,height
+            ,width);
     }
 }
 
@@ -333,10 +365,53 @@ void Form::onTextBrowserAnchorClicked(const QUrl& url)
 
     ui->textMqlReply->clear();
     m_pManager->runSearchQuery(value);
+    int height = ui->graphicsViewImage->size().height();
+    int width = ui->graphicsViewImage->size().width();
     if (value.startsWith('/')) {
         clearReplyImage();
         m_pManager->runImageQuery(value
-            ,ui->graphicsViewImage->size().height()
-            ,ui->graphicsViewImage->size().width());
+            ,height
+            ,width);
+    }
+}
+
+void Form::onBacwardAction()
+{
+    qDebug() << Q_FUNC_INFO;
+    int len;
+    QString tabName = ui->tabQuery->tabText(ui->tabQuery->currentIndex());
+    if (tabName == "MQL Request") {
+        len = m_history["MQL Request"].size();
+        if (m_historyPos["MQL Request"] < len-1) {
+            m_historyPos["MQL Request"]++;
+            ui->editMqlQuery->setPlainText(m_history["MQL Request"].value(m_historyPos["MQL Request"]));
+        }
+    } else if (tabName == "Search Request") {
+        len = m_history["Search Request"].size();
+        if (m_historyPos["Search Request"] < len-1) {
+            m_historyPos["Search Request"]++;
+            QStringList list = m_history["Search Request"].value(m_historyPos["Search Request"]).split("@");
+            ui->editSearchQuery->setPlainText(list.value(0));
+            ui->editSearchFilter->setPlainText(list.value(1));
+        }
+    }
+}
+
+void Form::onForwardAction()
+{
+    qDebug() << Q_FUNC_INFO;
+    QString tabName = ui->tabQuery->tabText(ui->tabQuery->currentIndex());
+    if (tabName == "MQL Request") {
+        if (m_historyPos["MQL Request"] > 0) {
+            m_historyPos["MQL Request"]--;
+            ui->editMqlQuery->setPlainText(m_history["MQL Request"].value(m_historyPos["MQL Request"]));
+        }
+    } else if (tabName == "Search Request") {
+        if (m_historyPos["Search Request"] > 0) {
+            m_historyPos["Search Request"]--;
+            QStringList list = m_history["Search Request"].value(m_historyPos["Search Request"]).split("@");
+            ui->editSearchQuery->setPlainText(list.value(0));
+            ui->editSearchFilter->setPlainText(list.value(1));
+        }
     }
 }

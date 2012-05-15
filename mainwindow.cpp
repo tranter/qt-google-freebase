@@ -12,6 +12,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(close()));
     connect(ui->actionLogin, SIGNAL(triggered()), this, SLOT(startLogin()));
     connect(ui->actionFreebaseLogin, SIGNAL(triggered()), this, SLOT(startFreebaseLogin()));
+    connect(ui->actionBackward,SIGNAL(triggered()),this,SLOT(goBackward()));
+    connect(ui->actionForward,SIGNAL(triggered()),this,SLOT(goForward()));
 
     QLabel* permanentWidget = new QLabel(this);
     permanentWidget->setText("Based on Freebase API: http://www.freebase.com");
@@ -46,4 +48,14 @@ void MainWindow::startLoginDefault()
 void MainWindow::showStatusText(const QString& msg)
 {
     m_pStatusLabel->setText(msg);
+}
+
+void MainWindow::goBackward()
+{
+    m_pForm->onBacwardAction();
+}
+
+void MainWindow::goForward()
+{
+    m_pForm->onForwardAction();
 }
