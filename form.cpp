@@ -429,3 +429,10 @@ void Form::onForwardAction()
         }
     }
 }
+
+void Form::runQuery()
+{
+    if (ui->btnRun->isEnabled()) {
+        onBtnRunClicked();
+    }
+}

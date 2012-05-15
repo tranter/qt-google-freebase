@@ -45,6 +45,7 @@ public:
     
     void startLogin(bool bForce); //Show login dialog even if there is gotten already access_token.
     void startFreebaseLogin();
+    void runQuery();
 
 public slots:
     void onSuggestData(const QString& name,const QString& id,const QString& mid);

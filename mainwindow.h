@@ -26,6 +26,7 @@ public slots:
     void startFreebaseLogin();
     void goBackward();
     void goForward();
+    void onRun();
 
 private:
     Ui::MainWindow *ui;
