@@ -217,10 +217,24 @@ void Form::onBtnClearClicked()
 
 void Form::listDomains()
 {
-    ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
+    m_historyPos["MQL Request"] = 0;
+    QString curValue = "[{\n\t\"id\": null,\n\t\"name\": null,\n\t\"type\": \"/type/domain\",\n\t\"!/freebase/domain_category/domains\": {\n\t\t\"id\": \"/category/commons\"\n\t}\n}]";
+    QString oldValue = m_history["MQL Request"].value(0);
+    if (curValue != oldValue) {
+        m_history["MQL Request"].insert(0,curValue);
+        if (m_history["MQL Request"].size()>m_historyMax) {
+            m_history["MQL Request"].removeLast();
+        }
+    }
+    ui->tabReply->setCurrentIndex(indexTabReplyByName("Json"));
     ui->textMqlReply->clear();
-    QString query = "[{\"id\": null,\"name\": null,\"type\": \"/type/domain\",\"!/freebase/domain_category/domains\": {\"id\": \"/category/commons\"}}]";
-    m_pManager->runMqlQuery(query);
+    m_pManager->runMqlQuery(curValue);
+
+
+//    ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
+//    ui->textMqlReply->clear();
+//    QString query = "[{\"id\": null,\"name\": null,\"type\": \"/type/domain\",\"!/freebase/domain_category/domains\": {\"id\": \"/category/commons\"}}]";
+//    m_pManager->runMqlQuery(query);
 }
 
 void Form::onTabQueryTabChanged(int pos)
