@@ -2,6 +2,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 #include <QDate>
+#include <QDesktopServices>
 
 #include "dlgdemo.h"
 #include "ui_dlgdemo.h"
@@ -13,6 +14,7 @@ DlgDemo::DlgDemo(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->comboBoxLimit->setCurrentIndex(3);
+    ui->webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
 
     m_pManager = new freebase_data_manager(this);
 
@@ -28,8 +30,7 @@ DlgDemo::DlgDemo(QWidget *parent) :
               SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )),
               this,
               SLOT(sslErrorHandler(QNetworkReply*, const QList<QSslError> & )));
-
-
+    connect(ui->webView,SIGNAL(linkClicked(QUrl)),this,SLOT(onLinkClicked(QUrl)));
 }
 
 DlgDemo::~DlgDemo()
@@ -116,11 +117,11 @@ void DlgDemo::getPersonalInfo(const QString& id)
     }
     if(!ui->deceasedCheckBox->isChecked())
     {
-        query += ",\"type\":\"/people/person\",\"*\":null}";
+        query += ",\"type\":\"/people/person\",\"key\":[{}],\"*\":null}";
     }
     else
     {
-        query += ",\"type\":\"/people/deceased_person\",\"*\":null}";
+        query += ",\"type\":\"/people/deceased_person\",\"key\":[{}],\"*\":null}";
     }
     qDebug() << "QUERY: " << query;
     m_pManager->runMqlQuery(query);
@@ -140,8 +141,19 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
 {
     QString strHtml = QString("<html><body>");
     QVariantList lst;
-    strHtml += QString("<img src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1?maxheight=400&maxwidth=200\">").arg(map["mid"].toString());
-    strHtml += "<P><u>Name</u>: <b>" + map["name"].toString() + "</b>\n\n";
+    strHtml += QString("<img src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1?maxheight=400&maxwidth=200\" align=\"left\">").arg(map["mid"].toString());
+
+    // Referencies
+    QString s = findNamespaceValue("/wikipedia/en_id",map);
+    if (!s.isEmpty()) {
+        strHtml += QString("<a href=\"http://www.freebase.com/view%1\"><img src=\"http://www.freebase.com/favicon.ico\" alt=\"Freebase\" hspace=\"2\"/>Freebase</a>")
+                .arg(map["mid"].toString());
+        strHtml += QString("<a href=\"http://en.wikipedia.org/wiki/index.html?curid=%1\"><img src=\"http://en.wikipedia.org/favicon.ico\" alt=\"Wiki\" hspace=\"2\"/>Wiki</a>")
+                .arg(s);
+    }
+
+    // Name
+    strHtml += "<P><u>Name</u>: <b>" + map["name"].toString() + "</b>";
 
     //Deceased person
     if(!map["date_of_death"].toString().isEmpty())
@@ -170,7 +182,6 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
         }
         strHtml += "<P><u>Cause of death</u>: <b>" + str + "</b>\n\n";
     }
-
 
     //Living person
     if(!map["date_of_birth"].toString().isEmpty())
@@ -271,4 +282,25 @@ void DlgDemo::sslErrorHandler(QNetworkReply* qnr, const QList<QSslError> & errli
   #endif
 
    qnr->ignoreSslErrors();
+}
+
+QString DlgDemo::findNamespaceValue(const QString& ns, const QVariantMap& map)
+{
+    QString ret;
+    QVariantList list = map["key"].toList();
+    foreach (QVariant item, list) {
+        QVariantMap m = item.toMap();
+        if (item.toMap()["namespace"].toString() == ns) {
+            ret = item.toMap()["value"].toString();
+            break;
+        }
+    }
+
+    return ret;
+}
+
+void DlgDemo::onLinkClicked(const QUrl& url)
+{
+    qDebug() << Q_FUNC_INFO << " url=" << url;
+    QDesktopServices::openUrl(url);
 }

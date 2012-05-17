@@ -28,12 +28,14 @@ private slots:
     void onJsonReady(const int rt);
     void onItemSelected();
     void sslErrorHandler(QNetworkReply* qnr, const QList<QSslError> & errlist);
+    void onLinkClicked(const QUrl& url);
 
 private:
     void getImage(const QString& mid);
     void getPersonalInfo(const QString& id);
     void clearOldData();
     QString createHtmlForPerson(const QVariantMap& map);
+    QString findNamespaceValue(const QString& ns, const QVariantMap& map);
 
 
 private:

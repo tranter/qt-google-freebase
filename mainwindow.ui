@@ -24,6 +24,7 @@
    <addaction name="actionBackward"/>
    <addaction name="actionForward"/>
    <addaction name="actionRun"/>
+   <addaction name="actionPeople_Info"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="enabled">
@@ -127,7 +128,10 @@
      <normaloff>:/images/people</normaloff>:/images/people</iconset>
    </property>
    <property name="text">
-    <string>People Info</string>
+    <string>Demo People Info</string>
+   </property>
+   <property name="toolTip">
+    <string>Demo People Info</string>
    </property>
   </action>
  </widget>
