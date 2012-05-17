@@ -4,6 +4,9 @@
 #include <QDialog>
 #include <QMap>
 #include <QPixmap>
+#include <QVariantMap>
+#include <QNetworkReply>
+#include <QSslError>
 
 namespace Ui {
 class DlgDemo;
@@ -27,17 +30,21 @@ private slots:
     void onItemSelected(const QString& str);
     void onImageReady(const QPixmap& image, const int rt);
 
+    void sslErrorHandler(QNetworkReply* qnr, const QList<QSslError> & errlist);
+
 private:
     void getImage(const QString& mid);
     void getPersonalInfo(const QString& id);
     void clearReplyImage();
     void clearOldData();
+    QString createHtmlForPerson(const QVariantMap& map);
+
 
 private:
     Ui::DlgDemo *ui;
     freebase_data_manager* m_pManager;
     QMap<QString,QString> m_mapMids;
-    QGraphicsScene* m_pScene;
+    //QGraphicsScene* m_pScene;
 };
 
 #endif // DLGDEMO_H
