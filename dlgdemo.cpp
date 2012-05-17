@@ -182,10 +182,34 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
     {
         strHtml += "<P><u>Place of birth</u>: <b>" + map["place_of_birth"].toString() + "</b>\n\n";
     }
+    lst = map["profession"].toList();
+    if(!lst.isEmpty())
+    {
+        QString str;
+        for(int i = 0; i < lst.count(); ++i)
+        {
+            str += lst[i].toString();
+            if(i < lst.count()-1)
+                str += ", ";
+        }
+        strHtml += "<P><u>Profession</u>: <b>" + str + "</b>\n\n";
+    }
     lst = map["nationality"].toList();
     if(!lst.isEmpty())
     {
         strHtml += "<P><u>Nationality</u>: <b>" + lst[0].toString() + "</b>\n\n";
+    }
+    lst = map["ethnicity"].toList();
+    if(!lst.isEmpty())
+    {
+        QString str;
+        for(int i = 0; i < lst.count(); ++i)
+        {
+            str += lst[i].toString();
+            if(i < lst.count()-1)
+                str += ", ";
+        }
+        strHtml += "<P><u>Ethnicity</u>: <b>" + str + "</b>\n\n";
     }
     lst = map["religion"].toList();
     if(!lst.isEmpty())
