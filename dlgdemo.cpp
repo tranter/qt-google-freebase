@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
+#include <QDate>
 
 #include "dlgdemo.h"
 #include "ui_dlgdemo.h"
@@ -45,7 +46,7 @@ void DlgDemo::startSearch()
     QString query = ui->lineEditInputDemo->text();
     if (!query.isEmpty()) {
         clearOldData();
-        m_pManager->runSearchQuery(query+"&type=/people/person",ui->comboBoxLimit->currentText(),ui->lineEditStart->text());
+        m_pManager->runSearchQuery(query+"&type=/people/person",ui->comboBoxLimit->currentText(),0);
     }
 }
 
@@ -58,6 +59,8 @@ void DlgDemo::onJsonReady(const int rt)
         QString mapKey;
         QVariantList list = m_pManager->getJsonData().toMap().contains("result") ?
                     m_pManager->getJsonData().toMap()["result"].toList() : QVariantList();
+
+        QStringList names;
         foreach (QVariant item, list) {
             mapKey = "";
             QVariantMap map = item.toMap();
@@ -69,11 +72,13 @@ void DlgDemo::onJsonReady(const int rt)
             }
             if (map.contains("mid")) {
                 m_mapMids[mapKey] = map["mid"].toString();
+                names << mapKey;
             }
         }
-        ui->comboBoxDemo->addItem("Select item");
-        ui->comboBoxDemo->addItems(m_mapMids.keys());
-        ui->comboBoxDemo->setMaxCount(m_mapMids.keys().size()+1);
+        //ui->comboBoxDemo->addItem("Select item");
+        //qDebug() << "KEYS = " << m_mapMids.keys().count();
+        ui->comboBoxDemo->addItems(names);
+        //ui->comboBoxDemo->setMaxCount(m_mapMids.keys().size()+1);
         ui->labelCount->setText(m_pManager->getJsonData().toMap().contains("hits") ?
                                     m_pManager->getJsonData().toMap()["hits"].toString() : "No Items"
                                     );
@@ -152,7 +157,8 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
     strHtml += QString("<img src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1?maxheight=400&maxwidth=200\">").arg(map["mid"].toString());
     strHtml += "<P><u>Name</u>: <b>" + map["name"].toString() + "</b>\n\n";
 
-    strHtml += "<P><u>Date of birth</u>: <b>" + map["date_of_birth"].toString() + "</b>\n\n";
+    QDate date = QDate::fromString(map["date_of_birth"].toString(), Qt::ISODate);
+    strHtml += "<P><u>Date of birth</u>: <b>" + date.toString("d MMM yyyy") + "</b>\n\n";
     strHtml += "<P><u>Place of birth</u>: <b>" + map["place_of_birth"].toString() + "</b>\n\n";
     QVariantList lst = map["nationality"].toList();
     if(!lst.isEmpty())
