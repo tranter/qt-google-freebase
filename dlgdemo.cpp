@@ -75,10 +75,7 @@ void DlgDemo::onJsonReady(const int rt)
                 names << mapKey;
             }
         }
-        //ui->comboBoxDemo->addItem("Select item");
-        //qDebug() << "KEYS = " << m_mapMids.keys().count();
         ui->comboBoxDemo->addItems(names);
-        //ui->comboBoxDemo->setMaxCount(m_mapMids.keys().size()+1);
         ui->labelCount->setText(m_pManager->getJsonData().toMap().contains("hits") ?
                                     m_pManager->getJsonData().toMap()["hits"].toString() : "No Items"
                                     );
@@ -89,11 +86,6 @@ void DlgDemo::onJsonReady(const int rt)
         QVariantMap map = m_pManager->getJsonData().toMap()["result"].toMap();
         QString strHtml = createHtmlForPerson(map);
         ui->webView->setHtml(strHtml);
-        //if (map.contains("name"))
-        //{
-            //qDebug() << "name=" << map["name"].toString();
-            //ui->labelName->setText(map["name"].toString());
-        //}
     }
 }
 
@@ -157,9 +149,15 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
     strHtml += QString("<img src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1?maxheight=400&maxwidth=200\">").arg(map["mid"].toString());
     strHtml += "<P><u>Name</u>: <b>" + map["name"].toString() + "</b>\n\n";
 
-    QDate date = QDate::fromString(map["date_of_birth"].toString(), Qt::ISODate);
-    strHtml += "<P><u>Date of birth</u>: <b>" + date.toString("d MMM yyyy") + "</b>\n\n";
-    strHtml += "<P><u>Place of birth</u>: <b>" + map["place_of_birth"].toString() + "</b>\n\n";
+    if(!map["date_of_birth"].toString().isEmpty())
+    {
+        QDate date = QDate::fromString(map["date_of_birth"].toString(), Qt::ISODate);
+        strHtml += "<P><u>Date of birth</u>: <b>" + date.toString("d MMM yyyy") + "</b>\n\n";
+    }
+    if(!map["place_of_birth"].toString().isEmpty())
+    {
+        strHtml += "<P><u>Place of birth</u>: <b>" + map["place_of_birth"].toString() + "</b>\n\n";
+    }
     QVariantList lst = map["nationality"].toList();
     if(!lst.isEmpty())
     {
@@ -211,7 +209,6 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
 
 
     strHtml += "</body></html>";
-    qDebug() << strHtml;
     return strHtml;
 }
 
