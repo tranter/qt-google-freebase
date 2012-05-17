@@ -26,16 +26,12 @@ public:
 private slots:
     void startSearch();
     void onJsonReady(const int rt);
-//    void onMqlReady(const int rt);
-    void onItemSelected(const QString& str);
-    void onImageReady(const QPixmap& image, const int rt);
-
+    void onItemSelected();
     void sslErrorHandler(QNetworkReply* qnr, const QList<QSslError> & errlist);
 
 private:
     void getImage(const QString& mid);
     void getPersonalInfo(const QString& id);
-    void clearReplyImage();
     void clearOldData();
     QString createHtmlForPerson(const QVariantMap& map);
 

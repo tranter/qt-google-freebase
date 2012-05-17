@@ -20,10 +20,9 @@ DlgDemo::DlgDemo(QWidget *parent) :
     //ui->graphicsViewDemo->setScene(m_pScene);
 
     connect(ui->pushButtonGoDemo,SIGNAL(clicked()),this,SLOT(startSearch()));
-    connect(ui->comboBoxDemo,SIGNAL(currentIndexChanged(QString)),this,SLOT(onItemSelected(QString)));
+    connect(ui->comboBoxDemo,SIGNAL(currentIndexChanged(QString)),this,SLOT(onItemSelected()));
     connect(m_pManager,SIGNAL(sigJsonReady(int)),this,SLOT(onJsonReady(int)));
-    connect(m_pManager,SIGNAL(sigImageReady(QPixmap,int)),this,SLOT(onImageReady(QPixmap,int)));
-//    connect(m_pManager,SIGNAL(sigMqlReplyReady()),this,SLOT(onMqlReady(int)));
+    connect(ui->deceasedCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onItemSelected()));
 
     connect(ui->webView->page()->networkAccessManager(),
               SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )),
@@ -89,11 +88,12 @@ void DlgDemo::onJsonReady(const int rt)
     }
 }
 
-void DlgDemo::onItemSelected(const QString& str)
+void DlgDemo::onItemSelected()
 {
+    QString str = ui->comboBoxDemo->currentText();
     qDebug() << Q_FUNC_INFO << " str=" << str;
-    if (str != "Select item" && !str.isEmpty()) {
-        getImage(m_mapMids[str]);
+    if (str != "Select item" && !str.isEmpty())
+    {
         getPersonalInfo(m_mapMids[str]);
     }
 }
@@ -114,26 +114,19 @@ void DlgDemo::getPersonalInfo(const QString& id)
     } else {
         query += "\"id\":\"" + id + "\"";
     }
-    query += ",\"type\":\"/people/person\",\"*\":null}";
+    if(!ui->deceasedCheckBox->isChecked())
+    {
+        query += ",\"type\":\"/people/person\",\"*\":null}";
+    }
+    else
+    {
+        query += ",\"type\":\"/people/deceased_person\",\"*\":null}";
+    }
     qDebug() << "QUERY: " << query;
     m_pManager->runMqlQuery(query);
 }
 
-void DlgDemo::clearReplyImage()
-{
-    //QList<QGraphicsItem*> list = ui->graphicsViewDemo->scene()->items();
-    //foreach (QGraphicsItem* p, list) {
-    //    ui->graphicsViewDemo->scene()->removeItem(p);
-    //}
-}
 
-void DlgDemo::onImageReady(const QPixmap& image, const int rt)
-{
-    qDebug() << Q_FUNC_INFO;
-    //QGraphicsPixmapItem *item = new QGraphicsPixmapItem(image);
-    //m_pScene->addItem(item);
-    //ui->graphicsViewDemo->fitInView(item,Qt::KeepAspectRatio);
-}
 
 void DlgDemo::clearOldData()
 {
@@ -146,9 +139,40 @@ void DlgDemo::clearOldData()
 QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
 {
     QString strHtml = QString("<html><body>");
+    QVariantList lst;
     strHtml += QString("<img src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1?maxheight=400&maxwidth=200\">").arg(map["mid"].toString());
     strHtml += "<P><u>Name</u>: <b>" + map["name"].toString() + "</b>\n\n";
 
+    //Deceased person
+    if(!map["date_of_death"].toString().isEmpty())
+    {
+        QDate date = QDate::fromString(map["date_of_death"].toString(), Qt::ISODate);
+        strHtml += "<P><u>Date of death</u>: <b>" + date.toString("d MMM yyyy") + "</b>\n\n";
+    }
+    if(!map["place_of_death"].toString().isEmpty())
+    {
+        strHtml += "<P><u>Place of death</u>: <b>" + map["place_of_death"].toString() + "</b>\n\n";
+    }
+    lst = map["place_of_burial"].toList();
+    if(!lst.isEmpty())
+    {
+        strHtml += "<P><u>Place of burial</u>: <b>" + lst[0].toString() + "</b>\n\n";
+    }
+    lst = map["cause_of_death"].toList();
+    if(!lst.isEmpty())
+    {
+        QString str;
+        for(int i = 0; i < lst.count(); ++i)
+        {
+            str += lst[i].toString();
+            if(i < lst.count()-1)
+                str += ", ";
+        }
+        strHtml += "<P><u>Cause of death</u>: <b>" + str + "</b>\n\n";
+    }
+
+
+    //Living person
     if(!map["date_of_birth"].toString().isEmpty())
     {
         QDate date = QDate::fromString(map["date_of_birth"].toString(), Qt::ISODate);
@@ -158,7 +182,7 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
     {
         strHtml += "<P><u>Place of birth</u>: <b>" + map["place_of_birth"].toString() + "</b>\n\n";
     }
-    QVariantList lst = map["nationality"].toList();
+    lst = map["nationality"].toList();
     if(!lst.isEmpty())
     {
         strHtml += "<P><u>Nationality</u>: <b>" + lst[0].toString() + "</b>\n\n";
