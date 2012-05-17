@@ -27,6 +27,7 @@ public slots:
     void goBackward();
     void goForward();
     void onRun();
+    void startDlgDemo();
 
 private:
     Ui::MainWindow *ui;

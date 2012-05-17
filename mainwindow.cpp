@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionBackward,SIGNAL(triggered()),this,SLOT(goBackward()));
     connect(ui->actionForward,SIGNAL(triggered()),this,SLOT(goForward()));
     connect(ui->actionRun,SIGNAL(triggered()),this,SLOT(onRun()));
+    connect(ui->actionPeople_Info,SIGNAL(triggered()),this,SLOT(startDlgDemo()));
 
     QLabel* permanentWidget = new QLabel(this);
     permanentWidget->setText("Based on Freebase API: http://www.freebase.com");
@@ -64,4 +65,9 @@ void MainWindow::goForward()
 void MainWindow::onRun()
 {
     m_pForm->runQuery();
+}
+
+void MainWindow::startDlgDemo()
+{
+    m_pForm->startDlgDemo();
 }

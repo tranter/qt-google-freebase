@@ -56,8 +56,15 @@
     <addaction name="actionBackward"/>
     <addaction name="actionForward"/>
    </widget>
+   <widget class="QMenu" name="menuDemo">
+    <property name="title">
+     <string>Demo</string>
+    </property>
+    <addaction name="actionPeople_Info"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
+   <addaction name="menuDemo"/>
   </widget>
   <action name="actionExit">
    <property name="text">
@@ -112,6 +119,15 @@
    </property>
    <property name="shortcut">
     <string>F5</string>
+   </property>
+  </action>
+  <action name="actionPeople_Info">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/images/people</normaloff>:/images/people</iconset>
+   </property>
+   <property name="text">
+    <string>People Info</string>
    </property>
   </action>
  </widget>

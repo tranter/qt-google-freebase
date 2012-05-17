@@ -9,6 +9,12 @@
 class QNetworkAccessManager;
 class QNetworkReply;
 
+#define REQ_LOGIN 1
+#define REQ_MQL 2
+#define REQ_SEARCH 3
+#define REQ_TEXT 4
+#define REQ_IMAGE 5
+
 class freebase_data_manager : public QObject
 {
     Q_OBJECT
@@ -24,7 +30,7 @@ public:
     void loginFreebase();
 
     void runMqlQuery(const QString& query);
-    void runSearchQuery(const QString& query);
+    void runSearchQuery(const QString& query, const QString& limit="20", const QString& start="0");
     void runWriteQuery(const QString& query, const QString& access_token, const QString& key);
     void runTextQuery(const QString& query);
     void runImageQuery(const QString& query, int maxHeight=4096, int maxWidth=4096);
@@ -33,9 +39,10 @@ public:
 signals:
     void sigErrorOccured(const QString& error);
     void sigUserEmailReady();
-    void sigMqlReplyReady();
-    void sigImageReady(const QPixmap& px);
-    void sigJsonReady();
+    void sigMqlReplyReady(const int rt);
+    void sigSearchReplyReady(const int rt);
+    void sigImageReady(const QPixmap& px,const int rt);
+    void sigJsonReady(const int rt);
 
 private slots:
     void replyFinished(QNetworkReply*);

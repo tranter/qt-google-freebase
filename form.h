@@ -46,6 +46,7 @@ public:
     void startLogin(bool bForce); //Show login dialog even if there is gotten already access_token.
     void startFreebaseLogin();
     void runQuery();
+    void startDlgDemo();
 
 public slots:
     void onSuggestData(const QString& name,const QString& id,const QString& mid);
@@ -56,9 +57,15 @@ private slots:
     void onLoginDone();
     void onErrorOccured(const QString& error);
     void onUserEmailReady();
-    void onMqlReplyReady();
-    void onJsonReady();
-    void onImageReady(const QPixmap& px);
+
+    void onMqlReplyReady(const int rt);
+    void onSearchReplyReady(const int rt);
+    void onJsonReady(const int rt);
+    void onImageReady(const QPixmap& px, const int rt);
+//    void onMqlReplyReady(const freebase_data_manager::REQ_TYPE rt);
+//    void onSearchReplyReady(const freebase_data_manager::REQ_TYPE& rt);
+//    void onJsonReady(const freebase_data_manager::REQ_TYPE& rt);
+//    void onImageReady(const QPixmap& px, const freebase_data_manager::REQ_TYPE& rt);
 
     void onBtnRunClicked();
     void onBtnClearClicked();

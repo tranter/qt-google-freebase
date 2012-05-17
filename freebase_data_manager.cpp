@@ -39,10 +39,10 @@ void freebase_data_manager::runMqlQuery(const QString& query)
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(url)));
 }
 
-void freebase_data_manager::runSearchQuery(const QString& query)
+void freebase_data_manager::runSearchQuery(const QString& query, const QString& limit, const QString& start)
 {
-    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/search?query=%1&indent=true")
-            .arg(query);
+    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/search?query=%1&start=%3&limit=%2&indent=true")
+            .arg(query,limit,start);
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(s)));
 }
 
@@ -83,8 +83,9 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
     QString url = reply->url().toString();
 
     qDebug() << "URL=" << url;
+    qDebug() << "json=" << json;
 
-    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+//    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if(reply->error()) {
         emit sigErrorOccured(QString("reply->error()=%1,\nerrmessage=%2,\njson=%3").arg(reply->error()).arg(reply->errorString(),QString(json)));
         return;
@@ -123,7 +124,7 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
         }
         m_jsonReply = result;
         m_strReply = modifyReply(json);
-        emit sigMqlReplyReady();
+        emit sigMqlReplyReady(REQ_LOGIN);
         return;
     } else if (url.contains("https://www.googleapis.com/freebase/v1-sandbox/mqlread")) {
         result = parser.parse(json,&ok);
@@ -138,8 +139,8 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
         m_jsonReply = result;
         m_strReply = modifyReply(json);
         m_strRichTextReply = modifyTextReply();
-        emit sigMqlReplyReady();
-        emit sigJsonReady();
+        emit sigMqlReplyReady(REQ_MQL);
+        emit sigJsonReady(REQ_MQL);
         return;
     } else if (url.contains("https://www.googleapis.com/freebase/v1-sandbox/search")) {
         result = parser.parse(json,&ok);
@@ -154,8 +155,8 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
         m_jsonReply = result;
         m_strReply = modifyReply(json);
         m_strRichTextReply = modifySearchReply();
-        emit sigMqlReplyReady();
-        emit sigJsonReady();
+        emit sigSearchReplyReady(REQ_SEARCH);
+        emit sigJsonReady(REQ_SEARCH);
         return;
     } else if (url.contains("https://www.googleapis.com/freebase/v1-sandbox/text")) {
         result = parser.parse(json,&ok);
@@ -170,15 +171,15 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
         m_jsonReply = result;
         m_strReply = modifyReply(json);
         m_strRichTextReply = modifyTextReply();
-        emit sigMqlReplyReady();
-        emit sigJsonReady();
+        emit sigMqlReplyReady(REQ_TEXT);
+        emit sigJsonReady(REQ_TEXT);
         return;
     } else if (url.contains("https://usercontent.googleapis.com/freebase/v1-sandbox/image")) {
         m_strReply = "";
         QByteArray arr(json);
         QPixmap px;
         px.loadFromData(arr);
-        emit sigImageReady(px);
+        emit sigImageReady(px,REQ_IMAGE);
         return;
     }
 }

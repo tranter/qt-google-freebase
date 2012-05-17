@@ -12,6 +12,7 @@
 #include "mainwindow.h"
 #include "treejsonmodel.h"
 #include "treejsonitem.h"
+#include "dlgdemo.h"
 
 Form::Form(QWidget *parent) :
     QWidget(parent),
@@ -54,9 +55,11 @@ Form::Form(QWidget *parent) :
     m_pManager = new freebase_data_manager(this);
     connect(m_pManager, SIGNAL(sigErrorOccured(QString)),this,SLOT(onErrorOccured(QString)));
     connect(m_pManager, SIGNAL(sigUserEmailReady()),this,SLOT(onUserEmailReady()));
-    connect(m_pManager, SIGNAL(sigMqlReplyReady()),this,SLOT(onMqlReplyReady()));
-    connect(m_pManager, SIGNAL(sigJsonReady()),this,SLOT(onJsonReady()));
-    connect(m_pManager, SIGNAL(sigImageReady(QPixmap)),this,SLOT(onImageReady(QPixmap)));
+
+    connect(m_pManager, SIGNAL(sigMqlReplyReady(int)),this,SLOT(onMqlReplyReady(int)));
+    connect(m_pManager, SIGNAL(sigSearchReplyReady(int)),this,SLOT(onSearchReplyReady(int)));
+    connect(m_pManager, SIGNAL(sigJsonReady(int)),this,SLOT(onJsonReady(int)));
+    connect(m_pManager, SIGNAL(sigImageReady(QPixmap,int)),this,SLOT(onImageReady(QPixmap,int)));
 
     connect(ui->btnRun,SIGNAL(clicked()),this,SLOT(onBtnRunClicked()));
     connect(ui->btnClear,SIGNAL(clicked()),this,SLOT(onBtnClearClicked()));
@@ -131,18 +134,24 @@ void Form::onUserEmailReady()
     m_pMain->showStatusText(m_pManager->getUserEmail());
 }
 
-void Form::onMqlReplyReady()
+void Form::onMqlReplyReady(const int rt)
 {
     ui->textMqlReply->setPlainText(m_pManager->getReplyStr());
     ui->textBrowserText->setHtml(m_pManager->getRichTextReplyStr());
 }
 
-void Form::onJsonReady()
+void Form::onSearchReplyReady(const int rt)
+{
+    ui->textMqlReply->setPlainText(m_pManager->getReplyStr());
+    ui->textBrowserText->setHtml(m_pManager->getRichTextReplyStr());
+}
+
+void Form::onJsonReady(const int rt)
 {
     m_pModel->setNewModelData(m_pManager->getJsonData());
 }
 
-void Form::onImageReady(const QPixmap& px)
+void Form::onImageReady(const QPixmap& px, const int rt)
 {
     QGraphicsPixmapItem *item = new QGraphicsPixmapItem(px);
     m_pScene->addItem(item);
@@ -435,4 +444,13 @@ void Form::runQuery()
     if (ui->btnRun->isEnabled()) {
         onBtnRunClicked();
     }
+}
+
+void Form::startDlgDemo()
+{
+    qDebug() << Q_FUNC_INFO;
+
+    DlgDemo* pDlg = new DlgDemo(this);
+    pDlg->exec();
+    delete pDlg;
 }

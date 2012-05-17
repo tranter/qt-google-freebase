@@ -34,7 +34,8 @@ SOURCES += main.cpp\
     form.cpp \
     freebase_data_manager.cpp \
     treejsonmodel.cpp \
-    treejsonitem.cpp
+    treejsonitem.cpp \
+    dlgdemo.cpp
 
 HEADERS  += mainwindow.h \
     oauth2.h \
@@ -42,11 +43,13 @@ HEADERS  += mainwindow.h \
     form.h \
     freebase_data_manager.h \
     treejsonmodel.h \
-    treejsonitem.h
+    treejsonitem.h \
+    dlgdemo.h
 
 FORMS    += mainwindow.ui \
     logindialog.ui \
-    form.ui
+    form.ui \
+    dlgdemo.ui
 
 RESOURCES += \
     resource.qrc
