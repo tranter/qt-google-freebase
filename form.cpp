@@ -26,7 +26,6 @@ Form::Form(QWidget *parent) :
     if (ind >= 0) {
         ui->tabQuery->removeTab(ind);
     }
-
     connect(ui->pushButtonTextGo,SIGNAL(clicked()),this,SLOT(onBtnTextGoClicked()));
     connect(ui->pushButtonImageGo,SIGNAL(clicked()),this,SLOT(onBtnImageGoClicked()));
     connect(ui->tabQuery,SIGNAL(currentChanged(int)),this,SLOT(onTabQueryTabChanged(int)));
@@ -65,10 +64,14 @@ Form::Form(QWidget *parent) :
     connect(ui->btnClear,SIGNAL(clicked()),this,SLOT(onBtnClearClicked()));
     connect(ui->pushButtonDomainsList,SIGNAL(clicked()),this,SLOT(listDomains()));
 
-    m_pScene = new QGraphicsScene();
-    ui->graphicsViewImage->setScene(m_pScene);
+//    m_pScene = new QGraphicsScene();
+//    ui->graphicsViewImage->setScene(m_pScene);
 
     initSuggestPage();
+    connect(ui->webViewImage->page()->networkAccessManager(),
+              SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )),
+              this,
+              SLOT(sslImageErrorHandler(QNetworkReply*, const QList<QSslError> & )));
 
     ui->tabReply->setCurrentIndex(indexTabReplyByName("Json"));
 
@@ -153,9 +156,9 @@ void Form::onJsonReady(const int rt)
 
 void Form::onImageReady(const QPixmap& px, const int rt)
 {
-    QGraphicsPixmapItem *item = new QGraphicsPixmapItem(px);
-    m_pScene->addItem(item);
-    ui->graphicsViewImage->fitInView(item,Qt::KeepAspectRatio);
+//    QGraphicsPixmapItem *item = new QGraphicsPixmapItem(px);
+//    m_pScene->addItem(item);
+//    ui->graphicsViewImage->fitInView(item,Qt::KeepAspectRatio);
 }
 
 void Form::onBtnRunClicked()
@@ -209,11 +212,13 @@ void Form::onBtnTextGoClicked()
 
 void Form::onBtnImageGoClicked()
 {
-    ui->tabReply->setCurrentIndex(indexTabReplyByName("Image"));
-    clearReplyImage();
-    m_pManager->runImageQuery(ui->lineEditImage->text()
-                              ,ui->graphicsViewImage->size().height()
-                              ,ui->graphicsViewImage->size().width());
+//    ui->tabReply->setCurrentIndex(indexTabReplyByName("Image"));
+//    clearReplyImage();
+//    m_pManager->runImageQuery(ui->lineEditImage->text()
+//                              ,ui->graphicsViewImage->size().height()
+//                              ,ui->graphicsViewImage->size().width());
+    QString strHtml = createImageHtml();
+    ui->webViewImage->setHtml(strHtml);
 }
 
 void Form::onBtnClearClicked()
@@ -287,10 +292,10 @@ int Form::indexTabReplyByName(const QString& name)
 
 void Form::clearReplyImage()
 {
-    QList<QGraphicsItem*> list = ui->graphicsViewImage->scene()->items();
-    foreach (QGraphicsItem* p, list) {
-        ui->graphicsViewImage->scene()->removeItem(p);
-    }
+//    QList<QGraphicsItem*> list = ui->graphicsViewImage->scene()->items();
+//    foreach (QGraphicsItem* p, list) {
+//        ui->graphicsViewImage->scene()->removeItem(p);
+//    }
 }
 
 void Form::clearTreeJson()
@@ -312,12 +317,15 @@ void Form::onSplitterMoved(int pos, int index)
 void Form::initSuggestPage()
 {
     QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
-    MyWebPage* page = new MyWebPage();
+    MyWebPage* page = new MyWebPage(ui->webViewSuggest);
     ui->webViewSuggest->setPage((QWebPage*)page);
     QWebFrame* frame = page->mainFrame();
     connect(frame,SIGNAL(javaScriptWindowObjectCleared()),this,SLOT(onNewPage()));
 
     ui->webViewSuggest->setUrl(QUrl("qrc:/html/suggest-basic.html"));
+
+    MyWebPage* pageImage = new MyWebPage(ui->webViewImage);
+    ui->webViewImage->setPage((QWebPage*)pageImage);
 }
 /** \brief On each new url add Form object to javascript context.
  *
@@ -334,51 +342,51 @@ void Form::onSuggestData(const QString& name,const QString& id,const QString& mi
     ui->textMqlReply->clear();
     m_pManager->runSearchQuery(id);
 
-    clearReplyImage();
-    m_pManager->runImageQuery(id
-        ,ui->graphicsViewImage->size().height()
-        ,ui->graphicsViewImage->size().width());
+//    clearReplyImage();
+//    m_pManager->runImageQuery(id
+//        ,ui->graphicsViewImage->size().height()
+//        ,ui->graphicsViewImage->size().width());
 }
 
 void Form::onTreeGoToItem(const QModelIndex& index)
 {
-    if (!index.isValid()) {
-        return;
-    }
-    TreeJsonItem* pNode = static_cast<TreeJsonItem*>(index.internalPointer());
-    TreeJsonItem* pParentNode = index.parent().isValid() ? static_cast<TreeJsonItem*>(index.parent().internalPointer()) : NULL;
-    QString key = pNode->data(0).toString();
-    QString keyParent = pParentNode ? pParentNode->data(0).toString() : "";
-    QString value = pNode->data(1).toString();
-    int height = ui->graphicsViewImage->size().height();
-    int width = ui->graphicsViewImage->size().width();
-    if (value.startsWith("/m/")) {
-        ui->textMqlReply->clear();
-        m_pManager->runSearchQuery(value);
+//    if (!index.isValid()) {
+//        return;
+//    }
+//    TreeJsonItem* pNode = static_cast<TreeJsonItem*>(index.internalPointer());
+//    TreeJsonItem* pParentNode = index.parent().isValid() ? static_cast<TreeJsonItem*>(index.parent().internalPointer()) : NULL;
+//    QString key = pNode->data(0).toString();
+//    QString keyParent = pParentNode ? pParentNode->data(0).toString() : "";
+//    QString value = pNode->data(1).toString();
+//    int height = ui->graphicsViewImage->size().height();
+//    int width = ui->graphicsViewImage->size().width();
+//    if (value.startsWith("/m/")) {
+//        ui->textMqlReply->clear();
+//        m_pManager->runSearchQuery(value);
 
-        clearReplyImage();
-        m_pManager->runImageQuery(value
-            ,height
-            ,width);
-    } else if (key == "guid" || keyParent == "guid") {
-        QString str = "/guid/";
-        str += value;
-        ui->textMqlReply->clear();
-        m_pManager->runSearchQuery(str);
+//        clearReplyImage();
+//        m_pManager->runImageQuery(value
+//            ,height
+//            ,width);
+//    } else if (key == "guid" || keyParent == "guid") {
+//        QString str = "/guid/";
+//        str += value;
+//        ui->textMqlReply->clear();
+//        m_pManager->runSearchQuery(str);
 
-        clearReplyImage();
-        m_pManager->runImageQuery(str
-            ,height
-            ,width);
-    } else if (key == "id" || keyParent == "id") {
-        ui->textMqlReply->clear();
-        m_pManager->runSearchQuery(value);
+//        clearReplyImage();
+//        m_pManager->runImageQuery(str
+//            ,height
+//            ,width);
+//    } else if (key == "id" || keyParent == "id") {
+//        ui->textMqlReply->clear();
+//        m_pManager->runSearchQuery(value);
 
-        clearReplyImage();
-        m_pManager->runImageQuery(value
-            ,height
-            ,width);
-    }
+//        clearReplyImage();
+//        m_pManager->runImageQuery(value
+//            ,height
+//            ,width);
+//    }
 }
 
 void Form::onTextBrowserAnchorClicked(const QUrl& url)
@@ -388,14 +396,14 @@ void Form::onTextBrowserAnchorClicked(const QUrl& url)
 
     ui->textMqlReply->clear();
     m_pManager->runSearchQuery(value);
-    int height = ui->graphicsViewImage->size().height();
-    int width = ui->graphicsViewImage->size().width();
-    if (value.startsWith('/')) {
-        clearReplyImage();
-        m_pManager->runImageQuery(value
-            ,height
-            ,width);
-    }
+//    int height = ui->graphicsViewImage->size().height();
+//    int width = ui->graphicsViewImage->size().width();
+//    if (value.startsWith('/')) {
+//        clearReplyImage();
+//        m_pManager->runImageQuery(value
+//            ,height
+//            ,width);
+//    }
 }
 
 void Form::onBacwardAction()
@@ -453,4 +461,37 @@ void Form::startDlgDemo()
     DlgDemo* pDlg = new DlgDemo(this);
     pDlg->exec();
     delete pDlg;
+}
+
+void Form::sslImageErrorHandler(QNetworkReply* qnr, const QList<QSslError>& /*errlist*/)
+{
+    qnr->ignoreSslErrors();
+}
+
+QString Form::createImageHtml()
+{
+    QString ret;
+    QString id = ui->lineEditImage->text();
+    if (id.isEmpty()) {
+        return ret;
+    }
+    int imageHeight = ui->webViewImage->size().height();
+    int imageWidth = ui->webViewImage->size().width();
+    ret += "<html>";
+    ret += "<script language=\"javascript\">"
+            "function fixImage() {"
+            "   var image=document.getElementById(\"resizeImage\");"
+            "   var w=image.width;"
+            "   var h=image.height;"
+            "   if (h > w) {"
+            "       image.setAttribute(\"height\",\"100%\");"
+            "   } else {"
+            "       image.setAttribute(\"width\",\"100%\");"
+            "   }"
+            "}</script>";
+    ret += "<body onLoad=\"fixImage();\">";
+    ret += QString("<img id=\"resizeImage\" src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1?maxheight=%2&maxwidth=%3&mode=fit\"/>")
+            .arg(id,QString::number(imageHeight),QString::number(imageWidth));
+    ret += "</body></html>";
+    return ret;
 }

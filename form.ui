@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>740</width>
-    <height>490</height>
+    <width>670</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,7 +24,7 @@
        <item>
         <widget class="QTabWidget" name="tabQuery">
          <property name="currentIndex">
-          <number>0</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="tabMql">
           <attribute name="title">
@@ -128,8 +128,8 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>392</width>
-            <height>413</height>
+            <width>16777215</width>
+            <height>16777215</height>
            </size>
           </property>
           <attribute name="title">
@@ -242,20 +242,16 @@
                </item>
               </layout>
              </item>
-             <item>
-              <spacer name="verticalSpacer">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
             </layout>
+           </item>
+           <item>
+            <widget class="QWebView" name="webViewImage">
+             <property name="url">
+              <url>
+               <string>about:blank</string>
+              </url>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -386,16 +382,6 @@
           <layout class="QVBoxLayout" name="verticalLayout_18">
            <item>
             <widget class="QTextBrowser" name="textBrowserText"/>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="tabImage">
-          <attribute name="title">
-           <string>Image</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_13">
-           <item>
-            <widget class="QGraphicsView" name="graphicsViewImage"/>
            </item>
           </layout>
          </widget>

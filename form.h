@@ -21,7 +21,7 @@ class TreeJsonModel;
 class MyWebPage : public QWebPage
 {
 public:
-    MyWebPage() {;}
+    MyWebPage(QObject* parent=0) : QWebPage(parent) {;}
 
     QString userAgentForUrl(const QUrl &url ) const
     {
@@ -80,6 +80,17 @@ private slots:
     void onTreeGoToItem(const QModelIndex& index);
     void onTextBrowserAnchorClicked(const QUrl& url);
 
+    void sslImageErrorHandler(QNetworkReply* qnr, const QList<QSslError>& errlist);
+
+private:
+    void saveSettings();
+    int indexTabQueryByName(const QString& name);
+    int indexTabReplyByName(const QString& name);
+    void clearReplyImage();
+    void clearTreeJson();
+    void initSuggestPage();
+    QString createImageHtml();
+
 private:
     Ui::Form *ui;
     MainWindow* m_pMain;
@@ -95,13 +106,6 @@ private:
     QMap<QString,QList<QString> > m_history;
     QMap<QString,int> m_historyPos;
     int m_historyMax;
-
-    void saveSettings();
-    int indexTabQueryByName(const QString& name);
-    int indexTabReplyByName(const QString& name);
-    void clearReplyImage();
-    void clearTreeJson();
-    void initSuggestPage();
 };
 
 #endif // FORM_H
