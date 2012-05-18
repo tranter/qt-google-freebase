@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>619</width>
+    <width>704</width>
     <height>599</height>
    </rect>
   </property>
@@ -52,48 +52,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="5">
-       <widget class="QPushButton" name="pushButtonGoDemo">
-        <property name="text">
-         <string>Find</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Results:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="comboBoxDemo">
-        <property name="minimumSize">
-         <size>
-          <width>300</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="editable">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="5">
-       <widget class="QLabel" name="labelCount">
-        <property name="text">
-         <string>No Items</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2" colspan="3">
-       <widget class="QCheckBox" name="deceasedCheckBox">
-        <property name="text">
-         <string>Deceased</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
+      <item row="0" column="3">
        <widget class="QComboBox" name="comboBoxLimit">
         <property name="currentIndex">
          <number>2</number>
@@ -128,6 +87,64 @@
           <string>100</string>
          </property>
         </item>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QPushButton" name="pushButtonGoDemo">
+        <property name="text">
+         <string>Find</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Results:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="comboBoxDemo">
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="editable">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2" colspan="2">
+       <widget class="QComboBox" name="typeComboBox">
+        <item>
+         <property name="text">
+          <string>/people/person</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>/people/deceased_person</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>/book/author</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>/military/military_commander</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QLabel" name="labelCount">
+        <property name="text">
+         <string>No Items</string>
+        </property>
        </widget>
       </item>
      </layout>

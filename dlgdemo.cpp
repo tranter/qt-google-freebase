@@ -24,7 +24,7 @@ DlgDemo::DlgDemo(QWidget *parent) :
     connect(ui->pushButtonGoDemo,SIGNAL(clicked()),this,SLOT(startSearch()));
     connect(ui->comboBoxDemo,SIGNAL(currentIndexChanged(QString)),this,SLOT(onItemSelected()));
     connect(m_pManager,SIGNAL(sigJsonReady(int)),this,SLOT(onJsonReady(int)));
-    connect(ui->deceasedCheckBox, SIGNAL(stateChanged(int)), this, SLOT(onItemSelected()));
+    connect(ui->typeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onItemSelected()));
 
     connect(ui->webView->page()->networkAccessManager(),
               SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )),
@@ -110,19 +110,16 @@ void DlgDemo::getImage(const QString& mid)
 void DlgDemo::getPersonalInfo(const QString& id)
 {
     QString query = "{";
-    if (id.startsWith("/m/")) {
-        query += "\"mid\":\"" + id + "\"";
-    } else {
-        query += "\"id\":\"" + id + "\"";
-    }
-    if(!ui->deceasedCheckBox->isChecked())
+    if (id.startsWith("/m/"))
     {
-        query += ",\"type\":\"/people/person\",\"key\":[{}],\"*\":null}";
+        query += "\"mid\":\"" + id + "\"";
     }
     else
     {
-        query += ",\"type\":\"/people/deceased_person\",\"key\":[{}],\"*\":null}";
+        query += "\"id\":\"" + id + "\"";
     }
+    QString type = ui->typeComboBox->currentText();
+    query += QString(",\"type\":\"%1\", \"*\":null}").arg(type);
     qDebug() << "QUERY: " << query;
     m_pManager->runMqlQuery(query);
 }
@@ -141,7 +138,7 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
 {
     QString strHtml = QString("<html><body>");
     QVariantList lst;
-    strHtml += QString("<img src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1?maxheight=400&maxwidth=200\" align=\"left\" vspace=10 hspace=10>").arg(map["mid"].toString());
+    strHtml += QString("<img src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1?maxheight=400&maxwidth=200\" align=\"right\">").arg(map["mid"].toString());
 
     // Referencies
     QString s = findNamespaceValue("/wikipedia/en_id",map);
@@ -264,6 +261,19 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
         }
         str += "</ul>";
         strHtml += "<P><u>Quotations</u>:<br>" + str + "\n\n";
+    }
+
+    //Books author
+    lst = map["works_written"].toList();
+    if(!lst.isEmpty())
+    {
+        QString str = "<ul>";
+        for(int i = 0; i < lst.count(); ++i)
+        {
+            str += "<li>" + lst[i].toString() + "</li>";
+        }
+        str += "</ul>";
+        strHtml += "<P><u>Works written</u>:<br>" + str + "\n\n";
     }
 
 
