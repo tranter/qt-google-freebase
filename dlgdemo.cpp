@@ -119,7 +119,7 @@ void DlgDemo::getPersonalInfo(const QString& id)
         query += "\"id\":\"" + id + "\"";
     }
     QString type = ui->typeComboBox->currentText();
-    query += QString(",\"type\":\"%1\", \"*\":null}").arg(type);
+    query += QString(",\"type\":\"%1\", \"key\":[{}], \"*\":null}").arg(type);
     qDebug() << "QUERY: " << query;
     m_pManager->runMqlQuery(query);
 }
