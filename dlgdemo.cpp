@@ -141,7 +141,7 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
 {
     QString strHtml = QString("<html><body>");
     QVariantList lst;
-    strHtml += QString("<img src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1?maxheight=400&maxwidth=200\" align=\"left\">").arg(map["mid"].toString());
+    strHtml += QString("<img src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1?maxheight=400&maxwidth=200\" align=\"left\" vspace=10 hspace=10>").arg(map["mid"].toString());
 
     // Referencies
     QString s = findNamespaceValue("/wikipedia/en_id",map);
