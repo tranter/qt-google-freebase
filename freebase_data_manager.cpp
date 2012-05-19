@@ -8,6 +8,8 @@
 
 freebase_data_manager::freebase_data_manager(QObject* parent) : QObject(parent)
 {
+//    m_webServer = "https://www.googleapis.com/freebase/v1-sandbox";
+//    m_webServer = "http://api.freebase.com/api/service";
     m_pNetworkAccessManager = new QNetworkAccessManager(this);
     connect(m_pNetworkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(replyFinished(QNetworkReply*)));
     connect(m_pNetworkAccessManager,SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)),this,SLOT(onSslError(QNetworkReply*,QList<QSslError>)));
@@ -34,15 +36,26 @@ void freebase_data_manager::loginFreebase()
 
 void freebase_data_manager::runMqlQuery(const QString& query)
 {
-    QString url = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlread?query=%1")
-            .arg(normalyzeString(query));
+//    QString url = QString("%1/mqlread?query={\"query\":%2}")
+//            .arg(m_webServer, normalyzeString(query));
+//    m_pNetworkAccessManager->get(QNetworkRequest(QUrl(url)));
+    QStringList list;
+    list << query;
+    runMqlQueryMultiple(list);
+}
+
+void freebase_data_manager::runMqlQueryMultiple(const QStringList& queries)
+{
+    QString convert = prepareConvert(queries);
+    QString url = QString("http://api.freebase.com/api/service/mqlread?queries={%1}")
+            .arg(normalyzeString(convert));
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(url)));
 }
 
 void freebase_data_manager::runSearchQuery(const QString& query, const QString& limit, const QString& start)
 {
-    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/search?query=%1&start=%3&limit=%2&indent=true")
-            .arg(query,limit,start);
+    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/search?query=%1&start=%2&limit=%3&indent=true")
+            .arg(query,start,limit);
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(s)));
 }
 
@@ -79,11 +92,13 @@ void freebase_data_manager::runImageQuery(const QString& query, int maxHeight, i
 
 void freebase_data_manager::replyFinished(QNetworkReply *reply)
 {
+    qDebug() << Q_FUNC_INFO;
+
     QByteArray json = reply->readAll();
     QString url = reply->url().toString();
 
     qDebug() << "URL=" << url;
-    qDebug() << "json=" << json;
+//    qDebug() << "json=" << json;
 
 //    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if(reply->error()) {
@@ -126,7 +141,7 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
         m_strReply = modifyReply(json);
         emit sigMqlReplyReady(REQ_LOGIN);
         return;
-    } else if (url.contains("https://www.googleapis.com/freebase/v1-sandbox/mqlread")) {
+    } else if (url.contains("/mqlread?query")) {
         result = parser.parse(json,&ok);
         if (!ok) {
             emit sigErrorOccured(QString("Cannot convert to QJson object: %1").arg(QString(json)));
@@ -142,7 +157,23 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
         emit sigMqlReplyReady(REQ_MQL);
         emit sigJsonReady(REQ_MQL);
         return;
-    } else if (url.contains("https://www.googleapis.com/freebase/v1-sandbox/search")) {
+    } else if (url.contains("/mqlread?queries")) {
+        result = parser.parse(json,&ok);
+        if (!ok) {
+            emit sigErrorOccured(QString("Cannot convert to QJson object: %1").arg(QString(json)));
+            return;
+        }
+        if (result.toMap().contains("error")) {
+            emit sigErrorOccured(result.toMap()["error"].toMap()["message"].toString());
+            return;
+        }
+        m_jsonReply = result;
+        m_strReply = modifyReply(json);
+        m_strRichTextReply = modifyTextReply();
+        emit sigMqlReplyReady(REQ_MQL);
+        emit sigJsonReady(REQ_MQL);
+        return;
+    } else if (url.contains("/search")) {
         result = parser.parse(json,&ok);
         if (!ok) {
             emit sigErrorOccured(QString("Cannot convert to QJson object: %1").arg(QString(json)));
@@ -158,7 +189,7 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
         emit sigSearchReplyReady(REQ_SEARCH);
         emit sigJsonReady(REQ_SEARCH);
         return;
-    } else if (url.contains("https://www.googleapis.com/freebase/v1-sandbox/text")) {
+    } else if (url.contains("/text")) {
         result = parser.parse(json,&ok);
         if (!ok) {
             emit sigErrorOccured(QString("Cannot convert to QJson object: %1").arg(QString(json)));
@@ -230,6 +261,33 @@ QString freebase_data_manager::modifyTextReply()
     return ret;
 }
 
+//QString freebase_data_manager::modifySearchReply()
+//{
+//    QString ret = "<b><p align='justify'>";
+//    QVariantList list = m_jsonReply.toMap()["result"].toList();
+//    foreach (QVariant item, list) {
+//        QVariantMap map = item.toMap();
+//        if (map.contains("name")) {
+//            ret += "<a href='" + map.value("name").toString() + "'>" + map.value("name").toString() + "</a>";
+//        }
+//        if (map.contains("notable")) {
+//            ret += " (" + map.value("notable").toMap().value("name").toString()+")";
+//        }
+//        if (map.contains("lang")) {
+//            ret += ", " + map.value("lang").toString();
+//        }
+//        if (map.contains("mid")) {
+//            ret += ", <a href='" + map.value("mid").toString() + "'>" + map.value("mid").toString() + "</a>";
+//        }
+//        if (map.contains("score")) {
+//            ret += ", score=" + map.value("score").toString();
+//        }
+//        ret += "</p><p align='justify'>";
+//    }
+//    ret += "</p></b>";
+//    return ret;
+//}
+
 QString freebase_data_manager::modifySearchReply()
 {
     QString ret = "<b><p align='justify'>";
@@ -294,6 +352,20 @@ QString freebase_data_manager::normalyzeString(const QString& str)
                 }
             }
         }
+    }
+
+    return ret;
+}
+
+QString freebase_data_manager::prepareConvert(const QStringList& list)
+{
+    QString ret;
+    int pos = 0;
+    foreach (QString item,list) {
+        if (pos != 0) {
+            ret += ",";
+        }
+        ret += "\"q"+QString::number(pos++)+"\":{\"query\":"+item+"}";
     }
 
     return ret;

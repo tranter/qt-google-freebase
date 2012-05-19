@@ -30,6 +30,7 @@ public:
     void loginFreebase();
 
     void runMqlQuery(const QString& query);
+    void runMqlQueryMultiple(const QStringList& queries);
     void runSearchQuery(const QString& query, const QString& limit="20", const QString& start="0");
     void runWriteQuery(const QString& query, const QString& access_token, const QString& key);
     void runTextQuery(const QString& query);
@@ -53,6 +54,7 @@ private:
     QString modifyTextReply();
     QString modifySearchReply();
     QString normalyzeString(const QString& str);
+    QString prepareConvert(const QStringList& list);
 
 private:
     QString m_strUserEmail;

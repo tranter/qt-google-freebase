@@ -83,8 +83,9 @@ void DlgDemo::onJsonReady(const int rt)
     else if (rt == REQ_MQL)
     {
         qDebug() << "Some info from MQL arrived";
-        QVariantMap map = m_pManager->getJsonData().toMap()["result"].toMap();
-        QString strHtml = createHtmlForPerson(map);
+//        QVariantMap map = m_pManager->getJsonData().toMap()["q0"].toMap()["result"].toMap();
+//        QString strHtml = createHtmlForPerson(map);
+        QString strHtml = createHtmlForPerson(m_pManager->getJsonData().toMap());
         ui->webView->setHtml(strHtml);
     }
 }
@@ -109,6 +110,7 @@ void DlgDemo::getImage(const QString& mid)
 
 void DlgDemo::getPersonalInfo(const QString& id)
 {
+    QStringList list;
     QString query = "{";
     if (id.startsWith("/m/"))
     {
@@ -118,10 +120,34 @@ void DlgDemo::getPersonalInfo(const QString& id)
     {
         query += "\"id\":\"" + id + "\"";
     }
-    QString type = ui->typeComboBox->currentText();
+    QString type = "/people/person";
     query += QString(",\"type\":\"%1\", \"key\":[{}], \"*\":null}").arg(type);
     qDebug() << "QUERY: " << query;
-    m_pManager->runMqlQuery(query);
+    list << query;
+
+    query = "{";
+    if (id.startsWith("/m/")) {
+        query += "\"mid\":\"" + id + "\"";
+    } else {
+        query += "\"id\":\"" + id + "\"";
+    }
+    type = "/people/deceased_person";
+    query += QString(",\"type\":\"%1\", \"key\":[{}], \"*\":null}").arg(type);
+    qDebug() << "QUERY: " << query;
+    list << query;
+
+    query = "{";
+    if (id.startsWith("/m/")) {
+        query += "\"mid\":\"" + id + "\"";
+    } else {
+        query += "\"id\":\"" + id + "\"";
+    }
+    type = "/book/author";
+    query += QString(",\"type\":\"%1\", \"key\":[{}], \"*\":null}").arg(type);
+    qDebug() << "QUERY: " << query;
+    list << query;
+
+    m_pManager->runMqlQueryMultiple(list);
 }
 
 
@@ -138,36 +164,44 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
 {
     QString strHtml = QString("<html><body>");
     QVariantList lst;
-    strHtml += QString("<img src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1?maxheight=400&maxwidth=200\" align=\"right\">").arg(map["mid"].toString());
+    strHtml += QString("<img src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1?maxheight=400&maxwidth=200\" align=\"right\">")
+            .arg(map["q0"].toMap()["result"].toMap()["mid"].toString());
 
     // Referencies
     QString s = findNamespaceValue("/wikipedia/en_id",map);
     if (!s.isEmpty()) {
         strHtml += QString("<a href=\"http://www.freebase.com/view%1\"><img src=\"http://www.freebase.com/favicon.ico\" alt=\"Freebase\" hspace=\"2\"/>Freebase</a>")
-                .arg(map["mid"].toString());
+                .arg(map["q0"].toMap()["result"].toMap()["mid"].toString());
         strHtml += QString("<a href=\"http://en.wikipedia.org/wiki/index.html?curid=%1\"><img src=\"http://en.wikipedia.org/favicon.ico\" alt=\"Wiki\" hspace=\"2\"/>Wiki</a>")
                 .arg(s);
     }
 
     // Name
-    strHtml += "<P><u>Name</u>: <b>" + map["name"].toString() + "</b>";
+    strHtml += "<P><u>Name</u>: <b>" + map["q0"].toMap()["result"].toMap()["name"].toString() + "</b>";
+    if(!map["q0"].toMap()["result"].toMap()["date_of_birth"].toString().isEmpty()) {
+        QDate date = QDate::fromString(map["q0"].toMap()["result"].toMap()["date_of_birth"].toString(), Qt::ISODate);
+        strHtml += "<P>" + date.toString("dd/MM/yyyy");
+
+        if(!map["q1"].toMap()["result"].toMap()["date_of_death"].toString().isEmpty()) {
+            QDate date = QDate::fromString(map["q1"].toMap()["result"].toMap()["date_of_death"].toString(), Qt::ISODate);
+            strHtml += " - " + date.toString("dd/MM/yyyy");
+//            strHtml += " - " + date.toString("d MMM yyyy");
+        }
+//        strHtml += ")";
+    }
 
     //Deceased person
-    if(!map["date_of_death"].toString().isEmpty())
+    strHtml += "<font color=\"blue\">";
+    if(!map["q1"].toMap()["result"].toMap()["place_of_death"].toString().isEmpty())
     {
-        QDate date = QDate::fromString(map["date_of_death"].toString(), Qt::ISODate);
-        strHtml += "<P><u>Date of death</u>: <b>" + date.toString("d MMM yyyy") + "</b>\n\n";
+        strHtml += "<P><u>Place of death</u>: <b>" + map["q0"].toMap()["result"].toMap()["place_of_death"].toString() + "</b>\n\n";
     }
-    if(!map["place_of_death"].toString().isEmpty())
-    {
-        strHtml += "<P><u>Place of death</u>: <b>" + map["place_of_death"].toString() + "</b>\n\n";
-    }
-    lst = map["place_of_burial"].toList();
+    lst = map["q1"].toMap()["result"].toMap()["place_of_burial"].toList();
     if(!lst.isEmpty())
     {
         strHtml += "<P><u>Place of burial</u>: <b>" + lst[0].toString() + "</b>\n\n";
     }
-    lst = map["cause_of_death"].toList();
+    lst = map["q1"].toMap()["result"].toMap()["cause_of_death"].toList();
     if(!lst.isEmpty())
     {
         QString str;
@@ -179,18 +213,14 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
         }
         strHtml += "<P><u>Cause of death</u>: <b>" + str + "</b>\n\n";
     }
+    strHtml += "</font>";
 
     //Living person
-    if(!map["date_of_birth"].toString().isEmpty())
+    if(!map["q0"].toMap()["result"].toMap()["place_of_birth"].toString().isEmpty())
     {
-        QDate date = QDate::fromString(map["date_of_birth"].toString(), Qt::ISODate);
-        strHtml += "<P><u>Date of birth</u>: <b>" + date.toString("d MMM yyyy") + "</b>\n\n";
+        strHtml += "<P><u>Place of birth</u>: <b>" + map["q0"].toMap()["result"].toMap()["place_of_birth"].toString() + "</b>\n\n";
     }
-    if(!map["place_of_birth"].toString().isEmpty())
-    {
-        strHtml += "<P><u>Place of birth</u>: <b>" + map["place_of_birth"].toString() + "</b>\n\n";
-    }
-    lst = map["profession"].toList();
+    lst = map["q0"].toMap()["result"].toMap()["profession"].toList();
     if(!lst.isEmpty())
     {
         QString str;
@@ -202,12 +232,12 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
         }
         strHtml += "<P><u>Profession</u>: <b>" + str + "</b>\n\n";
     }
-    lst = map["nationality"].toList();
+    lst = map["q0"].toMap()["result"].toMap()["nationality"].toList();
     if(!lst.isEmpty())
     {
         strHtml += "<P><u>Nationality</u>: <b>" + lst[0].toString() + "</b>\n\n";
     }
-    lst = map["ethnicity"].toList();
+    lst = map["q0"].toMap()["result"].toMap()["ethnicity"].toList();
     if(!lst.isEmpty())
     {
         QString str;
@@ -219,13 +249,13 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
         }
         strHtml += "<P><u>Ethnicity</u>: <b>" + str + "</b>\n\n";
     }
-    lst = map["religion"].toList();
+    lst = map["q0"].toMap()["result"].toMap()["religion"].toList();
     if(!lst.isEmpty())
     {
         strHtml += "<P><u>Religion</u>: <b>" + lst[0].toString() + "</b>\n\n";
     }
 
-    lst = map["children"].toList();
+    lst = map["q0"].toMap()["result"].toMap()["children"].toList();
     if(!lst.isEmpty())
     {
         QString children;
@@ -238,7 +268,7 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
         strHtml += "<P><u>Children</u>: <b>" + children + "</b>\n\n";
     }
 
-    lst = map["parents"].toList();
+    lst = map["q0"].toMap()["result"].toMap()["parents"].toList();
     if(!lst.isEmpty())
     {
         QString parents;
@@ -251,7 +281,7 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
         strHtml += "<P><u>Parents</u>: <b>" + parents + "</b>\n\n";
     }
 
-    lst = map["quotations"].toList();
+    lst = map["q0"].toMap()["result"].toMap()["quotations"].toList();
     if(!lst.isEmpty())
     {
         QString str = "<ul>";
@@ -264,7 +294,8 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
     }
 
     //Books author
-    lst = map["works_written"].toList();
+    strHtml += "<font color=\"green\">";
+    lst = map["q2"].toMap()["result"].toMap()["works_written"].toList();
     if(!lst.isEmpty())
     {
         QString str = "<ul>";
@@ -275,7 +306,7 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
         str += "</ul>";
         strHtml += "<P><u>Works written</u>:<br>" + str + "\n\n";
     }
-
+    strHtml += "</font>";
 
     strHtml += "</body></html>";
     return strHtml;
