@@ -116,25 +116,6 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="2" colspan="2">
-       <widget class="QComboBox" name="typeComboBox">
-        <item>
-         <property name="text">
-          <string>/people/person</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>/people/deceased_person</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>/book/author</string>
-         </property>
-        </item>
-       </widget>
-      </item>
       <item row="1" column="4">
        <widget class="QLabel" name="labelCount">
         <property name="text">

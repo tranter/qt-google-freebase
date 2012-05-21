@@ -24,7 +24,6 @@ DlgDemo::DlgDemo(QWidget *parent) :
     connect(ui->pushButtonGoDemo,SIGNAL(clicked()),this,SLOT(startSearch()));
     connect(ui->comboBoxDemo,SIGNAL(currentIndexChanged(QString)),this,SLOT(onItemSelected()));
     connect(m_pManager,SIGNAL(sigJsonReady(int)),this,SLOT(onJsonReady(int)));
-    connect(ui->typeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onItemSelected()));
 
     connect(ui->webView->page()->networkAccessManager(),
               SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )),
@@ -180,22 +179,19 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
     strHtml += "<p><u>Name</u>: <b>" + map["q0"].toMap()["result"].toMap()["name"].toString() + "</b></p>";
     if(!map["q0"].toMap()["result"].toMap()["date_of_birth"].toString().isEmpty()) {
         QDate date = QDate::fromString(map["q0"].toMap()["result"].toMap()["date_of_birth"].toString(), Qt::ISODate);
-        strHtml += "<p>" + date.toString("dd/MM/yyyy");
+        strHtml += "<p><u>Date of birth</u>: " + date.toString("MMM d, yyyy");
 
         if(!map["q1"].toMap()["result"].toMap()["date_of_death"].toString().isEmpty()) {
             QDate date = QDate::fromString(map["q1"].toMap()["result"].toMap()["date_of_death"].toString(), Qt::ISODate);
-            strHtml += " - " + date.toString("dd/MM/yyyy");
-//            strHtml += " - " + date.toString("d MMM yyyy");
+            strHtml += "<p><u>Date of depth</u>: " + date.toString("MMM d, yyyy");
         }
-//        strHtml += ")";
     }
 
     //Deceased person
-//    strHtml += "<font color=\"blue\">";
     if(!map["q1"].toMap()["result"].toMap()["place_of_death"].toString().isEmpty())
     {
         strHtml += "<p><i>Deceased Person:</i></p>";
-        strHtml += "<p><u>Place of death</u>: <b>" + map["q0"].toMap()["result"].toMap()["place_of_death"].toString() + "</b></p>";
+        strHtml += "<p><u>Place of death</u>: <b>" + map["q1"].toMap()["result"].toMap()["place_of_death"].toString() + "</b></p>";
     }
     lst = map["q1"].toMap()["result"].toMap()["place_of_burial"].toList();
     if(!lst.isEmpty())
@@ -214,7 +210,6 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
         }
         strHtml += "<p><u>Cause of death</u>: <b>" + str + "</b></p>";
     }
-//    strHtml += "</font>";
 
     //Living person
     if(!map["q0"].toMap()["result"].toMap()["place_of_birth"].toString().isEmpty())
