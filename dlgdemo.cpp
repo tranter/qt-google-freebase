@@ -177,10 +177,10 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
     }
 
     // Name
-    strHtml += "<P><u>Name</u>: <b>" + map["q0"].toMap()["result"].toMap()["name"].toString() + "</b>";
+    strHtml += "<p><u>Name</u>: <b>" + map["q0"].toMap()["result"].toMap()["name"].toString() + "</b></p>";
     if(!map["q0"].toMap()["result"].toMap()["date_of_birth"].toString().isEmpty()) {
         QDate date = QDate::fromString(map["q0"].toMap()["result"].toMap()["date_of_birth"].toString(), Qt::ISODate);
-        strHtml += "<P>" + date.toString("dd/MM/yyyy");
+        strHtml += "<p>" + date.toString("dd/MM/yyyy");
 
         if(!map["q1"].toMap()["result"].toMap()["date_of_death"].toString().isEmpty()) {
             QDate date = QDate::fromString(map["q1"].toMap()["result"].toMap()["date_of_death"].toString(), Qt::ISODate);
@@ -191,15 +191,16 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
     }
 
     //Deceased person
-    strHtml += "<font color=\"blue\">";
+//    strHtml += "<font color=\"blue\">";
     if(!map["q1"].toMap()["result"].toMap()["place_of_death"].toString().isEmpty())
     {
-        strHtml += "<P><u>Place of death</u>: <b>" + map["q0"].toMap()["result"].toMap()["place_of_death"].toString() + "</b>\n\n";
+        strHtml += "<p><i>Deceased Person:</i></p>";
+        strHtml += "<p><u>Place of death</u>: <b>" + map["q0"].toMap()["result"].toMap()["place_of_death"].toString() + "</b></p>";
     }
     lst = map["q1"].toMap()["result"].toMap()["place_of_burial"].toList();
     if(!lst.isEmpty())
     {
-        strHtml += "<P><u>Place of burial</u>: <b>" + lst[0].toString() + "</b>\n\n";
+        strHtml += "<p><u>Place of burial</u>: <b>" + lst[0].toString() + "</b></p>";
     }
     lst = map["q1"].toMap()["result"].toMap()["cause_of_death"].toList();
     if(!lst.isEmpty())
@@ -211,14 +212,15 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
             if(i < lst.count()-1)
                 str += ", ";
         }
-        strHtml += "<P><u>Cause of death</u>: <b>" + str + "</b>\n\n";
+        strHtml += "<p><u>Cause of death</u>: <b>" + str + "</b></p>";
     }
-    strHtml += "</font>";
+//    strHtml += "</font>";
 
     //Living person
     if(!map["q0"].toMap()["result"].toMap()["place_of_birth"].toString().isEmpty())
     {
-        strHtml += "<P><u>Place of birth</u>: <b>" + map["q0"].toMap()["result"].toMap()["place_of_birth"].toString() + "</b>\n\n";
+        strHtml += "<p><i>Living Person:</i></p>";
+        strHtml += "<p><u>Place of birth</u>: <b>" + map["q0"].toMap()["result"].toMap()["place_of_birth"].toString() + "</b></p>";
     }
     lst = map["q0"].toMap()["result"].toMap()["profession"].toList();
     if(!lst.isEmpty())
@@ -230,12 +232,12 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
             if(i < lst.count()-1)
                 str += ", ";
         }
-        strHtml += "<P><u>Profession</u>: <b>" + str + "</b>\n\n";
+        strHtml += "<p><u>Profession</u>: <b>" + str + "</b></p>";
     }
     lst = map["q0"].toMap()["result"].toMap()["nationality"].toList();
     if(!lst.isEmpty())
     {
-        strHtml += "<P><u>Nationality</u>: <b>" + lst[0].toString() + "</b>\n\n";
+        strHtml += "<p><u>Nationality</u>: <b>" + lst[0].toString() + "</b></p>";
     }
     lst = map["q0"].toMap()["result"].toMap()["ethnicity"].toList();
     if(!lst.isEmpty())
@@ -247,12 +249,12 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
             if(i < lst.count()-1)
                 str += ", ";
         }
-        strHtml += "<P><u>Ethnicity</u>: <b>" + str + "</b>\n\n";
+        strHtml += "<p><u>Ethnicity</u>: <b>" + str + "</b></p>";
     }
     lst = map["q0"].toMap()["result"].toMap()["religion"].toList();
     if(!lst.isEmpty())
     {
-        strHtml += "<P><u>Religion</u>: <b>" + lst[0].toString() + "</b>\n\n";
+        strHtml += "<p><u>Religion</u>: <b>" + lst[0].toString() + "</b></p>";
     }
 
     lst = map["q0"].toMap()["result"].toMap()["children"].toList();
@@ -265,7 +267,7 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
             if(i < lst.count()-1)
                 children += ", ";
         }
-        strHtml += "<P><u>Children</u>: <b>" + children + "</b>\n\n";
+        strHtml += "<p><u>Children</u>: <b>" + children + "</b></p>";
     }
 
     lst = map["q0"].toMap()["result"].toMap()["parents"].toList();
@@ -278,7 +280,7 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
             if(i < lst.count()-1)
                 parents += ", ";
         }
-        strHtml += "<P><u>Parents</u>: <b>" + parents + "</b>\n\n";
+        strHtml += "<p><u>Parents</u>: <b>" + parents + "</b></p>";
     }
 
     lst = map["q0"].toMap()["result"].toMap()["quotations"].toList();
@@ -290,23 +292,24 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
             str += "<li>" + lst[i].toString() + "</li>";
         }
         str += "</ul>";
-        strHtml += "<P><u>Quotations</u>:<br>" + str + "\n\n";
+        strHtml += "<p><u>Quotations</u>:<br>" + str;
     }
 
     //Books author
-    strHtml += "<font color=\"green\">";
+//    strHtml += "<font color=\"green\">";
     lst = map["q2"].toMap()["result"].toMap()["works_written"].toList();
     if(!lst.isEmpty())
     {
+        strHtml += "<p><i>Books author:</i></p>";
         QString str = "<ul>";
         for(int i = 0; i < lst.count(); ++i)
         {
             str += "<li>" + lst[i].toString() + "</li>";
         }
         str += "</ul>";
-        strHtml += "<P><u>Works written</u>:<br>" + str + "\n\n";
+        strHtml += "<p><u>Works written</u>:<br>" + str + "</p>";
     }
-    strHtml += "</font>";
+//    strHtml += "</font>";
 
     strHtml += "</body></html>";
     return strHtml;
@@ -328,7 +331,7 @@ void DlgDemo::sslErrorHandler(QNetworkReply* qnr, const QList<QSslError> & errli
 QString DlgDemo::findNamespaceValue(const QString& ns, const QVariantMap& map)
 {
     QString ret;
-    QVariantList list = map["key"].toList();
+    QVariantList list = map["q0"].toMap()["result"].toMap()["key"].toList();
     foreach (QVariant item, list) {
         QVariantMap m = item.toMap();
         if (item.toMap()["namespace"].toString() == ns) {
