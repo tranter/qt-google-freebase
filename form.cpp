@@ -64,9 +64,6 @@ Form::Form(QWidget *parent) :
     connect(ui->btnClear,SIGNAL(clicked()),this,SLOT(onBtnClearClicked()));
     connect(ui->pushButtonDomainsList,SIGNAL(clicked()),this,SLOT(listDomains()));
 
-//    m_pScene = new QGraphicsScene();
-//    ui->graphicsViewImage->setScene(m_pScene);
-
     initSuggestPage();
     connect(ui->webViewImage->page()->networkAccessManager(),
               SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )),
@@ -80,11 +77,10 @@ Form::Form(QWidget *parent) :
     ui->treeMqlReply->setHeaderHidden(false);
     connect(ui->treeMqlReply,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(onTreeGoToItem(QModelIndex)));
 
-    ui->textBrowserText->setTabStopWidth(20);
-    ui->textBrowserText->setReadOnly(true);
-    ui->textBrowserText->setOpenLinks(false);
-    ui->textBrowserText->setUndoRedoEnabled(true);
-    connect(ui->textBrowserText,SIGNAL(anchorClicked(QUrl)),this,SLOT(onTextBrowserAnchorClicked(QUrl)));
+    ui->webViewText->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+    connect(ui->webViewText->page()->networkAccessManager(),SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>& )),
+              this,SLOT(sslTextErrorHandler(QNetworkReply*, const QList<QSslError>& )));
+    connect(ui->webViewText,SIGNAL(linkClicked(QUrl)),this,SLOT(onTextLinkClicked(QUrl)));
 
     m_historyMax = 20;
     m_historyPos["MQL Request"] = 0;
@@ -140,13 +136,13 @@ void Form::onUserEmailReady()
 void Form::onMqlReplyReady(const int rt)
 {
     ui->textMqlReply->setPlainText(m_pManager->getReplyStr());
-    ui->textBrowserText->setHtml(m_pManager->getRichTextReplyStr());
+    ui->webViewText->setHtml(m_pManager->getRichTextReplyStr());
 }
 
 void Form::onSearchReplyReady(const int rt)
 {
     ui->textMqlReply->setPlainText(m_pManager->getReplyStr());
-    ui->textBrowserText->setHtml(m_pManager->getRichTextReplyStr());
+    ui->webViewText->setHtml(m_pManager->getRichTextReplyStr());
 }
 
 void Form::onJsonReady(const int rt)
@@ -224,7 +220,9 @@ void Form::onBtnImageGoClicked()
 void Form::onBtnClearClicked()
 {
     ui->textMqlReply->clear();
-    ui->textBrowserText->clear();
+//    ui->textBrowserText->clear();
+    ui->webViewText->setHtml(QString());
+    ui->webViewImage->setHtml(QString());
     clearReplyImage();
     clearTreeJson();
 }
@@ -389,21 +387,31 @@ void Form::onTreeGoToItem(const QModelIndex& index)
 //    }
 }
 
-void Form::onTextBrowserAnchorClicked(const QUrl& url)
+//void Form::onTextBrowserAnchorClicked(const QUrl& url)
+//{
+//    QString value = url.toString();
+//    qDebug() << Q_FUNC_INFO << " url=" << url;
+
+//    ui->textMqlReply->clear();
+//    m_pManager->runSearchQuery(value);
+////    int height = ui->graphicsViewImage->size().height();
+////    int width = ui->graphicsViewImage->size().width();
+////    if (value.startsWith('/')) {
+////        clearReplyImage();
+////        m_pManager->runImageQuery(value
+////            ,height
+////            ,width);
+////    }
+//}
+
+void Form::onTextLinkClicked(const QUrl& url)
 {
-    QString value = url.toString();
     qDebug() << Q_FUNC_INFO << " url=" << url;
+
+    QString value = url.toString();
 
     ui->textMqlReply->clear();
     m_pManager->runSearchQuery(value);
-//    int height = ui->graphicsViewImage->size().height();
-//    int width = ui->graphicsViewImage->size().width();
-//    if (value.startsWith('/')) {
-//        clearReplyImage();
-//        m_pManager->runImageQuery(value
-//            ,height
-//            ,width);
-//    }
 }
 
 void Form::onBacwardAction()
@@ -464,6 +472,11 @@ void Form::startDlgDemo()
 }
 
 void Form::sslImageErrorHandler(QNetworkReply* qnr, const QList<QSslError>& /*errlist*/)
+{
+    qnr->ignoreSslErrors();
+}
+
+void Form::sslTextErrorHandler(QNetworkReply* qnr, const QList<QSslError>& /*errlist*/)
 {
     qnr->ignoreSslErrors();
 }

@@ -381,7 +381,13 @@
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_18">
            <item>
-            <widget class="QTextBrowser" name="textBrowserText"/>
+            <widget class="QWebView" name="webViewText">
+             <property name="url">
+              <url>
+               <string>about:blank</string>
+              </url>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>

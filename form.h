@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QWebPage>
 #include <QModelIndex>
+#include <QNetworkReply>
 
 #include "freebase_data_manager.h"
 
@@ -20,8 +21,13 @@ class TreeJsonModel;
 
 class MyWebPage : public QWebPage
 {
+    Q_OBJECT
+
 public:
-    MyWebPage(QObject* parent=0) : QWebPage(parent) {;}
+    MyWebPage(QObject* parent=0) : QWebPage(parent) {
+        connect(networkAccessManager(),SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>& )),
+                  this,SLOT(sslErrorHandler(QNetworkReply*, const QList<QSslError>& )));
+    }
 
     QString userAgentForUrl(const QUrl &url ) const
     {
@@ -32,6 +38,11 @@ public:
 //    }
     void javaScriptConsoleMessage(const QString& msg, int lineNumber, const QString& sourceID) {
         qDebug() << Q_FUNC_INFO << " lineNumber=" << lineNumber << ", msg=" << msg << ", sourceID=" << sourceID;
+    }
+
+private slots:
+    void sslErrorHandler(QNetworkReply* qnr, const QList<QSslError>& /*errlist*/) {
+        qnr->ignoreSslErrors();
     }
 };
 
@@ -78,9 +89,11 @@ private slots:
 
     void onNewPage();
     void onTreeGoToItem(const QModelIndex& index);
-    void onTextBrowserAnchorClicked(const QUrl& url);
+//    void onTextBrowserAnchorClicked(const QUrl& url);
 
     void sslImageErrorHandler(QNetworkReply* qnr, const QList<QSslError>& errlist);
+    void sslTextErrorHandler(QNetworkReply* qnr, const QList<QSslError>& errlist);
+    void onTextLinkClicked(const QUrl& url);
 
 private:
     void saveSettings();

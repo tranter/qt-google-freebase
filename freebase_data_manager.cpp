@@ -261,39 +261,13 @@ QString freebase_data_manager::modifyTextReply()
     return ret;
 }
 
-//QString freebase_data_manager::modifySearchReply()
-//{
-//    QString ret = "<b><p align='justify'>";
-//    QVariantList list = m_jsonReply.toMap()["result"].toList();
-//    foreach (QVariant item, list) {
-//        QVariantMap map = item.toMap();
-//        if (map.contains("name")) {
-//            ret += "<a href='" + map.value("name").toString() + "'>" + map.value("name").toString() + "</a>";
-//        }
-//        if (map.contains("notable")) {
-//            ret += " (" + map.value("notable").toMap().value("name").toString()+")";
-//        }
-//        if (map.contains("lang")) {
-//            ret += ", " + map.value("lang").toString();
-//        }
-//        if (map.contains("mid")) {
-//            ret += ", <a href='" + map.value("mid").toString() + "'>" + map.value("mid").toString() + "</a>";
-//        }
-//        if (map.contains("score")) {
-//            ret += ", score=" + map.value("score").toString();
-//        }
-//        ret += "</p><p align='justify'>";
-//    }
-//    ret += "</p></b>";
-//    return ret;
-//}
-
 QString freebase_data_manager::modifySearchReply()
 {
-    QString ret = "<b><p align='justify'>";
+    QString ret = "<b><ul>";
     QVariantList list = m_jsonReply.toMap()["result"].toList();
     foreach (QVariant item, list) {
         QVariantMap map = item.toMap();
+        ret += "<li>";
         if (map.contains("name")) {
             ret += "<a href='" + map.value("name").toString() + "'>" + map.value("name").toString() + "</a>";
         }
@@ -309,9 +283,13 @@ QString freebase_data_manager::modifySearchReply()
         if (map.contains("score")) {
             ret += ", score=" + map.value("score").toString();
         }
-        ret += "</p><p align='justify'>";
+        if (map.contains("mid")) {
+            ret += QString("<p><img id=\"resizeImage\" src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1\"/>")
+                    .arg(map.value("mid").toString());
+        }
+        ret += "</p></li>";
     }
-    ret += "</p></b>";
+    ret += "</ul></b>";
     return ret;
 }
 
