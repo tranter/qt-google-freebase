@@ -13,7 +13,6 @@ class DlgDemo;
 }
 
 class freebase_data_manager;
-class QGraphicsScene;
 
 class DlgDemo : public QDialog
 {
@@ -42,7 +41,6 @@ private:
     Ui::DlgDemo *ui;
     freebase_data_manager* m_pManager;
     QMap<QString,QString> m_mapMids;
-    //QGraphicsScene* m_pScene;
 };
 
 #endif // DLGDEMO_H

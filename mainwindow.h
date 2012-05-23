@@ -28,6 +28,7 @@ public slots:
     void goForward();
     void onRun();
     void startDlgDemo();
+    void startDlgDemoCountry();
 
 private:
     Ui::MainWindow *ui;

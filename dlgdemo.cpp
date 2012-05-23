@@ -34,7 +34,6 @@ DlgDemo::DlgDemo(QWidget *parent) :
 
 DlgDemo::~DlgDemo()
 {
-    //delete m_pScene;
     delete m_pManager;
     delete ui;
 }

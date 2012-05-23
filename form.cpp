@@ -13,6 +13,7 @@
 #include "treejsonmodel.h"
 #include "treejsonitem.h"
 #include "dlgdemo.h"
+#include "dlgdemocountry.h"
 
 Form::Form(QWidget *parent) :
     QWidget(parent),
@@ -467,6 +468,15 @@ void Form::startDlgDemo()
     qDebug() << Q_FUNC_INFO;
 
     DlgDemo* pDlg = new DlgDemo(this);
+    pDlg->exec();
+    delete pDlg;
+}
+
+void Form::startDlgDemoCountry()
+{
+    qDebug() << Q_FUNC_INFO;
+
+    DlgDemoCountry* pDlg = new DlgDemoCountry(this);
     pDlg->exec();
     delete pDlg;
 }

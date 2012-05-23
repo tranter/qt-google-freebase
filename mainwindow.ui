@@ -24,7 +24,9 @@
    <addaction name="actionBackward"/>
    <addaction name="actionForward"/>
    <addaction name="actionRun"/>
+   <addaction name="separator"/>
    <addaction name="actionPeople_Info"/>
+   <addaction name="actionDemo_Country_Info"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="enabled">
@@ -62,6 +64,7 @@
      <string>Demo</string>
     </property>
     <addaction name="actionPeople_Info"/>
+    <addaction name="actionDemo_Country_Info"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -132,6 +135,15 @@
    </property>
    <property name="toolTip">
     <string>Demo People Info</string>
+   </property>
+  </action>
+  <action name="actionDemo_Country_Info">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/images/globe</normaloff>:/images/globe</iconset>
+   </property>
+   <property name="text">
+    <string>Demo Country Info</string>
    </property>
   </action>
  </widget>
