@@ -24,66 +24,58 @@
        <item>
         <widget class="QTabWidget" name="tabQuery">
          <property name="currentIndex">
-          <number>2</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="tabMql">
           <attribute name="title">
            <string>MQL Request</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_16">
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_7">
-             <item>
-              <widget class="QLabel" name="labelSearch">
-               <property name="text">
-                <string>Query text:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPlainTextEdit" name="editMqlQuery">
-               <property name="lineWrapMode">
-                <enum>QPlainTextEdit::NoWrap</enum>
-               </property>
-               <property name="plainText">
-                <string>[{
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="0" colspan="2">
+            <widget class="QLabel" name="labelSearch">
+             <property name="text">
+              <string>Query text:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" colspan="2">
+            <widget class="QPlainTextEdit" name="editMqlQuery">
+             <property name="lineWrapMode">
+              <enum>QPlainTextEdit::NoWrap</enum>
+             </property>
+             <property name="plainText">
+              <string>[{
 	&quot;clouds&quot;: [],
 	&quot;name&quot;:   null,
 	&quot;id&quot;:     null,
 	&quot;sort&quot;:   &quot;name&quot;,
 	&quot;type&quot;:   &quot;/meteorology/cloud_classification&quot;
 }]</string>
-               </property>
-               <property name="tabStopWidth">
-                <number>20</number>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_5">
-               <item>
-                <spacer name="horizontalSpacer_3">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButtonDomainsList">
-                 <property name="text">
-                  <string>Domains List</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
+             </property>
+             <property name="tabStopWidth">
+              <number>20</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>200</width>
+               <height>17</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="2" column="1">
+            <widget class="QPushButton" name="pushButtonDomainsList">
+             <property name="text">
+              <string>Domains List</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -91,31 +83,27 @@
           <attribute name="title">
            <string>Search Request</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_8" stretch="3,0,1">
-             <item>
-              <widget class="QPlainTextEdit" name="editSearchQuery">
-               <property name="plainText">
-                <string>john kennedy</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label">
-               <property name="text">
-                <string>Filter:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPlainTextEdit" name="editSearchFilter">
-               <property name="plainText">
-                <string>type=/people/person&amp;type=/location/citytown&amp;type_strict=any</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="0" column="0">
+            <widget class="QPlainTextEdit" name="editSearchQuery">
+             <property name="plainText">
+              <string>john kennedy</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Filter:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QPlainTextEdit" name="editSearchFilter">
+             <property name="plainText">
+              <string>type=/people/person&amp;type_strict=any</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -135,116 +123,104 @@
           <attribute name="title">
            <string>Misc Request</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_14">
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_12">
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_3">
-               <item>
-                <widget class="QLabel" name="label_2">
-                 <property name="minimumSize">
-                  <size>
-                   <width>70</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>70</width>
-                   <height>16</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Text Input:</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="lineEditText">
-                 <property name="text">
-                  <string>/en/kurt_vonnegut</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButtonTextGo">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>25</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Go</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_4">
-               <item>
-                <widget class="QLabel" name="label_3">
-                 <property name="minimumSize">
-                  <size>
-                   <width>70</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>70</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Image Input:</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="lineEditImage">
-                 <property name="text">
-                  <string>/en/kurt_vonnegut</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="pushButtonImageGo">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>25</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Go</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-            </layout>
+          <layout class="QGridLayout" name="gridLayout_3">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_2">
+             <property name="minimumSize">
+              <size>
+               <width>70</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>70</width>
+               <height>16</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Text Input:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
            </item>
-           <item>
+           <item row="0" column="1">
+            <widget class="QLineEdit" name="lineEditText">
+             <property name="text">
+              <string>/en/kurt_vonnegut</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QPushButton" name="pushButtonTextGo">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>25</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Go</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_3">
+             <property name="minimumSize">
+              <size>
+               <width>70</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>70</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Image Input:</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="lineEditImage">
+             <property name="text">
+              <string>/en/kurt_vonnegut</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QPushButton" name="pushButtonImageGo">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>25</width>
+               <height>20</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Go</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0" colspan="3">
             <widget class="QWebView" name="webViewImage">
              <property name="url">
               <url>
@@ -259,26 +235,22 @@
           <attribute name="title">
            <string>Write Request</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_11">
+          <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout_10">
-             <item>
-              <widget class="QPlainTextEdit" name="editWriteQuery">
-               <property name="plainText">
-                <string>{
+            <widget class="QPlainTextEdit" name="editWriteQuery">
+             <property name="plainText">
+              <string>{
  &quot;create&quot;: &quot;unless_exists&quot;,
  &quot;name&quot;:   &quot;Test Object 1&quot;,
  &quot;type&quot;:   &quot;/base/mqlexamples/testobject&quot;,
  &quot;id&quot;:     null,
  &quot;guid&quot;:   null
 }</string>
-               </property>
-               <property name="tabStopWidth">
-                <number>20</number>
-               </property>
-              </widget>
-             </item>
-            </layout>
+             </property>
+             <property name="tabStopWidth">
+              <number>20</number>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -331,23 +303,19 @@
        <item>
         <widget class="QTabWidget" name="tabReply">
          <property name="currentIndex">
-          <number>2</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="tabTree">
           <attribute name="title">
            <string>Tree</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_5">
+          <layout class="QVBoxLayout" name="verticalLayout_4">
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout_4">
-             <item>
-              <widget class="QTreeView" name="treeMqlReply">
-               <property name="headerHidden">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
+            <widget class="QTreeView" name="treeMqlReply">
+             <property name="headerHidden">
+              <bool>true</bool>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -355,23 +323,19 @@
           <attribute name="title">
            <string>Json</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_3">
+          <layout class="QVBoxLayout" name="verticalLayout">
            <item>
-            <layout class="QVBoxLayout" name="verticalLayout">
-             <item>
-              <widget class="QPlainTextEdit" name="textMqlReply">
-               <property name="lineWrapMode">
-                <enum>QPlainTextEdit::WidgetWidth</enum>
-               </property>
-               <property name="readOnly">
-                <bool>true</bool>
-               </property>
-               <property name="tabStopWidth">
-                <number>20</number>
-               </property>
-              </widget>
-             </item>
-            </layout>
+            <widget class="QPlainTextEdit" name="textMqlReply">
+             <property name="lineWrapMode">
+              <enum>QPlainTextEdit::WidgetWidth</enum>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+             <property name="tabStopWidth">
+              <number>20</number>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
