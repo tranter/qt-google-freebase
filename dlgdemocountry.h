@@ -32,7 +32,7 @@ private:
     void getImage(const QString& mid);
     void getCountryInfo(const QString& id);
     void clearOldData();
-    QString createHtmlForPerson(const QVariantMap& map);
+    QString createHtmlForCountry(const QVariantMap& map);
     QString findNamespaceValue(const QString& ns, const QVariantMap& map);
 
 private:
