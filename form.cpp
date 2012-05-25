@@ -161,7 +161,7 @@ void Form::onMqlReplyReady(const int rt)
             name = map["name"].toString();
             type = map["type"].toString();
 
-            QString link = QString("<a href=\"%1\">%1</a>").arg(id);
+            QString link = QString("<a href=\"mql:%1\">%1</a>").arg(id);
 
             if( type == "/type/domain" )
                 link = mqlHref.arg( "Type", id );
@@ -458,8 +458,15 @@ void Form::onTextLinkClicked(const QUrl& url)
     QString value = url.toString();
     ui->textMqlReply->clear();
 
-    if( value.startsWith("mqltype:") )
+    if( value.startsWith("mql:") )
     {
+        QString q = value.remove(0,4);
+        if( q.startsWith("/m/") )
+            m_pManager->runSearchQuery(q);
+        else
+            m_pManager->runTextQuery(q);
+        return;
+    } else if( value.startsWith("mqltype:") ) {
         QString q = QString("[{ \"id\": null, \"name\": null, \"sort\": \"name\", \"type\": \"/type/type\", \"domain\": \"%1\" }]").arg( value.remove(0, 8) );
         m_pManager->runMqlQuery(q);
         return;
