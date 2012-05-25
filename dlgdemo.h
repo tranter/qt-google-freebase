@@ -29,6 +29,7 @@ private slots:
     void sslErrorHandler(QNetworkReply* qnr, const QList<QSslError> & errlist);
     void onLinkClicked(const QUrl& url);
     void onBack();
+    void onForward();
 
 private:
     void getImage(const QString& mid);
@@ -36,12 +37,16 @@ private:
     void clearOldData();
     QString createHtmlForPerson(const QVariantMap& map);
     QString findNamespaceValue(const QString& ns, const QVariantMap& map);
+    void addMidToStack(const QString& mid);
 
 
 private:
     Ui::DlgDemo *ui;
     freebase_data_manager* m_pManager;
     QMap<QString,QString> m_mapMids;
+
+    QStringList m_midsUndoStack;
+    int m_nMidPosition;
 };
 
 #endif // DLGDEMO_H
