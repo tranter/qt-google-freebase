@@ -13,10 +13,12 @@ INCLUDEPATH += ../qjson/include
 
 linux* {
 LIBS += ../qjson/build/lib/libqjson.so
+QMAKE_CXXFLAGS += -Wno-unused-parameter
 }
 
 win32-g++ {
 LIBS += ../qjson/build/lib/qjson0.dll
+QMAKE_CXXFLAGS += -Wno-unused-parameter
 }
 
 win32-msvc* {
