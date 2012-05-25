@@ -475,9 +475,33 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
     }
 
     // Reference's links
+    // Persons
     lst = map["q3"].toMap()["result"].toList();
     if (!lst.isEmpty()) {
         strHtml += "<p><i><u>People Referencies</u></i></p>";
+        mapLocal = lst[0].toMap();
+        key = "/type/reflect/any_reverse";
+        text = "Referencies:";
+        if (mapLocal.contains(key)) {
+            QVariant::Type t = mapLocal[key].type();
+            if (t == QVariant::List) {
+                lst = mapLocal[key].toList();
+                if (!lst.isEmpty()) {
+                    strHtml += "<p><i>" + text + "</i></p><ul>";
+                    foreach (QVariant item, lst) {
+                        strHtml += "<li><a href=\""+item.toMap()["mid"].toString()+"\">" + item.toMap()["name"].toString()+ "</a></li>";
+                    }
+                    strHtml += "</ul>";
+                }
+            } else if (t != QVariant::Invalid) {
+                strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
+            }
+        }
+    }
+    // Events
+    lst = map["q4"].toMap()["result"].toList();
+    if (!lst.isEmpty()) {
+        strHtml += "<p><i><u>Event Referencies</u></i></p>";
         mapLocal = lst[0].toMap();
         key = "/type/reflect/any_reverse";
         text = "Referencies:";
