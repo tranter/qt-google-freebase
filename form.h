@@ -120,6 +120,8 @@ private:
     QMap<QString,QList<QString> > m_history;
     QMap<QString,int> m_historyPos;
     int m_historyMax;
+
+    bool m_requestForDomainList;
 };
 
 #endif // FORM_H

@@ -88,6 +88,8 @@ Form::Form(QWidget *parent) :
     m_historyPos["Search Request"] = 0;
     m_history["MQL Request"].insert(0,ui->editMqlQuery->toPlainText());
     m_history["Search Request"].insert(0,ui->editSearchQuery->toPlainText()+"@"+ui->editSearchFilter->toPlainText());
+
+    m_requestForDomainList = false;
 }
 
 Form::~Form()
@@ -136,12 +138,48 @@ void Form::onUserEmailReady()
 
 void Form::onMqlReplyReady(const int rt)
 {
+    qDebug() << Q_FUNC_INFO;
     ui->textMqlReply->setPlainText(m_pManager->getReplyStr());
     ui->webViewText->setHtml(m_pManager->getRichTextReplyStr());
+
+    if( m_requestForDomainList )
+    {
+        QVariantMap map = m_pManager->getJsonData().toMap();
+        if( ! map["q0"].isValid() ) return;
+
+        QString html( "<html><head><style type=\"text/css\">a{color:black;text-decoration:none}</style></head><body><table>" );
+        QVariantList list = map["q0"].toMap()["result"].toList();
+        QString id, name, type;
+
+        QString mqlHref( "<a href=\"mql%1:%2\">%2</a>" );
+
+        foreach(const QVariant & v, list)
+        {
+            map  = v.toMap();
+            id   = map["id"].toString();
+            name = map["name"].toString();
+            type = map["type"].toString();
+
+            QString link = QString("<a href=\"%1\">%1</a>").arg(id);
+
+            if( type == "/type/domain" )
+                link = mqlHref.arg( "Type", id );
+            else if( type == "/type/type" )
+                link = mqlHref.arg( "Instances", id );
+
+            html += QString("<tr><td><a href=\"%2\">%1</a></td>"
+                            "<td>%3</td></tr>").arg(name, id, link);
+        }
+
+        html += "</table></body></html>";
+
+        ui->webViewText->setHtml( html );
+    }
 }
 
 void Form::onSearchReplyReady(const int rt)
 {
+    qDebug() << Q_FUNC_INFO;
     ui->textMqlReply->setPlainText(m_pManager->getReplyStr());
     ui->webViewText->setHtml(m_pManager->getRichTextReplyStr());
 }
@@ -160,6 +198,8 @@ void Form::onImageReady(const QPixmap& px, const int rt)
 
 void Form::onBtnRunClicked()
 {
+    m_requestForDomainList = false;
+
     ui->textMqlReply->clear();
     clearReplyImage();
     int index = ui->tabQuery->currentIndex();
@@ -202,6 +242,7 @@ void Form::onBtnRunClicked()
 
 void Form::onBtnTextGoClicked()
 {
+    m_requestForDomainList = false;
     ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
     ui->textMqlReply->clear();
     m_pManager->runTextQuery(ui->lineEditText->text());
@@ -209,6 +250,7 @@ void Form::onBtnTextGoClicked()
 
 void Form::onBtnImageGoClicked()
 {
+    m_requestForDomainList = false;
 //    ui->tabReply->setCurrentIndex(indexTabReplyByName("Image"));
 //    clearReplyImage();
 //    m_pManager->runImageQuery(ui->lineEditImage->text()
@@ -220,6 +262,7 @@ void Form::onBtnImageGoClicked()
 
 void Form::onBtnClearClicked()
 {
+    m_requestForDomainList = false;
     ui->textMqlReply->clear();
 //    ui->textBrowserText->clear();
     ui->webViewText->setHtml(QString());
@@ -231,7 +274,7 @@ void Form::onBtnClearClicked()
 void Form::listDomains()
 {
     m_historyPos["MQL Request"] = 0;
-    QString curValue = "[{\n\t\"id\": null,\n\t\"name\": null,\n\t\"type\": \"/type/domain\",\n\t\"!/freebase/domain_category/domains\": {\n\t\t\"id\": \"/category/commons\"\n\t}\n}]";
+    QString curValue = "[{\n\t\"id\": null,\n\t\"name\": null,\n\t\"sort\": \"name\",\n\t\"type\": \"/type/domain\",\n\t\"!/freebase/domain_category/domains\": {\n\t\t\"id\": \"/category/commons\"\n\t}\n}]";
     QString oldValue = m_history["MQL Request"].value(0);
     if (curValue != oldValue) {
         m_history["MQL Request"].insert(0,curValue);
@@ -239,10 +282,12 @@ void Form::listDomains()
             m_history["MQL Request"].removeLast();
         }
     }
-    ui->tabReply->setCurrentIndex(indexTabReplyByName("Json"));
+    //ui->tabReply->setCurrentIndex(indexTabReplyByName("Json"));
+    ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
     ui->textMqlReply->clear();
     m_pManager->runMqlQuery(curValue);
 
+    m_requestForDomainList = true;
 
 //    ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
 //    ui->textMqlReply->clear();
@@ -410,8 +455,19 @@ void Form::onTextLinkClicked(const QUrl& url)
     qDebug() << Q_FUNC_INFO << " url=" << url;
 
     QString value = url.toString();
-
     ui->textMqlReply->clear();
+
+    if( value.startsWith("mqltype:") )
+    {
+        QString q = QString("[{ \"id\": null, \"name\": null, \"type\": \"/type/type\", \"domain\": \"%1\" }]").arg( value.remove(0, 8) );
+        m_pManager->runMqlQuery(q);
+        return;
+    } else if( value.startsWith("mqlinstances:") ) {
+        QString q = QString("[{ \"id\": null, \"name\": null, \"type\": \"%1\" }]").arg( value.remove(0, 13) );
+        m_pManager->runMqlQuery(q);
+        return;
+    }
+
     m_pManager->runSearchQuery(value);
 }
 

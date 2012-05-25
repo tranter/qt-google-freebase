@@ -6,6 +6,7 @@
         <file alias="run">images/run.png</file>
         <file alias="people">images/people_info.png</file>
         <file alias="globe">images/globe.png</file>
+        <file alias="clear">images/edit-clear.png</file>
     </qresource>
     <qresource prefix="/html">
         <file alias="suggest-basic.html">suggest-basic.html</file>

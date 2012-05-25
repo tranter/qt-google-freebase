@@ -292,6 +292,10 @@
            <property name="text">
             <string>Run</string>
            </property>
+           <property name="icon">
+            <iconset resource="resource.qrc">
+             <normaloff>:/images/run</normaloff>:/images/run</iconset>
+           </property>
           </widget>
          </item>
         </layout>
@@ -343,8 +347,8 @@
           <attribute name="title">
            <string>Text</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_18">
-           <item>
+          <layout class="QGridLayout" name="gridLayout_4">
+           <item row="0" column="0" colspan="2">
             <widget class="QWebView" name="webViewText">
              <property name="url">
               <url>
@@ -377,6 +381,10 @@
            <property name="text">
             <string>Clear</string>
            </property>
+           <property name="icon">
+            <iconset resource="resource.qrc">
+             <normaloff>:/images/clear</normaloff>:/images/clear</iconset>
+           </property>
           </widget>
          </item>
         </layout>
@@ -394,6 +402,8 @@
    <header>QtWebKit/QWebView</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
  <connections/>
 </ui>
