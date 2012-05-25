@@ -171,7 +171,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
     text = "Name:";
     if (mapLocal.contains(key)) {
         QVariant::Type t = mapLocal[key].type();
-        if (t == QMetaType::QVariantList) {
+        if (t == QVariant::List) {
             lst = mapLocal[key].toList();
             if (!lst.isEmpty()) {
                 strHtml += "<p><i>" + text + "</i></p><ul>";
@@ -188,7 +188,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
     text = "Capital:";
     if (mapLocal.contains(key)) {
         QVariant::Type t = mapLocal[key].type();
-        if (t == QMetaType::QVariantList) {
+        if (t == QVariant::List) {
             lst = mapLocal[key].toList();
             if (!lst.isEmpty()) {
                 strHtml += "<p><i>" + text + "</i></p><ul>";
@@ -205,7 +205,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
     text = "Administrative Divisions:";
     if (mapLocal.contains(key)) {
         QVariant::Type t = mapLocal[key].type();
-        if (t == QMetaType::QVariantList) {
+        if (t == QVariant::List) {
             lst = mapLocal[key].toList();
             if (!lst.isEmpty()) {
                 strHtml += "<p><i>" + text + "</i></p><ul>";
@@ -222,7 +222,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
     text = "Calling code:";
     if (mapLocal.contains(key)) {
         QVariant::Type t = mapLocal[key].type();
-        if (t == QMetaType::QVariantList) {
+        if (t == QVariant::List) {
             lst = mapLocal[key].toList();
             if (!lst.isEmpty()) {
                 strHtml += "<p><i>" + text + "</i></p><ul>";
@@ -239,7 +239,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
     text = "Currency used:";
     if (mapLocal.contains(key)) {
         QVariant::Type t = mapLocal[key].type();
-        if (t == QMetaType::QVariantList) {
+        if (t == QVariant::List) {
             lst = mapLocal[key].toList();
             if (!lst.isEmpty()) {
                 strHtml += "<p><i>" + text + "</i></p><ul>";
@@ -256,7 +256,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
     text = "FIFA code:";
     if (mapLocal.contains(key)) {
         QVariant::Type t = mapLocal[key].type();
-        if (t == QMetaType::QVariantList) {
+        if (t == QVariant::List) {
             lst = mapLocal[key].toList();
             if (!lst.isEmpty()) {
                 strHtml += "<p><i>" + text + "</i></p><ul>";
@@ -273,7 +273,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
     text = "Form of government:";
     if (mapLocal.contains(key)) {
         QVariant::Type t = mapLocal[key].type();
-        if (t == QMetaType::QVariantList) {
+        if (t == QVariant::List) {
             lst = mapLocal[key].toList();
             if (!lst.isEmpty()) {
                 strHtml += "<p><i>" + text + "</i></p><ul>";
@@ -290,7 +290,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
     text = "Internet domains:";
     if (mapLocal.contains(key)) {
         QVariant::Type t = mapLocal[key].type();
-        if (t == QMetaType::QVariantList) {
+        if (t == QVariant::List) {
             lst = mapLocal[key].toList();
             if (!lst.isEmpty()) {
                 strHtml += "<p><i>" + text + "</i></p><ul>";
@@ -307,7 +307,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
     text = "Language spoken:";
     if (mapLocal.contains(key)) {
         QVariant::Type t = mapLocal[key].type();
-        if (t == QMetaType::QVariantList) {
+        if (t == QVariant::List) {
             lst = mapLocal[key].toList();
             if (!lst.isEmpty()) {
                 strHtml += "<p><i>" + text + "</i></p><ul>";
@@ -324,7 +324,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
     text = "Official languages:";
     if (mapLocal.contains(key)) {
         QVariant::Type t = mapLocal[key].type();
-        if (t == QMetaType::QVariantList) {
+        if (t == QVariant::List) {
             lst = mapLocal[key].toList();
             if (!lst.isEmpty()) {
                 strHtml += "<p><i>" + text + "</i></p><ul>";
@@ -345,7 +345,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
     text = "Area (km2):";
     if (mapLocal.contains(key)) {
         QVariant::Type t = mapLocal[key].type();
-        if (t == QMetaType::QVariantList) {
+        if (t == QVariant::List) {
             lst = mapLocal[key].toList();
             if (!lst.isEmpty()) {
                 strHtml += "<p><i>" + text + "</i></p><ul>";
@@ -362,7 +362,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
     text = "Contained by:";
     if (mapLocal.contains(key)) {
         QVariant::Type t = mapLocal[key].type();
-        if (t == QMetaType::QVariantList) {
+        if (t == QVariant::List) {
             lst = mapLocal[key].toList();
             if (!lst.isEmpty()) {
                 strHtml += "<p><i>" + text + "</i></p><ul>";
@@ -379,7 +379,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
     text = "Time zones:";
     if (mapLocal.contains(key)) {
         QVariant::Type t = mapLocal[key].type();
-        if (t == QMetaType::QVariantList) {
+        if (t == QVariant::List) {
             lst = mapLocal[key].toList();
             if (!lst.isEmpty()) {
                 strHtml += "<p><i>" + text + "</i></p><ul>";
