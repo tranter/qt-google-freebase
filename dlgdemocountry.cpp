@@ -150,23 +150,22 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
     qDebug() << Q_FUNC_INFO;
     QString strHtml = QString("<html><body>");
     QVariantList lst;
-    QVariantMap mapLocal;
+    QVariantMap mapLocal =  map["q0"].toMap()["result"].toMap();
     QString key, text;
     strHtml += QString("<img src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1?maxheight=400&maxwidth=200\" align=\"right\">")
-            .arg(map["q0"].toMap()["result"].toMap()["mid"].toString());
+            .arg(mapLocal["mid"].toString());
 
     // Referencies
     QString s = findNamespaceValue("/wikipedia/en_id",map);
     if (!s.isEmpty()) {
         strHtml += QString("<a href=\"http://www.freebase.com/view%1\"><img src=\"http://www.freebase.com/favicon.ico\" alt=\"Freebase\" hspace=\"2\"/>Freebase</a>")
-                .arg(map["q0"].toMap()["result"].toMap()["mid"].toString());
+                .arg(mapLocal["mid"].toString());
         strHtml += QString("<a href=\"http://en.wikipedia.org/wiki/index.html?curid=%1\"><img src=\"http://en.wikipedia.org/favicon.ico\" alt=\"Wiki\" hspace=\"2\"/>Wiki</a>")
                 .arg(s);
     }
 
     strHtml += "<p><i><u>General Info</u></i></p>";
     ///location/country
-    mapLocal =  map["q0"].toMap()["result"].toMap();
     key = "name";
     text = "Name:";
     if (mapLocal.contains(key)) {
@@ -180,7 +179,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
                 }
                 strHtml += "</ul>";
             }
-        } else {
+        } else if (t != QVariant::Invalid) {
             strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
         }
     }
@@ -197,7 +196,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
                 }
                 strHtml += "</ul>";
             }
-        } else {
+        } else if (t != QVariant::Invalid) {
             strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
         }
     }
@@ -214,7 +213,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
                 }
                 strHtml += "</ul>";
             }
-        } else {
+        } else if (t != QVariant::Invalid) {
             strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
         }
     }
@@ -231,7 +230,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
                 }
                 strHtml += "</ul>";
             }
-        } else {
+        } else if (t != QVariant::Invalid) {
             strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
         }
     }
@@ -248,7 +247,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
                 }
                 strHtml += "</ul>";
             }
-        } else {
+        } else if (t != QVariant::Invalid) {
             strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
         }
     }
@@ -265,7 +264,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
                 }
                 strHtml += "</ul>";
             }
-        } else {
+        } else if (t != QVariant::Invalid) {
             strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
         }
     }
@@ -282,7 +281,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
                 }
                 strHtml += "</ul>";
             }
-        } else {
+        } else if (t != QVariant::Invalid) {
             strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
         }
     }
@@ -299,7 +298,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
                 }
                 strHtml += "</ul>";
             }
-        } else {
+        } else if (t != QVariant::Invalid) {
             strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
         }
     }
@@ -316,7 +315,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
                 }
                 strHtml += "</ul>";
             }
-        } else {
+        } else if (t != QVariant::Invalid) {
             strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
         }
     }
@@ -333,7 +332,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
                 }
                 strHtml += "</ul>";
             }
-        } else {
+        } else if (t != QVariant::Invalid) {
             strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
         }
     }
@@ -354,7 +353,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
                 }
                 strHtml += "</ul>";
             }
-        } else {
+        } else if (t != QVariant::Invalid) {
             strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
         }
     }
@@ -371,7 +370,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
                 }
                 strHtml += "</ul>";
             }
-        } else {
+        } else if (t != QVariant::Invalid) {
             strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
         }
     }
@@ -388,7 +387,7 @@ QString DlgDemoCountry::createHtmlForCountry(const QVariantMap& map)
                 }
                 strHtml += "</ul>";
             }
-        } else {
+        } else if (t != QVariant::Invalid) {
             strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
         }
     }

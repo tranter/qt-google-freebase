@@ -28,6 +28,7 @@ private slots:
     void onItemSelected();
     void sslErrorHandler(QNetworkReply* qnr, const QList<QSslError> & errlist);
     void onLinkClicked(const QUrl& url);
+    void onBack();
 
 private:
     void getImage(const QString& mid);
