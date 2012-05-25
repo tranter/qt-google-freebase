@@ -147,7 +147,8 @@ void Form::onMqlReplyReady(const int rt)
         QVariantMap map = m_pManager->getJsonData().toMap();
         if( ! map["q0"].isValid() ) return;
 
-        QString html( "<html><head><style type=\"text/css\">a{color:black;text-decoration:none}</style></head><body><table>" );
+        QString html( "<html><head><style type=\"text/css\">a{color:black;text-decoration:none}</style></head>"
+                      "<body><table><tr><td><b>Name</b></td><td><b>ID</b></td></tr>" );
         QVariantList list = map["q0"].toMap()["result"].toList();
         QString id, name, type;
 
@@ -459,11 +460,11 @@ void Form::onTextLinkClicked(const QUrl& url)
 
     if( value.startsWith("mqltype:") )
     {
-        QString q = QString("[{ \"id\": null, \"name\": null, \"type\": \"/type/type\", \"domain\": \"%1\" }]").arg( value.remove(0, 8) );
+        QString q = QString("[{ \"id\": null, \"name\": null, \"sort\": \"name\", \"type\": \"/type/type\", \"domain\": \"%1\" }]").arg( value.remove(0, 8) );
         m_pManager->runMqlQuery(q);
         return;
     } else if( value.startsWith("mqlinstances:") ) {
-        QString q = QString("[{ \"id\": null, \"name\": null, \"type\": \"%1\" }]").arg( value.remove(0, 13) );
+        QString q = QString("[{ \"id\": null, \"name\": null, \"sort\": \"name\", \"type\": \"%1\" }]").arg( value.remove(0, 13) );
         m_pManager->runMqlQuery(q);
         return;
     }
