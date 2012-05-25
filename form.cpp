@@ -507,9 +507,9 @@ QString Form::createImageHtml()
             "   var w=image.width;"
             "   var h=image.height;"
             "   if (h > w) {"
-            "       image.setAttribute(\"height\",\"100%\");"
+            "       image.setAttribute(\"height\",\"95%\");"
             "   } else {"
-            "       image.setAttribute(\"width\",\"100%\");"
+            "       image.setAttribute(\"width\",\"95%\");"
             "   }"
             "}</script>";
     ret += "<body onLoad=\"fixImage();\">";
