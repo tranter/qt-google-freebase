@@ -32,6 +32,7 @@ DlgDemo::DlgDemo(QWidget *parent) :
               SLOT(sslErrorHandler(QNetworkReply*, const QList<QSslError> & )));
     connect(ui->webView,SIGNAL(linkClicked(QUrl)),this,SLOT(onLinkClicked(QUrl)));
     connect(ui->pushButtonBack,SIGNAL(clicked()),this,SLOT(onBack()));
+    connect(ui->pushButtonForward,SIGNAL(clicked()),this,SLOT(onForward()));
 }
 
 DlgDemo::~DlgDemo()
@@ -97,7 +98,7 @@ void DlgDemo::onItemSelected()
     qDebug() << Q_FUNC_INFO << " str=" << str;
     if (str != "Select item" && !str.isEmpty())
     {
-        getPersonalInfo(m_mapMids[str]);
+        addMidToStack(m_mapMids[str]);
     }
 }
 
@@ -147,6 +148,18 @@ void DlgDemo::getPersonalInfo(const QString& id)
     query += QString(",\"type\":\"%1\", \"key\":[{}], \"*\":null}").arg(type);
     qDebug() << "QUERY: " << query;
     list << query;
+
+//    query = "{";
+//    if (id.startsWith("/m/")) {
+//        query += "\"mid\":\"" + id + "\"";
+//    } else {
+//        query += "\"id\":\"" + id + "\"";
+//    }
+//    type = "/event/event";
+//    query += QString(",\"type\":\"%1\", \"key\":[{}], \"*\":null}").arg(type);
+//    qDebug() << "QUERY: " << query;
+//    list << query;
+
 
     query = "[{";
     if (id.startsWith("/m/")) {
@@ -453,12 +466,12 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
     }
 
     //Books author
-    strHtml += "<p><i><u>Books Info</u></i></p>";
     ///books/author
     mapLocal =  map["q2"].toMap()["result"].toMap();
     key = "works_written";
     text = "Works written:";
     if (mapLocal.contains(key)) {
+        strHtml += "<p><i><u>Books Info</u></i></p>";
         QVariant::Type t = mapLocal[key].type();
         if (t == QVariant::List) {
             lst = mapLocal[key].toList();
@@ -487,7 +500,7 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
             if (t == QVariant::List) {
                 lst = mapLocal[key].toList();
                 if (!lst.isEmpty()) {
-                    strHtml += "<p><i>" + text + "</i></p><ul>";
+                    strHtml += "<p></p><ul>";
                     foreach (QVariant item, lst) {
                         strHtml += "<li><a href=\""+item.toMap()["mid"].toString()+"\">" + item.toMap()["name"].toString()+ "</a></li>";
                     }
@@ -510,7 +523,7 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
             if (t == QVariant::List) {
                 lst = mapLocal[key].toList();
                 if (!lst.isEmpty()) {
-                    strHtml += "<p><i>" + text + "</i></p><ul>";
+                    strHtml += "<p></p><ul>";
                     foreach (QVariant item, lst) {
                         strHtml += "<li><a href=\""+item.toMap()["mid"].toString()+"\">" + item.toMap()["name"].toString()+ "</a></li>";
                     }
@@ -559,13 +572,52 @@ void DlgDemo::onLinkClicked(const QUrl& url)
     qDebug() << Q_FUNC_INFO << " url=" << url;
     if (url.toString().contains("http://")) {
         QDesktopServices::openUrl(url);
-    } else if (url.toString().startsWith("/m/")) {
-        getPersonalInfo(url.toString());
+    }
+    else if (url.toString().startsWith("/m/"))
+    {
+        addMidToStack(url.toString());
     }
 }
 
 void DlgDemo::onBack()
 {
     qDebug() << Q_FUNC_INFO;
-    ui->webView->back();
+    //ui->webView->back();
+    if(m_nMidPosition > 0)
+    {
+        //m_midsUndoStack.removeLast();
+        --m_nMidPosition;
+        getPersonalInfo(m_midsUndoStack[m_nMidPosition]);
+    }
+}
+
+void DlgDemo::onForward()
+{
+    qDebug() << Q_FUNC_INFO;
+    //ui->webView->back();
+    if(m_nMidPosition < m_midsUndoStack.count()-1)
+    {
+        //m_midsUndoStack.removeLast();
+        ++m_nMidPosition;
+        getPersonalInfo(m_midsUndoStack[m_nMidPosition]);
+    }
+}
+
+void DlgDemo::addMidToStack(const QString& mid)
+{
+    if(!m_midsUndoStack.isEmpty())
+    {
+        while(m_nMidPosition < m_midsUndoStack.count()-1)
+        {
+            m_midsUndoStack.removeLast();
+        }
+        m_midsUndoStack.append(mid);
+        ++m_nMidPosition;
+    }
+    else
+    {
+        m_midsUndoStack.append(mid);
+        m_nMidPosition = 0;
+    }
+    getPersonalInfo(m_midsUndoStack[m_nMidPosition]);
 }
