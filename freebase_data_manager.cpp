@@ -263,34 +263,65 @@ QString freebase_data_manager::modifyTextReply()
 
 QString freebase_data_manager::modifySearchReply()
 {
-    QString ret = "<b><ul>";
+    QString ret;// = "<ul>";
     QVariantList list = m_jsonReply.toMap()["result"].toList();
     foreach (QVariant item, list) {
         QVariantMap map = item.toMap();
-        ret += "<li>";
+        ret += "<div style=\"display: table-row; width: 100%\"><p>";
+        if (map.contains("mid")) {
+            ret += QString("<span style=\"float: left; margin: 5px; width: 100px;\">"
+                           "<img src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1\"/></span>")
+                    .arg(map.value("mid").toString());
+        }
         if (map.contains("name")) {
             ret += "<a href='" + map.value("name").toString() + "'>" + map.value("name").toString() + "</a>";
         }
         if (map.contains("notable")) {
             ret += " (" + map.value("notable").toMap().value("name").toString()+")";
         }
+        ret += "<br/>";
+        if (map.contains("mid")) {
+            ret += "<a href='" + map.value("mid").toString() + "'>" + map.value("mid").toString() + "</a>";
+        }
         if (map.contains("lang")) {
             ret += ", " + map.value("lang").toString();
-        }
-        if (map.contains("mid")) {
-            ret += ", <a href='" + map.value("mid").toString() + "'>" + map.value("mid").toString() + "</a>";
         }
         if (map.contains("score")) {
             ret += ", score=" + map.value("score").toString();
         }
-        if (map.contains("mid")) {
-            ret += QString("<p><img id=\"resizeImage\" src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1\"/>")
-                    .arg(map.value("mid").toString());
-        }
-        ret += "</p></li>";
+        ret += "</p></div>";
     }
-    ret += "</ul></b>";
+    //ret += "</ul>";
     return ret;
+
+//    QString ret = "<b><ul>";
+//    QVariantList list = m_jsonReply.toMap()["result"].toList();
+//    foreach (QVariant item, list) {
+//        QVariantMap map = item.toMap();
+//        ret += "<li>";
+//        if (map.contains("name")) {
+//            ret += "<a href='" + map.value("name").toString() + "'>" + map.value("name").toString() + "</a>";
+//        }
+//        if (map.contains("notable")) {
+//            ret += " (" + map.value("notable").toMap().value("name").toString()+")";
+//        }
+//        if (map.contains("lang")) {
+//            ret += ", " + map.value("lang").toString();
+//        }
+//        if (map.contains("mid")) {
+//            ret += ", <a href='" + map.value("mid").toString() + "'>" + map.value("mid").toString() + "</a>";
+//        }
+//        if (map.contains("score")) {
+//            ret += ", score=" + map.value("score").toString();
+//        }
+//        if (map.contains("mid")) {
+//            ret += QString("<p><img id=\"resizeImage\" src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1\"/>")
+//                    .arg(map.value("mid").toString());
+//        }
+//        ret += "</p></li>";
+//    }
+//    ret += "</ul></b>";
+//    return ret;
 }
 
 void freebase_data_manager::onSslError(QNetworkReply* reply,QList<QSslError> listErr)
