@@ -33,6 +33,7 @@ DlgDemo::DlgDemo(QWidget *parent) :
     connect(ui->webView,SIGNAL(linkClicked(QUrl)),this,SLOT(onLinkClicked(QUrl)));
     connect(ui->pushButtonBack,SIGNAL(clicked()),this,SLOT(onBack()));
     connect(ui->pushButtonForward,SIGNAL(clicked()),this,SLOT(onForward()));
+    m_state = ST_NONE;
 }
 
 DlgDemo::~DlgDemo()
@@ -84,11 +85,22 @@ void DlgDemo::onJsonReady(const int rt)
     else if (rt == REQ_MQL)
     {
         qDebug() << "Some info from MQL arrived";
-        QString strHtml = createHtmlForPerson(m_pManager->getJsonData().toMap());
-        ui->webView->setHtml(strHtml);
-//        QWebPage* page = new QWebPage(this);
-//        page->mainFrame()->setHtml(strHtml);
-//        ui->webView->setPage(page);
+        if (m_state == ST_NONE) {
+            QString strHtml = createHtmlForPerson(m_pManager->getJsonData().toMap());
+            ui->webView->setHtml(strHtml);
+        } else {
+            m_state = ST_NONE;
+            QVariantMap map = m_pManager->getJsonData().toMap()["q0"].toMap();
+            if (map.contains("result")) {
+                QVariantList list = map["result"].toList();
+                if (list.size() > 0) {
+                    if (list[0].toMap().contains("key")) {
+                        QString url = "http://en.wikipedia.org/wiki/index.html?curid="+list[0].toMap()["key"].toMap()["value"].toString();
+                        QDesktopServices::openUrl(QUrl(url));
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -218,23 +230,7 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
 
     strHtml += "<p><i><u>General Info</u></i></p>";
     ///people/person
-    key = "name";
-    text = "Name:";
-    if (mapLocal.contains(key)) {
-        QVariant::Type t = mapLocal[key].type();
-        if (t == QVariant::List) {
-            lst = mapLocal[key].toList();
-            if (!lst.isEmpty()) {
-                strHtml += "<p><i>" + text + "</i></p><ul>";
-                foreach (QVariant item, lst) {
-                    strHtml += "<li><b>"+item.toString()+"</b></li>";
-                }
-                strHtml += "</ul>";
-            }
-        } else if (t != QVariant::Invalid) {
-            strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
-        }
-    }
+    strHtml += makeHtmlRecord(mapLocal,"name","Name:");
     key = "date_of_birth";
     text = "Date of birth:";
     if (mapLocal.contains(key)) {
@@ -272,220 +268,27 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
             strHtml += "<p><i>" + text + " </i><b>" + date.toString("MMM d, yyyy") + "</b></p>";
         }
     }
-    key = "place_of_death";
-    text = "Place of death:";
-    if (mapLocal.contains(key)) {
-        QVariant::Type t = mapLocal[key].type();
-        if (t == QVariant::List) {
-            lst = mapLocal[key].toList();
-            if (!lst.isEmpty()) {
-                strHtml += "<p><i>" + text + "</i></p><ul>";
-                foreach (QVariant item, lst) {
-                    strHtml += "<li><b>"+item.toString()+"</b></li>";
-                }
-                strHtml += "</ul>";
-            }
-        } else if (t != QVariant::Invalid) {
-            strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
-        }
-    }
-    key = "place_of_burial";
-    text = "Place of bural:";
-    if (mapLocal.contains(key)) {
-        QVariant::Type t = mapLocal[key].type();
-        if (t == QVariant::List) {
-            lst = mapLocal[key].toList();
-            if (!lst.isEmpty()) {
-                strHtml += "<p><i>" + text + "</i></p><ul>";
-                foreach (QVariant item, lst) {
-                    strHtml += "<li><b>"+item.toString()+"</b></li>";
-                }
-                strHtml += "</ul>";
-            }
-        } else if (t != QVariant::Invalid) {
-            strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
-        }
-    }
-    key = "cause_of_death";
-    text = "Cause of death:";
-    if (mapLocal.contains(key)) {
-        QVariant::Type t = mapLocal[key].type();
-        if (t == QVariant::List) {
-            lst = mapLocal[key].toList();
-            if (!lst.isEmpty()) {
-                strHtml += "<p><i>" + text + "</i></p><ul>";
-                foreach (QVariant item, lst) {
-                    strHtml += "<li><b>"+item.toString()+"</b></li>";
-                }
-                strHtml += "</ul>";
-            }
-        } else if (t != QVariant::Invalid) {
-            strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
-        }
-    }
+    strHtml += makeHtmlRecord(mapLocal,"place_of_death","Place of death:");
+    strHtml += makeHtmlRecord(mapLocal,"place_of_burial","Place of burial:");
+    strHtml += makeHtmlRecord(mapLocal,"cause_of_death","Cause of death:");
 
     //Living person
     strHtml += "<p><i><u>Person Info</u></i></p>";
     ///people/person
     mapLocal =  map["q0"].toMap()["result"].toMap();
-    key = "place_of_birth";
-    text = "Place of birth:";
-    if (mapLocal.contains(key)) {
-        QVariant::Type t = mapLocal[key].type();
-        if (t == QVariant::List) {
-            lst = mapLocal[key].toList();
-            if (!lst.isEmpty()) {
-                strHtml += "<p><i>" + text + "</i></p><ul>";
-                foreach (QVariant item, lst) {
-                    strHtml += "<li><b>"+item.toString()+"</b></li>";
-                }
-                strHtml += "</ul>";
-            }
-        } else if (t != QVariant::Invalid) {
-            strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
-        }
-    }
-    key = "profession";
-    text = "Profession:";
-    if (mapLocal.contains(key)) {
-        QVariant::Type t = mapLocal[key].type();
-        if (t == QVariant::List) {
-            lst = mapLocal[key].toList();
-            if (!lst.isEmpty()) {
-                strHtml += "<p><i>" + text + "</i></p><ul>";
-                foreach (QVariant item, lst) {
-                    strHtml += "<li><b>"+item.toString()+"</b></li>";
-                }
-                strHtml += "</ul>";
-            }
-        } else if (t != QVariant::Invalid) {
-            strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
-        }
-    }
-    key = "nationality";
-    text = "Nationality:";
-    if (mapLocal.contains(key)) {
-        QVariant::Type t = mapLocal[key].type();
-        if (t == QVariant::List) {
-            lst = mapLocal[key].toList();
-            if (!lst.isEmpty()) {
-                strHtml += "<p><i>" + text + "</i></p><ul>";
-                foreach (QVariant item, lst) {
-                    strHtml += "<li><b>"+item.toString()+"</b></li>";
-                }
-                strHtml += "</ul>";
-            }
-        } else if (t != QVariant::Invalid) {
-            strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
-        }
-    }
-    key = "ethnicity";
-    text = "Ethnicity:";
-    if (mapLocal.contains(key)) {
-        QVariant::Type t = mapLocal[key].type();
-        if (t == QVariant::List) {
-            lst = mapLocal[key].toList();
-            if (!lst.isEmpty()) {
-                strHtml += "<p><i>" + text + "</i></p><ul>";
-                foreach (QVariant item, lst) {
-                    strHtml += "<li><b>"+item.toString()+"</b></li>";
-                }
-                strHtml += "</ul>";
-            }
-        } else if (t != QVariant::Invalid) {
-            strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
-        }
-    }
-    key = "religion";
-    text = "Religion:";
-    if (mapLocal.contains(key)) {
-        QVariant::Type t = mapLocal[key].type();
-        if (t == QVariant::List) {
-            lst = mapLocal[key].toList();
-            if (!lst.isEmpty()) {
-                strHtml += "<p><i>" + text + "</i></p><ul>";
-                foreach (QVariant item, lst) {
-                    strHtml += "<li><b>"+item.toString()+"</b></li>";
-                }
-                strHtml += "</ul>";
-            }
-        } else if (t != QVariant::Invalid) {
-            strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
-        }
-    }
-    key = "children";
-    text = "Children:";
-    if (mapLocal.contains(key)) {
-        QVariant::Type t = mapLocal[key].type();
-        if (t == QVariant::List) {
-            lst = mapLocal[key].toList();
-            if (!lst.isEmpty()) {
-                strHtml += "<p><i>" + text + "</i></p><ul>";
-                foreach (QVariant item, lst) {
-                    strHtml += "<li><b>"+item.toString()+"</b></li>";
-                }
-                strHtml += "</ul>";
-            }
-        } else if (t != QVariant::Invalid) {
-            strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
-        }
-    }
-    key = "parents";
-    text = "Parents:";
-    if (mapLocal.contains(key)) {
-        QVariant::Type t = mapLocal[key].type();
-        if (t == QVariant::List) {
-            lst = mapLocal[key].toList();
-            if (!lst.isEmpty()) {
-                strHtml += "<p><i>" + text + "</i></p><ul>";
-                foreach (QVariant item, lst) {
-                    strHtml += "<li><b>"+item.toString()+"</b></li>";
-                }
-                strHtml += "</ul>";
-            }
-        } else if (t != QVariant::Invalid) {
-            strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
-        }
-    }
-    key = "quotations";
-    text = "Quotations:";
-    if (mapLocal.contains(key)) {
-        QVariant::Type t = mapLocal[key].type();
-        if (t == QVariant::List) {
-            lst = mapLocal[key].toList();
-            if (!lst.isEmpty()) {
-                strHtml += "<p><i>" + text + "</i></p><ul>";
-                foreach (QVariant item, lst) {
-                    strHtml += "<li><b>"+item.toString()+"</b></li>";
-                }
-                strHtml += "</ul>";
-            }
-        } else if (t != QVariant::Invalid) {
-            strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
-        }
-    }
+    strHtml += makeHtmlRecord(mapLocal,"place_of_birth","Place of birth:");
+    strHtml += makeHtmlRecord(mapLocal,"profession","Profession:");
+    strHtml += makeHtmlRecord(mapLocal,"nationality","Nationality:");
+    strHtml += makeHtmlRecord(mapLocal,"ethnicity","Ethnicity:");
+    strHtml += makeHtmlRecord(mapLocal,"religion","Religion:");
+    strHtml += makeHtmlRecord(mapLocal,"children","Children:");
+    strHtml += makeHtmlRecord(mapLocal,"parents","Parents:");
+    strHtml += makeHtmlRecord(mapLocal,"quotations","Quotations:");
 
     //Books author
     ///books/author
     mapLocal =  map["q2"].toMap()["result"].toMap();
-    key = "works_written";
-    text = "Works written:";
-    if (mapLocal.contains(key)) {
-        strHtml += "<p><i><u>Books Info</u></i></p>";
-        QVariant::Type t = mapLocal[key].type();
-        if (t == QVariant::List) {
-            lst = mapLocal[key].toList();
-            if (!lst.isEmpty()) {
-                strHtml += "<p><i>" + text + "</i></p><ul>";
-                foreach (QVariant item, lst) {
-                    strHtml += "<li><b>"+item.toString()+"</b></li>";
-                }
-                strHtml += "</ul>";
-            }
-        } else if (t != QVariant::Invalid) {
-            strHtml += "<p><i>" + text + " </i><b>"+mapLocal[key].toString()+"</b></p>";
-        }
-    }
+    strHtml += makeHtmlRecord(mapLocal,"works_written","Works written:");
 
     // Reference's links
     // Persons
@@ -525,7 +328,7 @@ QString DlgDemo::createHtmlForPerson(const QVariantMap& map)
                 if (!lst.isEmpty()) {
                     strHtml += "<p></p><ul>";
                     foreach (QVariant item, lst) {
-                        strHtml += "<li><a href=\""+item.toMap()["mid"].toString()+"\">" + item.toMap()["name"].toString()+ "</a></li>";
+                        strHtml += "<li><a href=\"event@"+item.toMap()["mid"].toString()+"\">" + item.toMap()["name"].toString()+ "</a></li>";
                     }
                     strHtml += "</ul>";
                 }
@@ -572,10 +375,12 @@ void DlgDemo::onLinkClicked(const QUrl& url)
     qDebug() << Q_FUNC_INFO << " url=" << url;
     if (url.toString().contains("http://")) {
         QDesktopServices::openUrl(url);
-    }
-    else if (url.toString().startsWith("/m/"))
-    {
+    } else if (url.toString().startsWith("/m/")) {
         addMidToStack(url.toString());
+    } else if (url.toString().startsWith("event@")) {
+        QStringList list = url.toString().split("@");
+        getEventReferencies(list[1]);
+//        addMidToStack(url.toString());
     }
 }
 
@@ -620,4 +425,39 @@ void DlgDemo::addMidToStack(const QString& mid)
         m_nMidPosition = 0;
     }
     getPersonalInfo(m_midsUndoStack[m_nMidPosition]);
+}
+
+QString DlgDemo::makeHtmlRecord(const QVariantMap& map, const QString& key, const QString& text)
+{
+    QString ret;
+    if (map.contains(key)) {
+        QVariant::Type t = map[key].type();
+        if (t == QVariant::List) {
+            QVariantList lst = map[key].toList();
+            if (!lst.isEmpty()) {
+                ret += "<p><i>" + text + "</i></p><ul>";
+                foreach (QVariant item, lst) {
+                    ret += "<li><b>"+item.toString()+"</b></li>";
+                }
+                ret += "</ul>";
+            }
+        } else if (t != QVariant::Invalid) {
+            ret += "<p><i>" + text + " </i><b>"+map[key].toString()+"</b></p>";
+        }
+    }
+    return ret;
+}
+
+void DlgDemo::getEventReferencies(const QString& mid)
+{
+    qDebug() << Q_FUNC_INFO;
+    QStringList list;
+    QString query = "[{";
+    query += "\"mid\":\"" + mid + "\"";
+    query += QString(",\"key\":{\"namespace\":\"/wikipedia/en_id\", \"value\":null}}]");
+    qDebug() << "QUERY: " << query;
+    list << query;
+
+    m_state = ST_REF;
+    m_pManager->runMqlQueryMultiple(list);
 }

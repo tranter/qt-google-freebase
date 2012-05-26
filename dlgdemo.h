@@ -38,6 +38,8 @@ private:
     QString createHtmlForPerson(const QVariantMap& map);
     QString findNamespaceValue(const QString& ns, const QVariantMap& map);
     void addMidToStack(const QString& mid);
+    QString makeHtmlRecord(const QVariantMap& map, const QString& key, const QString& text);
+    void getEventReferencies(const QString& mid);
 
 
 private:
@@ -47,6 +49,9 @@ private:
 
     QStringList m_midsUndoStack;
     int m_nMidPosition;
+#define ST_NONE 0
+#define ST_REF  1
+    int m_state;
 };
 
 #endif // DLGDEMO_H
