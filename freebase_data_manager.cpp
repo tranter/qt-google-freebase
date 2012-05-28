@@ -54,7 +54,7 @@ void freebase_data_manager::runMqlQueryMultiple(const QStringList& queries)
 
 void freebase_data_manager::runSearchQuery(const QString& query, const QString& limit, const QString& start)
 {
-    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/search?query=%1&start=%2&limit=%3&indent=true")
+    QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/search?query=%1&offset=%2&limit=%3&indent=true")
             .arg(query,start,limit);
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(s)));
 }

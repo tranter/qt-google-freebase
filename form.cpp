@@ -12,8 +12,8 @@
 #include "mainwindow.h"
 #include "treejsonmodel.h"
 #include "treejsonitem.h"
-#include "dlgdemo.h"
-#include "dlgdemocountry.h"
+#include "countrysearcher.h"
+#include "peoplesearcher.h"
 
 Form::Form(QWidget *parent) :
     QWidget(parent),
@@ -531,18 +531,22 @@ void Form::startDlgDemo()
 {
     qDebug() << Q_FUNC_INFO;
 
-    DlgDemo* pDlg = new DlgDemo(this);
-    pDlg->exec();
-    delete pDlg;
+    QDialog dialog(this);
+    dialog.setLayout(new QVBoxLayout);
+    dialog.layout()->addWidget(new PeopleSearcher);
+    dialog.layout()->setMargin(0);
+    dialog.exec();
 }
 
 void Form::startDlgDemoCountry()
 {
     qDebug() << Q_FUNC_INFO;
 
-    DlgDemoCountry* pDlg = new DlgDemoCountry(this);
-    pDlg->exec();
-    delete pDlg;
+    QDialog dialog(this);
+    dialog.setLayout(new QVBoxLayout);
+    dialog.layout()->addWidget(new CountrySearcher);
+    dialog.layout()->setMargin(0);
+    dialog.exec();
 }
 
 void Form::sslImageErrorHandler(QNetworkReply* qnr, const QList<QSslError>& /*errlist*/)

@@ -37,8 +37,10 @@ SOURCES += main.cpp\
     freebase_data_manager.cpp \
     treejsonmodel.cpp \
     treejsonitem.cpp \
-    dlgdemo.cpp \
-    dlgdemocountry.cpp
+    simplesearcher.cpp \
+    peoplesearcher.cpp \
+    htmlgenerators.cpp \
+    countrysearcher.cpp
 
 HEADERS  += mainwindow.h \
     oauth2.h \
@@ -47,14 +49,15 @@ HEADERS  += mainwindow.h \
     freebase_data_manager.h \
     treejsonmodel.h \
     treejsonitem.h \
-    dlgdemo.h \
-    dlgdemocountry.h
+    simplesearcher.h \
+    peoplesearcher.h \
+    htmlgenerators.h \
+    countrysearcher.h
 
 FORMS    += mainwindow.ui \
     logindialog.ui \
     form.ui \
-    dlgdemo.ui \
-    dlgdemocountry.ui
+    simplesearcher.ui
 
 RESOURCES += \
     resource.qrc

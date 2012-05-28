@@ -9,17 +9,16 @@
 class QNetworkAccessManager;
 class QNetworkReply;
 
-#define REQ_LOGIN 1
-#define REQ_MQL 2
-#define REQ_SEARCH 3
-#define REQ_TEXT 4
-#define REQ_IMAGE 5
-
 class freebase_data_manager : public QObject
 {
     Q_OBJECT
 
 public:
+
+    enum RequestStatus {
+        REQ_LOGIN, REQ_MQL, REQ_SEARCH, REQ_TEXT, REQ_IMAGE
+    };
+
     freebase_data_manager(QObject* parent = 0);
 
     void requestUserEmail(const QString& access_token);
