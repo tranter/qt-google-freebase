@@ -30,6 +30,9 @@ SimpleSearcher::SimpleSearcher(QWidget *p) :
 
     connect(ui->prevPageButton, SIGNAL(clicked()), this, SLOT(previousPage()));
     connect(ui->nextPageButton, SIGNAL(clicked()), this, SLOT(nextPage()));
+    connect(ui->findButton,     SIGNAL(clicked()), this, SLOT(search()));
+    connect(ui->searchLineEdit, SIGNAL(returnPressed()), this, SLOT(search()));
+    connect(ui->resultComboBox, SIGNAL(activated(int)), this, SLOT(showPosition(int)));
 
     //ui->typeComboBox->addItem(tr("Person (/people/person)"), "/people/person");
     //showTypeWidgets(false);

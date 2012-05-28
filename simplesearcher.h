@@ -27,17 +27,13 @@ protected slots:
 private slots:
     void onJsonReady(int);
 
-    void on_findButton_clicked() { search(); }
     void on_addTypeButton_clicked();
     void previousPage();
     void nextPage();
-    void on_resultComboBox_activated(int index) { showPosition(index); }
-    void on_searchLineEdit_returnPressed() { search(); }
 
     void sslErrorHandler(class QNetworkReply * qnr, const QList<QSslError> & /*errlist*/);
-
-private:
     void search();
+
     void showPosition(int pos);
 
 protected:
