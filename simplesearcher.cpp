@@ -5,6 +5,7 @@
 
 #include <QJson/Serializer>
 
+#include <QNetworkReply>
 #include <QDebug>
 
 SimpleSearcher::SimpleSearcher(QWidget *p) :
@@ -13,11 +14,21 @@ SimpleSearcher::SimpleSearcher(QWidget *p) :
     m_currentResults(0),
     m_resultsCount(0),
     m_historyPos(-1),
+    m_delegateMQLrequest(false),
     m_history(),
     m_pManager(new freebase_data_manager(this))
 {
     ui->setupUi(this);
+
+    ui->webView->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+
     connect(m_pManager,SIGNAL(sigJsonReady(int)),this,SLOT(onJsonReady(int)));
+
+    connect(ui->webView->page()->networkAccessManager(),
+              SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )),
+              this,
+              SLOT(sslErrorHandler(QNetworkReply*, const QList<QSslError> & )));
+    connect(ui->webView,SIGNAL(linkClicked(QUrl)),this,SLOT(onLinkClicked(QUrl)));
 
     //ui->typeComboBox->addItem(tr("Person (/people/person)"), "/people/person");
     //showTypeWidgets(false);
@@ -83,6 +94,13 @@ void SimpleSearcher::onJsonReady(int rt)
     else if (rt == freebase_data_manager::REQ_MQL)
     {
         qDebug() << "Some info from MQL arrived";
+
+        if(m_delegateMQLrequest)
+        {
+            delegatedRequest(jsonMap);
+            return;
+        }
+
         ui->webView->setHtml( createHtml(jsonMap) );
     }
 }
@@ -100,7 +118,11 @@ void SimpleSearcher::on_backButton_clicked()
         m_history[m_historyPos].first,
         getCurrentType()
     );
-    ui->resultComboBox->setCurrentIndex(m_history[m_historyPos].second);
+    int pos = m_history[m_historyPos].second;
+    if( -1 < pos && pos < ui->resultComboBox->count() )
+        ui->resultComboBox->setCurrentIndex(pos);
+    else
+        ui->resultComboBox->setCurrentIndex(-1);
 
     ui->backButton->setEnabled( 0 < m_historyPos );
     ui->nextButton->setEnabled(true);
@@ -114,10 +136,27 @@ void SimpleSearcher::on_nextButton_clicked()
         m_history[m_historyPos].first,
         getCurrentType()
     );
-    ui->resultComboBox->setCurrentIndex(m_history[m_historyPos].second);
+    int pos = m_history[m_historyPos].second;
+    if( -1 < pos && pos < ui->resultComboBox->count() )
+        ui->resultComboBox->setCurrentIndex(pos);
+    else
+        ui->resultComboBox->setCurrentIndex(-1);
 
     ui->nextButton->setEnabled( m_historyPos < m_history.count()-1 );
     ui->backButton->setEnabled(true);
+}
+
+void SimpleSearcher::sslErrorHandler(QNetworkReply* qnr, const QList<QSslError> & /*errlist*/)
+{
+
+  #if DEBUG_BUYIT
+  qDebug() << "---frmBuyIt::sslErrorHandler: ";
+  // show list of all ssl errors
+  foreach (QSslError err, errlist)
+    qDebug() << "ssl error: " << err;
+  #endif
+
+   qnr->ignoreSslErrors();
 }
 
 void SimpleSearcher::search(SearchSwitch s)
@@ -162,10 +201,7 @@ void SimpleSearcher::showPosition(int pos)
 {
     qDebug() << Q_FUNC_INFO;
 
-    m_history << QPair<QString, int>(ui->resultComboBox->itemData(pos).toString(), pos);
-    m_historyPos = m_history.count()-1;
-    ui->backButton->setEnabled(m_historyPos);
-    ui->nextButton->setEnabled(false);
+    appendToHistory(ui->resultComboBox->itemData(pos).toString(), pos);
 
     getInfo(
         m_history.last().first,
@@ -198,4 +234,13 @@ void SimpleSearcher::getInfo(const QString & id, const QString & type)
     m_pManager->runMqlQueryMultiple( QStringList( QJson::Serializer().serialize(query) ) );
 }
 
+QWebView * SimpleSearcher::webView() const { return ui->webView; }
 
+
+void SimpleSearcher::appendToHistory(const QString & value, int pos)
+{
+    m_history << HistoryNode(value, pos);
+    m_historyPos = m_history.count()-1;
+    ui->backButton->setEnabled(m_historyPos);
+    ui->nextButton->setEnabled(false);
+}

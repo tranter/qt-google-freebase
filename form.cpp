@@ -534,7 +534,6 @@ void Form::startDlgDemo()
     QDialog dialog(this);
     dialog.setLayout(new QVBoxLayout);
     dialog.layout()->addWidget(new PeopleSearcher);
-    dialog.layout()->setMargin(0);
     dialog.exec();
 }
 
@@ -545,7 +544,6 @@ void Form::startDlgDemoCountry()
     QDialog dialog(this);
     dialog.setLayout(new QVBoxLayout);
     dialog.layout()->addWidget(new CountrySearcher);
-    dialog.layout()->setMargin(0);
     dialog.exec();
 }
 
