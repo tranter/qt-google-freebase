@@ -14,7 +14,6 @@ class SimpleSearcher;
 class SimpleSearcher : public QWidget
 {
     Q_OBJECT
-    enum SearchSwitch { PREVIOUS, NEW, FORWARD };
     
 public:
     explicit SimpleSearcher(QWidget *parent = 0);
@@ -30,17 +29,15 @@ private slots:
 
     void on_findButton_clicked() { search(); }
     void on_addTypeButton_clicked();
-    void on_backButton_clicked();
-    void on_nextButton_clicked();
+    void previousPage();
+    void nextPage();
     void on_resultComboBox_activated(int index) { showPosition(index); }
-    void on_prevButton_clicked() { search(PREVIOUS); }
-    void on_forwButton_clicked() { search(FORWARD); }
     void on_searchLineEdit_returnPressed() { search(); }
 
     void sslErrorHandler(class QNetworkReply * qnr, const QList<QSslError> & /*errlist*/);
 
 private:
-    void search(SearchSwitch s = NEW);
+    void search();
     void showPosition(int pos);
 
 protected:
@@ -55,8 +52,6 @@ protected:
 
 private:
     Ui::SimpleSearcher * ui;
-    int m_currentResults;
-    int m_resultsCount;
 
     int m_historyPos;
     bool m_delegateMQLrequest;

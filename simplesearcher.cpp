@@ -11,8 +11,6 @@
 SimpleSearcher::SimpleSearcher(QWidget *p) :
     QWidget(p),
     ui(new Ui::SimpleSearcher),
-    m_currentResults(0),
-    m_resultsCount(0),
     m_historyPos(-1),
     m_delegateMQLrequest(false),
     m_history(),
@@ -29,6 +27,9 @@ SimpleSearcher::SimpleSearcher(QWidget *p) :
               this,
               SLOT(sslErrorHandler(QNetworkReply*, const QList<QSslError> & )));
     connect(ui->webView,SIGNAL(linkClicked(QUrl)),this,SLOT(onLinkClicked(QUrl)));
+
+    connect(ui->prevPageButton, SIGNAL(clicked()), this, SLOT(previousPage()));
+    connect(ui->nextPageButton, SIGNAL(clicked()), this, SLOT(nextPage()));
 
     //ui->typeComboBox->addItem(tr("Person (/people/person)"), "/people/person");
     //showTypeWidgets(false);
@@ -55,8 +56,6 @@ void SimpleSearcher::onJsonReady(int rt)
 
     if (rt == freebase_data_manager::REQ_SEARCH)
     {
-        ui->prevButton->setEnabled(false);
-        ui->forwButton->setEnabled(false);
         ui->resultComboBox->clear();
 
         QString mapKey;
@@ -76,19 +75,12 @@ void SimpleSearcher::onJsonReady(int rt)
             }
         }
 
-        if( jsonMap.contains("hits") )
-        {
-            m_resultsCount = jsonMap["hits"].toInt();
+        //if( jsonMap.contains("hits") )
+        //{
+            //m_resultsCount = jsonMap["hits"].toInt();
+        //} else m_resultsCount = 0;
 
-            ui->forwButton->setEnabled(
-                m_currentResults + ui->limitComboBox->currentText().toInt() < m_resultsCount
-            );
-            ui->prevButton->setEnabled(
-                0 <= m_currentResults - ui->limitComboBox->currentText().toInt()
-            );
-        } else m_resultsCount = 0;
-
-        if( 0 < m_resultsCount )
+        if( list.size() )
             showPosition(0);
     }
     else if (rt == freebase_data_manager::REQ_MQL)
@@ -110,7 +102,7 @@ void SimpleSearcher::on_addTypeButton_clicked()
     qDebug() << "Not implemented";
 }
 
-void SimpleSearcher::on_backButton_clicked()
+void SimpleSearcher::previousPage()
 {
     --m_historyPos;
 
@@ -124,11 +116,11 @@ void SimpleSearcher::on_backButton_clicked()
     else
         ui->resultComboBox->setCurrentIndex(-1);
 
-    ui->backButton->setEnabled( 0 < m_historyPos );
-    ui->nextButton->setEnabled(true);
+    ui->prevPageButton->setEnabled( 0 < m_historyPos );
+    ui->nextPageButton->setEnabled(true);
 }
 
-void SimpleSearcher::on_nextButton_clicked()
+void SimpleSearcher::nextPage()
 {
     ++m_historyPos;
 
@@ -142,8 +134,8 @@ void SimpleSearcher::on_nextButton_clicked()
     else
         ui->resultComboBox->setCurrentIndex(-1);
 
-    ui->nextButton->setEnabled( m_historyPos < m_history.count()-1 );
-    ui->backButton->setEnabled(true);
+    ui->nextPageButton->setEnabled( m_historyPos < m_history.count()-1 );
+    ui->prevPageButton->setEnabled(true);
 }
 
 void SimpleSearcher::sslErrorHandler(QNetworkReply* qnr, const QList<QSslError> & /*errlist*/)
@@ -159,7 +151,7 @@ void SimpleSearcher::sslErrorHandler(QNetworkReply* qnr, const QList<QSslError> 
    qnr->ignoreSslErrors();
 }
 
-void SimpleSearcher::search(SearchSwitch s)
+void SimpleSearcher::search()
 {
     qDebug() << Q_FUNC_INFO;
     QString query = ui->searchLineEdit->text().trimmed();
@@ -167,33 +159,11 @@ void SimpleSearcher::search(SearchSwitch s)
 
     if( ! query.isEmpty() )
     {
-        int limit = ui->limitComboBox->currentText().toInt();
-        switch(s)
-        {
-        case NEW:
-            m_historyPos = -1;
-            m_history.clear();
-            m_currentResults = 0;
-            break;
-
-        case FORWARD:
-            if( limit + m_currentResults < m_resultsCount )
-                m_currentResults += limit;
-            ui->forwButton->setEnabled( m_currentResults + limit < m_resultsCount );
-            break;
-
-        case PREVIOUS:
-            if( 0 <= m_currentResults - limit )
-                m_currentResults -= limit;
-            ui->prevButton->setEnabled( 0 <= m_currentResults - limit );
-            break;
-        // ...
-        }
-
-        qDebug() << m_resultsCount << m_currentResults << limit;
+        m_historyPos = -1;
+        m_history.clear();
 
         QString type = getCurrentType();
-        m_pManager->runSearchQuery(query+"&type="+type, ui->limitComboBox->currentText(), QString::number(m_currentResults));
+        m_pManager->runSearchQuery(query+"&type="+type, ui->limitComboBox->currentText(), "0");
     }
 }
 
@@ -239,8 +209,15 @@ QWebView * SimpleSearcher::webView() const { return ui->webView; }
 
 void SimpleSearcher::appendToHistory(const QString & value, int pos)
 {
+    if( m_historyPos != m_history.count()-1 )
+    {
+        int count = m_history.count()-m_historyPos;
+        for(int i(0); i < count; ++i)
+            m_history.removeLast();
+    }
+
     m_history << HistoryNode(value, pos);
     m_historyPos = m_history.count()-1;
-    ui->backButton->setEnabled(m_historyPos);
-    ui->nextButton->setEnabled(false);
+    ui->prevPageButton->setEnabled(m_historyPos);
+    ui->nextPageButton->setEnabled(false);
 }

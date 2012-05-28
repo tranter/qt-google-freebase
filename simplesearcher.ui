@@ -150,42 +150,25 @@
       <property name="margin">
        <number>1</number>
       </property>
-      <item row="0" column="5">
-       <widget class="QToolButton" name="prevButton">
+      <item row="0" column="1">
+       <widget class="QToolButton" name="nextPageButton">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>Previous</string>
-        </property>
-        <property name="icon">
-         <iconset resource="resource.qrc">
-          <normaloff>:/images/backward</normaloff>:/images/backward</iconset>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextBesideIcon</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="6">
-       <widget class="QToolButton" name="forwButton">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>Forward</string>
+         <string>...</string>
         </property>
         <property name="icon">
          <iconset resource="resource.qrc">
           <normaloff>:/images/forward</normaloff>:/images/forward</iconset>
         </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        <property name="arrowType">
+         <enum>Qt::NoArrow</enum>
         </property>
        </widget>
       </item>
       <item row="0" column="0">
-       <widget class="QToolButton" name="backButton">
+       <widget class="QToolButton" name="prevPageButton">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -198,6 +181,15 @@
         </property>
         <property name="arrowType">
          <enum>Qt::NoArrow</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="6">
+       <widget class="QWebView" name="webView">
+        <property name="url">
+         <url>
+          <string>about:blank</string>
+         </url>
         </property>
        </widget>
       </item>
@@ -214,7 +206,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3" colspan="2">
+      <item row="0" column="3" colspan="3">
        <widget class="QComboBox" name="resultComboBox">
         <property name="minimumSize">
          <size>
@@ -224,32 +216,6 @@
         </property>
         <property name="editable">
          <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QToolButton" name="nextButton">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-        <property name="icon">
-         <iconset resource="resource.qrc">
-          <normaloff>:/images/forward</normaloff>:/images/forward</iconset>
-        </property>
-        <property name="arrowType">
-         <enum>Qt::NoArrow</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="7">
-       <widget class="QWebView" name="webView">
-        <property name="url">
-         <url>
-          <string>about:blank</string>
-         </url>
         </property>
        </widget>
       </item>
