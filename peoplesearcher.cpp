@@ -54,8 +54,8 @@ void PeopleSearcher::getInfo(const QString & id, const QString & /*type*/)
         query["id"] = id;
 
     query["type"] = type;
-    query["key"] = QVariantList();
-    query["*"] = QVariant();
+    query["key"] = QVariantList() << QVariantMap(); // "key": [{}]
+    query["*"] = QVariant(); // "*": null
 
 
     list << QJson::Serializer().serialize(query);

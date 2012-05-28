@@ -61,6 +61,9 @@ private:
     int m_historyPos;
     bool m_delegateMQLrequest;
 
+    // first: mid, second: result position in comboBox
+    // second = -1 -> undefined position
+
     typedef QPair<QString, int> HistoryNode;
     QList<HistoryNode> m_history;
 
