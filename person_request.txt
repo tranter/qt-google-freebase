@@ -1,0 +1,31 @@
+[{
+ "mid": "/m/0d3k14",
+   "name" : [],
+
+  "/people/person/date_of_birth": [],
+  "/people/person/place_of_birth": [],
+  "/people/person/parents": [],
+  "/people/person/children": [],
+  "/people/person/ethnicity": [],
+  "/people/person/nationality": [],
+  "/people/person/religion": [],
+  "/people/person/profession": [],
+  "/people/person/quotations": [],
+  "/book/author/works_written": [],
+  "/music/composer/compositions": [],
+
+  "/people/deceased_person/place_of_death": [],
+  "/people/deceased_person/date_of_death": [],
+  "/people/deceased_person/cause_of_death": [],
+  "/people/deceased_person/place_of_burial": [],
+
+  "key": [{ "namespace": "/wikipedia/en_id", "value":null}],
+
+  "/event/event/start_date": [],
+  "/event/event/end_date": [],
+
+  "/type/reflect/any_reverse" : [ { "name": null, "type|=": ["/people/person", "/event/event" ], "type":null, "mid": null }]
+
+
+  
+}]
