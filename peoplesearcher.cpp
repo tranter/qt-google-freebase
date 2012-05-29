@@ -108,16 +108,20 @@ void PeopleSearcher::onLinkClicked(const QUrl & url)
     {
         QDesktopServices::openUrl(url);
     }
-    else if (url.toString().startsWith("/m/"))
-    {
-        appendToHistory( url.toString() );
-        getInfo(url.toString(), getCurrentType());
-    }
-    else if (url.toString().startsWith("event@"))
+//    else if (url.toString().startsWith("/m/"))
+//    {
+//        appendToHistory( url.toString() );
+//        getInfo(url.toString(), getCurrentType());
+//    }
+//    else if (url.toString().startsWith("event@"))
+//    {
+    else if (url.toString().startsWith("data@"))
     {
         QStringList list = url.toString().split("@");
         //getEventReferencies(list[1]);
-        appendToHistory( list[1] );
+        qDebug() << list[1];
+        int pos = addItemToResultsList(list[2], list[1]);
+        appendToHistory( list[1], pos );
         getInfo(list[1], getCurrentType());
     }
 }

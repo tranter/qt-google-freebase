@@ -160,7 +160,14 @@ QString HtmlGenerators::createHtmlForPerson(const QVariantMap& map)
                 if (!lst.isEmpty()) {
                     strHtml += "<p></p><ul>";
                     foreach (QVariant item, lst) {
-                        strHtml += "<li><a href=\""+item.toMap()["mid"].toString()+"\">" + item.toMap()["name"].toString()+ "</a></li>";
+//                        strHtml += "<li><a href=\""+item.toMap()["mid"].toString()+"\">" + item.toMap()["name"].toString()+ "</a></li>";
+                        strHtml +=
+                                "<li><a href=\"data@"
+                                + item.toMap()["mid"].toString()
+                                + "@" + item.toMap()["name"].toString()
+                                + "\">"
+                                + item.toMap()["name"].toString()
+                                + "</a></li>";
                     }
                     strHtml += "</ul>";
                 }
@@ -183,7 +190,13 @@ QString HtmlGenerators::createHtmlForPerson(const QVariantMap& map)
                 if (!lst.isEmpty()) {
                     strHtml += "<p></p><ul>";
                     foreach (QVariant item, lst) {
-                        strHtml += "<li><a href=\"event@"+item.toMap()["mid"].toString()+"\">" + item.toMap()["name"].toString()+ "</a></li>";
+                        strHtml +=
+                                "<li><a href=\"data@"
+                                + item.toMap()["mid"].toString()
+                                + "@" + item.toMap()["name"].toString()
+                                + "\">"
+                                + item.toMap()["name"].toString()
+                                + "</a></li>";
                     }
                     strHtml += "</ul>";
                 }

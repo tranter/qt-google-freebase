@@ -214,7 +214,7 @@ void SimpleSearcher::appendToHistory(const QString & value, int pos)
 {
     if( m_historyPos != m_history.count()-1 )
     {
-        int count = m_history.count()-m_historyPos;
+        int count = m_history.count()-m_historyPos-1;
         for(int i(0); i < count; ++i)
             m_history.removeLast();
     }
@@ -223,4 +223,12 @@ void SimpleSearcher::appendToHistory(const QString & value, int pos)
     m_historyPos = m_history.count()-1;
     ui->prevPageButton->setEnabled(m_historyPos);
     ui->nextPageButton->setEnabled(false);
+}
+
+int SimpleSearcher::addItemToResultsList(const QString & item, const QVariant & itemData)
+{
+    int pos = ui->resultComboBox->count();
+    ui->resultComboBox->addItem(item, itemData);
+    ui->resultComboBox->setCurrentIndex(pos);
+    return pos;
 }

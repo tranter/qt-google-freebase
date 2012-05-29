@@ -45,6 +45,7 @@ protected:
     void delegateRequests() { m_delegateMQLrequest = true; }
     class QWebView * webView() const;
     void appendToHistory(const QString & value, int pos = -1);
+    int addItemToResultsList(const QString & item, const QVariant & itemData = QVariant());
 
 private:
     Ui::SimpleSearcher * ui;
