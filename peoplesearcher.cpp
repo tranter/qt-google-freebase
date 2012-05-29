@@ -72,8 +72,8 @@ void PeopleSearcher::getInfo(const QString & id, const QString & /*type*/)
     //-------------------------------------------
 
 
-//    query["type"] = "/event/event";
-//    list << QJson::Serializer().serialize(query);
+    query["type"] = "/event/event";
+    list << QJson::Serializer().serialize(query);
 //    //-------------------------------------------
 
 
@@ -108,13 +108,17 @@ void PeopleSearcher::onLinkClicked(const QUrl & url)
     {
         QDesktopServices::openUrl(url);
     }
-    else if (url.toString().startsWith("/m/")) {
+    else if (url.toString().startsWith("/m/"))
+    {
         appendToHistory( url.toString() );
         getInfo(url.toString(), getCurrentType());
     }
-    else if (url.toString().startsWith("event@")) {
+    else if (url.toString().startsWith("event@"))
+    {
         QStringList list = url.toString().split("@");
-        getEventReferencies(list[1]);
+        //getEventReferencies(list[1]);
+        appendToHistory( list[1] );
+        getInfo(list[1], getCurrentType());
     }
 }
 

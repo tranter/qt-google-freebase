@@ -9,6 +9,8 @@ QString HtmlGenerators::createHtmlForPerson(const QVariantMap& map)
 {
     QString strHtml = QString("<html><body>");
     QVariantList lst;
+
+    //Person
     QVariantMap mapLocal =  map["q0"].toMap()["result"].toMap();
     QString key, text;
     strHtml += QString("<img src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image%1?maxheight=400&maxwidth=200\" align=\"right\">")
@@ -24,12 +26,16 @@ QString HtmlGenerators::createHtmlForPerson(const QVariantMap& map)
                 .arg(s);
     }
 
-    strHtml += "<p><i><u>General Info</u></i></p>";
     ///people/person
-    strHtml += makeHtmlRecordForPerson(mapLocal,"name","Name:");
+    if(mapLocal.contains("name"))
+    {
+        strHtml += "<p><i><u>General Info</u></i></p>";
+        strHtml += makeHtmlRecordForPerson(mapLocal,"name","Name:");
+    }
     key = "date_of_birth";
     text = "Date of birth:";
-    if (mapLocal.contains(key)) {
+    if (mapLocal.contains(key))
+    {
         QVariant::Type t = mapLocal[key].type();
         if (t == QVariant::List) {
             lst = mapLocal[key].toList();
@@ -45,10 +51,13 @@ QString HtmlGenerators::createHtmlForPerson(const QVariantMap& map)
             strHtml += "<p><i>" + text + " </i><b>" + date.toString("MMM d, yyyy") + "</b></p>";
         }
     }
+
+    //Deceased person
     mapLocal =  map["q1"].toMap()["result"].toMap();
     key = "date_of_death";
     text = "Date of death:";
-    if (mapLocal.contains(key)) {
+    if (mapLocal.contains(key))
+    {
         QVariant::Type t = mapLocal[key].type();
         if (t == QVariant::List) {
             lst = mapLocal[key].toList();
@@ -59,7 +68,9 @@ QString HtmlGenerators::createHtmlForPerson(const QVariantMap& map)
                 }
                 strHtml += "</ul>";
             }
-        } else if (t != QVariant::Invalid) {
+        }
+        else if (t != QVariant::Invalid)
+        {
             QDate date = QDate::fromString(mapLocal[key].toString(), Qt::ISODate);
             strHtml += "<p><i>" + text + " </i><b>" + date.toString("MMM d, yyyy") + "</b></p>";
         }
@@ -69,7 +80,6 @@ QString HtmlGenerators::createHtmlForPerson(const QVariantMap& map)
     strHtml += makeHtmlRecordForPerson(mapLocal,"cause_of_death","Cause of death:");
 
     //Living person
-    strHtml += "<p><i><u>Person Info</u></i></p>";
     ///people/person
     mapLocal =  map["q0"].toMap()["result"].toMap();
     strHtml += makeHtmlRecordForPerson(mapLocal,"place_of_birth","Place of birth:");
@@ -86,9 +96,58 @@ QString HtmlGenerators::createHtmlForPerson(const QVariantMap& map)
     mapLocal =  map["q2"].toMap()["result"].toMap();
     strHtml += makeHtmlRecordForPerson(mapLocal,"works_written","Works written:");
 
+
+    ///event/event
+    mapLocal =  map["q3"].toMap()["result"].toMap();
+    strHtml += makeHtmlRecordForPerson(mapLocal,"name","Name:");
+    key = "start_date";
+    text = "Start date:";
+    if(mapLocal.contains(key))
+    {
+        QVariant::Type t = mapLocal[key].type();
+        if (t == QVariant::List) {
+            lst = mapLocal[key].toList();
+            if (!lst.isEmpty()) {
+                strHtml += "<p><i>" + text + "</i></p><ul>";
+                foreach (QVariant item, lst) {
+                    strHtml += "<li><b>"+item.toString()+"</b></li>";
+                }
+                strHtml += "</ul>";
+            }
+        }
+        else if (t != QVariant::Invalid)
+        {
+            QDate date = QDate::fromString(mapLocal[key].toString(), Qt::ISODate);
+            strHtml += "<p><i>" + text + " </i><b>" + date.toString("MMM d, yyyy") + "</b></p>";
+        }
+    }
+    key = "end_date";
+    text = "End date:";
+    if(mapLocal.contains(key))
+    {
+        QVariant::Type t = mapLocal[key].type();
+        if (t == QVariant::List) {
+            lst = mapLocal[key].toList();
+            if (!lst.isEmpty()) {
+                strHtml += "<p><i>" + text + "</i></p><ul>";
+                foreach (QVariant item, lst) {
+                    strHtml += "<li><b>"+item.toString()+"</b></li>";
+                }
+                strHtml += "</ul>";
+            }
+        }
+        else if (t != QVariant::Invalid)
+        {
+            QDate date = QDate::fromString(mapLocal[key].toString(), Qt::ISODate);
+            strHtml += "<p><i>" + text + " </i><b>" + date.toString("MMM d, yyyy") + "</b></p>";
+        }
+    }
+    strHtml += makeHtmlRecordForPerson(mapLocal,"locations","Locations:");
+
+
     // Reference's links
     // Persons
-    lst = map["q3"].toMap()["result"].toList();
+    lst = map["q4"].toMap()["result"].toList();
     if (!lst.isEmpty()) {
         strHtml += "<p><i><u>People Referencies</u></i></p>";
         mapLocal = lst[0].toMap();
@@ -111,7 +170,7 @@ QString HtmlGenerators::createHtmlForPerson(const QVariantMap& map)
         }
     }
     // Events
-    lst = map["q4"].toMap()["result"].toList();
+    lst = map["q5"].toMap()["result"].toList();
     if (!lst.isEmpty()) {
         strHtml += "<p><i><u>Event Referencies</u></i></p>";
         mapLocal = lst[0].toMap();
