@@ -2,6 +2,7 @@
 #include "ui_simplesearcher.h"
 
 #include "freebase_data_manager.h"
+#include "schemeexplorerdialog.h"
 
 #include <QJson/Serializer>
 
@@ -102,7 +103,22 @@ void SimpleSearcher::onJsonReady(int rt)
 
 void SimpleSearcher::on_addTypeButton_clicked()
 {
-    qDebug() << "Not implemented";
+    SchemeExplorerDialog dialog(this);
+    dialog.setSelectionMode(SchemeExplorer::TYPES);
+    dialog.resize(600, 400);
+
+    if( dialog.exec() != QDialog::Accepted )
+        return;
+
+    QString selectedId = dialog.selectedId();
+
+    if( selectedId.isEmpty() )
+        return;
+
+    if( ui->typeComboBox->count() > 10 )
+        ui->typeComboBox->removeItem( ui->typeComboBox->count() - 1 );
+    ui->typeComboBox->insertItem(0, selectedId);
+    ui->typeComboBox->setCurrentIndex(0);
 }
 
 void SimpleSearcher::previousPage()

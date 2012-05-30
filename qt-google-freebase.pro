@@ -40,7 +40,9 @@ SOURCES += main.cpp\
     simplesearcher.cpp \
     peoplesearcher.cpp \
     htmlgenerators.cpp \
-    countrysearcher.cpp
+    countrysearcher.cpp \
+    schemeexplorer.cpp \
+    schemeexplorerdialog.cpp
 
 HEADERS  += mainwindow.h \
     oauth2.h \
@@ -52,12 +54,16 @@ HEADERS  += mainwindow.h \
     simplesearcher.h \
     peoplesearcher.h \
     htmlgenerators.h \
-    countrysearcher.h
+    countrysearcher.h \
+    schemeexplorer.h \
+    schemeexplorerdialog.h
 
 FORMS    += mainwindow.ui \
     logindialog.ui \
     form.ui \
-    simplesearcher.ui
+    simplesearcher.ui \
+    schemeexplorer.ui \
+    schemeexplorerdialog.ui
 
 RESOURCES += \
     resource.qrc

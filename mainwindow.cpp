@@ -4,6 +4,8 @@
 #include "ui_mainwindow.h"
 #include "form.h"
 
+#include "schemeexplorerdialog.h"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -17,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionRun,SIGNAL(triggered()),this,SLOT(onRun()));
     connect(ui->actionPeople_Info,SIGNAL(triggered()),this,SLOT(startDlgDemo()));
     connect(ui->actionDemo_Country_Info,SIGNAL(triggered()),this,SLOT(startDlgDemoCountry()));
+    connect(ui->actionSchemeExplorer, SIGNAL(triggered()), this, SLOT(openSchemeExplorer()));
 
     QLabel* permanentWidget = new QLabel(this);
     permanentWidget->setText("Based on Freebase API: http://www.freebase.com");
@@ -76,4 +79,11 @@ void MainWindow::startDlgDemo()
 void MainWindow::startDlgDemoCountry()
 {
     m_pForm->startDlgDemoCountry();
+}
+
+void MainWindow::openSchemeExplorer()
+{
+    SchemeExplorerDialog dialog(this);
+    dialog.resize(600, 400);
+    dialog.exec();
 }

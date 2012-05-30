@@ -29,6 +29,7 @@ public slots:
     void onRun();
     void startDlgDemo();
     void startDlgDemoCountry();
+    void openSchemeExplorer();
 
 private:
     Ui::MainWindow *ui;

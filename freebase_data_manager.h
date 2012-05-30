@@ -34,7 +34,7 @@ public:
     void runWriteQuery(const QString& query, const QString& access_token, const QString& key);
     void runTextQuery(const QString& query);
     void runImageQuery(const QString& query, int maxHeight=4096, int maxWidth=4096);
-    QVariant& getJsonData() {return m_jsonReply;}
+    const QVariant & getJsonData() const { return m_jsonReply; }
 
 signals:
     void sigErrorOccured(const QString& error);

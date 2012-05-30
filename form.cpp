@@ -15,6 +15,8 @@
 #include "countrysearcher.h"
 #include "peoplesearcher.h"
 
+#include <QJson/Serializer>
+
 Form::Form(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Form)
@@ -63,7 +65,6 @@ Form::Form(QWidget *parent) :
 
     connect(ui->btnRun,SIGNAL(clicked()),this,SLOT(onBtnRunClicked()));
     connect(ui->btnClear,SIGNAL(clicked()),this,SLOT(onBtnClearClicked()));
-    connect(ui->pushButtonDomainsList,SIGNAL(clicked()),this,SLOT(listDomains()));
 
     initSuggestPage();
     connect(ui->webViewImage->page()->networkAccessManager(),
@@ -89,7 +90,7 @@ Form::Form(QWidget *parent) :
     m_history["MQL Request"].insert(0,ui->editMqlQuery->toPlainText());
     m_history["Search Request"].insert(0,ui->editSearchQuery->toPlainText()+"@"+ui->editSearchFilter->toPlainText());
 
-    m_requestForDomainList = false;
+//    m_requestForDomainList = false;
 }
 
 Form::~Form()
@@ -142,40 +143,42 @@ void Form::onMqlReplyReady(const int rt)
     ui->textMqlReply->setPlainText(m_pManager->getReplyStr());
     ui->webViewText->setHtml(m_pManager->getRichTextReplyStr());
 
-    if( m_requestForDomainList )
-    {
-        QVariantMap map = m_pManager->getJsonData().toMap();
-        if( ! map["q0"].isValid() ) return;
+//    if( m_requestForDomainList )
+//    {
+//        QVariantMap map = m_pManager->getJsonData().toMap();
+//        if( ! map["q0"].isValid() ) return;
 
-        QString html( "<html><head><style type=\"text/css\">a{color:black;text-decoration:none}</style></head>"
-                      "<body><table><tr><td><b>Name</b></td><td><b>ID</b></td></tr>" );
-        QVariantList list = map["q0"].toMap()["result"].toList();
-        QString id, name, type;
+//        QString html( "<html><head><style type=\"text/css\">a{color:black;text-decoration:none}</style></head>"
+//                      "<body><table><tr><td><b>Name</b></td><td><b>ID</b></td></tr>" );
+//        QVariantList list = map["q0"].toMap()["result"].toList();
+//        QString id, name, type;
 
-        QString mqlHref( "<a href=\"mql%1:%2\">%2</a>" );
+//        QString mqlHref( "<a href=\"mql%1:%2\">%2</a>" );
 
-        foreach(const QVariant & v, list)
-        {
-            map  = v.toMap();
-            id   = map["id"].toString();
-            name = map["name"].toString();
-            type = map["type"].toString();
+//        foreach(const QVariant & v, list)
+//        {
+//            map  = v.toMap();
+//            id   = map["id"].toString();
+//            name = map["name"].toString();
+//            type = map["type"].toString();
 
-            QString link = QString("<a href=\"mql:%1\">%1</a>").arg(id);
+//            QString link = QString("<a href=\"mql:%1\">%1</a>").arg(id);
 
-            if( type == "/type/domain" )
-                link = mqlHref.arg( "Type", id );
-            else if( type == "/type/type" )
-                link = mqlHref.arg( "Instances", id );
+//            if( type == "/type/domain" )
+//                link = mqlHref.arg( "type", id );
+//            else if( type == "/type/type" )
+////                link = mqlHref.arg( "instances", id );
+////            else if( type.count('/') > 1 )
+//                link = mqlHref.arg( "properties", id );
 
-            html += QString("<tr><td><a href=\"%2\">%1</a></td>"
-                            "<td>%3</td></tr>").arg(name, id, link);
-        }
+//            html += QString("<tr><td><a href=\"%2\">%1</a></td>"
+//                            "<td>%3</td></tr>").arg(name, id, link);
+//        }
 
-        html += "</table></body></html>";
+//        html += "</table></body></html>";
 
-        ui->webViewText->setHtml( html );
-    }
+//        ui->webViewText->setHtml( html );
+//    }
 }
 
 void Form::onSearchReplyReady(const int rt)
@@ -199,7 +202,7 @@ void Form::onImageReady(const QPixmap& px, const int rt)
 
 void Form::onBtnRunClicked()
 {
-    m_requestForDomainList = false;
+//    m_requestForDomainList = false;
 
     ui->textMqlReply->clear();
     clearReplyImage();
@@ -243,7 +246,7 @@ void Form::onBtnRunClicked()
 
 void Form::onBtnTextGoClicked()
 {
-    m_requestForDomainList = false;
+//    m_requestForDomainList = false;
     ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
     ui->textMqlReply->clear();
     m_pManager->runTextQuery(ui->lineEditText->text());
@@ -251,7 +254,7 @@ void Form::onBtnTextGoClicked()
 
 void Form::onBtnImageGoClicked()
 {
-    m_requestForDomainList = false;
+//    m_requestForDomainList = false;
 //    ui->tabReply->setCurrentIndex(indexTabReplyByName("Image"));
 //    clearReplyImage();
 //    m_pManager->runImageQuery(ui->lineEditImage->text()
@@ -263,7 +266,7 @@ void Form::onBtnImageGoClicked()
 
 void Form::onBtnClearClicked()
 {
-    m_requestForDomainList = false;
+//    m_requestForDomainList = false;
     ui->textMqlReply->clear();
 //    ui->textBrowserText->clear();
     ui->webViewText->setHtml(QString());
@@ -288,7 +291,7 @@ void Form::listDomains()
     ui->textMqlReply->clear();
     m_pManager->runMqlQuery(curValue);
 
-    m_requestForDomainList = true;
+//    m_requestForDomainList = true;
 
 //    ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
 //    ui->textMqlReply->clear();
@@ -470,10 +473,44 @@ void Form::onTextLinkClicked(const QUrl& url)
         QString q = QString("[{ \"id\": null, \"name\": null, \"sort\": \"name\", \"type\": \"/type/type\", \"domain\": \"%1\" }]").arg( value.remove(0, 8) );
         m_pManager->runMqlQuery(q);
         return;
-    } else if( value.startsWith("mqlinstances:") ) {
-        QString q = QString("[{ \"id\": null, \"name\": null, \"sort\": \"name\", \"type\": \"%1\" }]").arg( value.remove(0, 13) );
-        m_pManager->runMqlQuery(q);
-        return;
+//    } else if( value.startsWith("mqlinstances:") ) {
+//        QString q = QString("[{ \"id\": null, \"name\": null, \"sort\": \"name\", \"type\": \"%1\" }]").arg( value.remove(0, 13) );
+//        m_pManager->runMqlQuery(q);
+//        return;
+    } else if( value.startsWith("mqlproperties:") ) {
+
+//        {
+//            "id":"/music/artist",
+//            "type":"/type/type",
+//            "properties":[{
+//                "expected_type":{
+//                    "default_property":null,
+//                    "id":null,
+//                    "name": null
+//                },
+//                "id":null,
+//                "name":null
+//            }]
+//        }
+
+        QVariantMap query;
+        query["id"]   = value.remove(0, 14);
+        query["type"] = "/type/type";
+
+        QVariantMap properties;
+        properties["id"]   = QVariant();
+        properties["name"] = QVariant();
+
+        QVariantMap expected_type;
+        expected_type["default_property"] = QVariant();
+        expected_type["id"]   = QVariant();
+        expected_type["name"] = QVariant();
+
+        properties["expected_type"] = expected_type;
+
+        query["properties"] = QVariantList() << properties;
+
+        m_pManager->runMqlQuery( QJson::Serializer().serialize(query) );
     }
 
     m_pManager->runSearchQuery(value);

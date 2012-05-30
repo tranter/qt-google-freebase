@@ -27,6 +27,7 @@
    <addaction name="separator"/>
    <addaction name="actionPeople_Info"/>
    <addaction name="actionDemo_Country_Info"/>
+   <addaction name="actionSchemeExplorer"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="enabled">
@@ -65,12 +66,17 @@
     </property>
     <addaction name="actionPeople_Info"/>
     <addaction name="actionDemo_Country_Info"/>
+    <addaction name="actionSchemeExplorer"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuDemo"/>
   </widget>
   <action name="actionExit">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/images/close</normaloff>:/images/close</iconset>
+   </property>
    <property name="text">
     <string>Exit</string>
    </property>
@@ -147,6 +153,15 @@
    </property>
    <property name="text">
     <string>Demo Country Info</string>
+   </property>
+  </action>
+  <action name="actionSchemeExplorer">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/images/fschema</normaloff>:/images/fschema</iconset>
+   </property>
+   <property name="text">
+    <string>Scheme Explorer</string>
    </property>
   </action>
  </widget>
