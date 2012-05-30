@@ -42,7 +42,8 @@ SOURCES += main.cpp\
     htmlgenerators.cpp \
     countrysearcher.cpp \
     schemeexplorer.cpp \
-    schemeexplorerdialog.cpp
+    schemeexplorerdialog.cpp \
+    freebaseexplorer.cpp
 
 HEADERS  += mainwindow.h \
     oauth2.h \
@@ -56,7 +57,8 @@ HEADERS  += mainwindow.h \
     htmlgenerators.h \
     countrysearcher.h \
     schemeexplorer.h \
-    schemeexplorerdialog.h
+    schemeexplorerdialog.h \
+    freebaseexplorer.h
 
 FORMS    += mainwindow.ui \
     logindialog.ui \

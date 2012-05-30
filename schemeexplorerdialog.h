@@ -19,6 +19,7 @@ public:
 
     void setSelectionMode(SchemeExplorer::DataType type);
     QString selectedId() const;
+    QVariantList selectedData() const;
     
 private:
     Ui::SchemeExplorerDialog *ui;

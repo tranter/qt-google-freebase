@@ -9,6 +9,8 @@
 #include <QNetworkReply>
 #include <QDebug>
 
+#include <QKeyEvent>
+
 SimpleSearcher::SimpleSearcher(QWidget *p) :
     QWidget(p),
     ui(new Ui::SimpleSearcher),
@@ -34,9 +36,7 @@ SimpleSearcher::SimpleSearcher(QWidget *p) :
     connect(ui->findButton,     SIGNAL(clicked()), this, SLOT(search()));
     connect(ui->searchLineEdit, SIGNAL(returnPressed()), this, SLOT(search()));
     connect(ui->resultComboBox, SIGNAL(activated(int)), this, SLOT(showPosition(int)));
-
-    //ui->typeComboBox->addItem(tr("Person (/people/person)"), "/people/person");
-    //showTypeWidgets(false);
+    connect(ui->schemeTypeButton,  SIGNAL(clicked()), this, SLOT(addSchemeType()));
 }
 
 SimpleSearcher::~SimpleSearcher()
@@ -48,7 +48,7 @@ void SimpleSearcher::showTypeWidgets(bool v)
 {
     ui->labelType->setVisible(v);
     ui->typeComboBox->setVisible(v);
-    ui->addTypeButton->setVisible(v);
+    ui->schemeTypeButton->setVisible(v);
     ui->findButton->setToolButtonStyle(v ? Qt::ToolButtonTextUnderIcon : Qt::ToolButtonTextBesideIcon);
 }
 
@@ -101,7 +101,7 @@ void SimpleSearcher::onJsonReady(int rt)
     }
 }
 
-void SimpleSearcher::on_addTypeButton_clicked()
+void SimpleSearcher::addSchemeType()
 {
     SchemeExplorerDialog dialog(this);
     dialog.setSelectionMode(SchemeExplorer::TYPES);
@@ -110,15 +110,14 @@ void SimpleSearcher::on_addTypeButton_clicked()
     if( dialog.exec() != QDialog::Accepted )
         return;
 
-    QString selectedId = dialog.selectedId();
+    QVariantList list( dialog.selectedData() );
 
-    if( selectedId.isEmpty() )
+    if( list.size() < 2 )
         return;
 
-    if( ui->typeComboBox->count() > 10 )
-        ui->typeComboBox->removeItem( ui->typeComboBox->count() - 1 );
-    ui->typeComboBox->insertItem(0, selectedId);
-    ui->typeComboBox->setCurrentIndex(0);
+    int pos = ui->typeComboBox->count();
+    ui->typeComboBox->addItem( QString("%1 (%2)").arg( list.at(0).toString(), list.at(1).toString()), list.at(1) );
+    ui->typeComboBox->setCurrentIndex(pos);
 }
 
 void SimpleSearcher::previousPage()
@@ -172,7 +171,6 @@ void SimpleSearcher::sslErrorHandler(QNetworkReply* qnr, const QList<QSslError> 
 
 void SimpleSearcher::search()
 {
-    qDebug() << Q_FUNC_INFO;
     QString query = ui->searchLineEdit->text().trimmed();
     ui->webView->setHtml("<html/>");
 

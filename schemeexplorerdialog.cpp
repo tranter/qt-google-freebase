@@ -30,3 +30,8 @@ QString SchemeExplorerDialog::
 selectedId() const {
     return ui->schemeExplorer->selectedId();
 }
+
+QVariantList SchemeExplorerDialog::
+selectedData() const {
+    return ui->schemeExplorer->selectedData();
+}
