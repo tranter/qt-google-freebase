@@ -21,8 +21,11 @@ public:
 
     void showTypeWidgets(bool);
 
+signals:
+    void currentSchemaTypeChanged(const QString & id);
+
 protected slots:
-    virtual void onLinkClicked(const QUrl &) {}
+    virtual void onLinkClicked(const QUrl &);
 
 private slots:
     void onJsonReady(int);
@@ -35,6 +38,7 @@ private slots:
     void search();
 
     void showPosition(int pos);
+    void onCurrentTypeChanged(int);
 
 protected:
     virtual QString getCurrentType() const;

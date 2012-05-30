@@ -9,6 +9,7 @@
 #include <QNetworkReply>
 #include <QDebug>
 
+#include <QDesktopServices>
 #include <QKeyEvent>
 
 SimpleSearcher::SimpleSearcher(QWidget *p) :
@@ -37,6 +38,7 @@ SimpleSearcher::SimpleSearcher(QWidget *p) :
     connect(ui->searchLineEdit, SIGNAL(returnPressed()), this, SLOT(search()));
     connect(ui->resultComboBox, SIGNAL(activated(int)), this, SLOT(showPosition(int)));
     connect(ui->schemeTypeButton,  SIGNAL(clicked()), this, SLOT(addSchemeType()));
+    connect(ui->typeComboBox,   SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentTypeChanged(int)));
 }
 
 SimpleSearcher::~SimpleSearcher()
@@ -50,6 +52,13 @@ void SimpleSearcher::showTypeWidgets(bool v)
     ui->typeComboBox->setVisible(v);
     ui->schemeTypeButton->setVisible(v);
     ui->findButton->setToolButtonStyle(v ? Qt::ToolButtonTextUnderIcon : Qt::ToolButtonTextBesideIcon);
+}
+
+void SimpleSearcher::onLinkClicked(const QUrl & url)
+{
+    qDebug() << Q_FUNC_INFO << " url=" << url;
+    if( url.toString().contains("http://") )
+        QDesktopServices::openUrl(url);
 }
 
 void SimpleSearcher::onJsonReady(int rt)
@@ -194,6 +203,11 @@ void SimpleSearcher::showPosition(int pos)
         m_history.last().first,
         getCurrentType()
     );
+}
+
+void SimpleSearcher::onCurrentTypeChanged(int idx)
+{
+    emit currentSchemaTypeChanged( ui->typeComboBox->itemData(idx).toString() );
 }
 
 QString SimpleSearcher::getCurrentType() const
