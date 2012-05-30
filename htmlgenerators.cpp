@@ -29,7 +29,6 @@ QString HtmlGenerators::createHtmlForPerson(const QVariantMap& map)
     ///people/person
     if(mapLocal.contains("name"))
     {
-        strHtml += "<p><i><u>General Info</u></i></p>";
         strHtml += makeHtmlRecordForPerson(mapLocal,"name","Name:");
     }
     key = "date_of_birth";
