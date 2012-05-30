@@ -19,6 +19,7 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const;
     QString data(int row, int column) const;
+    QVariantList data(int row) const;
 
     void setData(const QList<QVariantList> &, int t = SchemeExplorer::DOMAINS);
     int currentDataType() const { return m_currentType; }
@@ -81,6 +82,12 @@ data(int row, int column) const
             : QString();
 }
 
+QVariantList TypeTableModel::
+data(int row) const
+{
+    return -1 < row && row < m_data.size() ? m_data[row] : QVariantList();
+}
+
 void TypeTableModel::
 setData(const QList<QVariantList> & dataList, int t)
 {
@@ -122,6 +129,12 @@ SchemeExplorer::
 ~SchemeExplorer()
 {
     delete ui;
+}
+
+QString SchemeExplorer::
+selectedId() const
+{
+    return m_selectedData.size() > 1 ? m_selectedData.at(1).toString() : QString();
 }
 
 void SchemeExplorer::
@@ -253,8 +266,8 @@ doubleClicked(const QModelIndex & index)
         QString id = m_model->data(list.first().row(), 1);
         if( id.isEmpty() ) return;
 
-        m_selectedId = id;
-        emit idSelected( id );
+        m_selectedData = m_model->data(index.row());
+        emit idSelected( m_selectedData.at(1).toString() );
         return;
 
     } else if( m_requestedType == PROPERTIES )

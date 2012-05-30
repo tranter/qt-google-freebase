@@ -30,6 +30,7 @@ public slots:
     void startDlgDemo();
     void startDlgDemoCountry();
     void openSchemeExplorer();
+    void openFreebaseExplorer();
 
 private:
     Ui::MainWindow *ui;

@@ -27,7 +27,7 @@ protected slots:
 private slots:
     void onJsonReady(int);
 
-    void on_addTypeButton_clicked();
+    void addSchemeType();
     void previousPage();
     void nextPage();
 

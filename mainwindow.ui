@@ -28,6 +28,7 @@
    <addaction name="actionPeople_Info"/>
    <addaction name="actionDemo_Country_Info"/>
    <addaction name="actionSchemeExplorer"/>
+   <addaction name="actionFreebaseExplorer"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="enabled">
@@ -162,6 +163,11 @@
    </property>
    <property name="text">
     <string>Scheme Explorer</string>
+   </property>
+  </action>
+  <action name="actionFreebaseExplorer">
+   <property name="text">
+    <string>Freebase Explorer</string>
    </property>
   </action>
  </widget>

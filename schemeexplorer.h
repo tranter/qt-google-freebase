@@ -19,7 +19,8 @@ public:
     explicit SchemeExplorer(QWidget *parent = 0);
     ~SchemeExplorer();
     
-    QString selectedId() const { return m_selectedId; }
+    QString selectedId() const;
+    QVariantList selectedData() const { return m_selectedData; }
 
 public slots:
     void selectionMode(DataType type = NONE);
@@ -47,7 +48,8 @@ private:
     int m_requestedType;
     DataType m_selection;
     QString m_currentId;
-    QString m_selectedId;
+
+    QVariantList m_selectedData;
 };
 
 #endif // SCHEMEEXPLORER_H

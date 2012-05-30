@@ -5,6 +5,10 @@
 #include "form.h"
 
 #include "schemeexplorerdialog.h"
+#include "freebaseexplorer.h"
+
+#include <QDialog>
+#include <QVBoxLayout>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -20,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->actionPeople_Info,SIGNAL(triggered()),this,SLOT(startDlgDemo()));
     connect(ui->actionDemo_Country_Info,SIGNAL(triggered()),this,SLOT(startDlgDemoCountry()));
     connect(ui->actionSchemeExplorer, SIGNAL(triggered()), this, SLOT(openSchemeExplorer()));
+    connect(ui->actionFreebaseExplorer, SIGNAL(triggered()), this, SLOT(openFreebaseExplorer()));
 
     QLabel* permanentWidget = new QLabel(this);
     permanentWidget->setText("Based on Freebase API: http://www.freebase.com");
@@ -85,5 +90,13 @@ void MainWindow::openSchemeExplorer()
 {
     SchemeExplorerDialog dialog(this);
     dialog.resize(600, 400);
+    dialog.exec();
+}
+
+void MainWindow::openFreebaseExplorer()
+{
+    QDialog dialog(this);
+    dialog.setLayout(new QVBoxLayout);
+    dialog.layout()->addWidget(new FreebaseExplorer);
     dialog.exec();
 }
