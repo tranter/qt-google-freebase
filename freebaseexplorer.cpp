@@ -93,98 +93,110 @@ QString FreebaseExplorer::createSearchLink(QString type, QString typeName, QStri
 
 QString FreebaseExplorer::createHtml(const QVariantMap & map)
 {
-    QString html("<html><head><style type=\"text/css\">a{color:black}</style></head><body>");
-
     QVariantList results( map["q0"].toMap()["result"].toList() );
     if( results.isEmpty() )
     {
-        html += "<p><i>Empty result</i></p></body></html>";
-        return html;
+        return "<html><body><p><i>Empty result</i></p></body></html>";
     }
 
-    QVariant value;
+    QString head(
+                "<html><head><style type=\"text/css\">a{color:black}</style>"
+                "<script type=\"text/javascript\">"
+                "function loadText() {"
+                "var req = new XMLHttpRequest();"
+                "req.onreadystatechange = function() {"
+                "if( req.readyState == 4 && req.status == 200 ) {"
+                "var result = eval('(' + req.responseText + ')');"
+                "document.getElementById('art').innerHTML = result['result'];"
+                "} };"
+                "req.open( 'GET', 'https://www.googleapis.com/freebase/v1-sandbox/text"
+            "%1', true );"
+                "req.send( null ); }"
+                "</script></head><body onload=\"loadText()\">"
+                "<img src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image"
+            "%1"
+                "?maxheight=400&maxwidth=200\" align=\"right\"/>"
+                "<p><a href=\"http://www.freebase.com/view"
+            "%1"
+                "\"><img src=\"http://www.freebase.com/favicon.ico\" alt=\"Freebase\" hspace=\"2\"/>Freebase</a>"
+    );
 
-    foreach(const QVariant & v, results)
+    QVariantMap vMap( results.at(0).toMap() );
+
+    QString name(vMap["name"].toString());
+    QString mid( vMap["mid"].toString() );
+
+    QString html( head.arg(mid) );
+
     {
-        QVariantMap vMap( v.toMap() );
+        QVariantMap key( vMap["key"].toMap() );
+        QString wiki( key["namespace"].toString().startsWith("/wikipedia") ? key["value"].toString() : QString() );
 
-        QString name(vMap["name"].toString());
-        QString mid( vMap["mid"].toString() );
+        QString wikipedia = wiki.isEmpty() ? QString() : QString(
+            "<a href=\"http://en.wikipedia.org/wiki/index.html?curid=%1\">"
+            "<img src=\"http://en.wikipedia.org/favicon.ico\" alt=\"Wiki\" hspace=\"2\"/>Wiki</a></p>"
+        ).arg(wiki);
 
+        html.append( wikipedia.isEmpty() ? "</p>" : wikipedia );
+    }
+
+    html += QString("<h2>%1</h2><p id=\"art\"></p>").arg(name);
+
+    foreach( const Tuple & t, schema )
+    {
+        QVariant value = vMap[t.property];
+        if( value.isNull() )
+            continue;
+
+        bool attachedTypeInfo( ! (t.type_id.isEmpty() || t.type_name.isEmpty()) );
+
+        QString strValue;
+
+        if( value.type() == QVariant::List )
         {
-            QVariantMap key( vMap["key"].toMap() );
-            QString wiki( key["namespace"].toString().startsWith("/wikipedia") ? key["value"].toString() : QString() );
+            QVariantList list = value.toList();
+            if( list.count() )
+            {
+                int nulls(0);
 
-            QString freebase = mid.isEmpty() ? QString() : QString(
-                "<a href=\"http://www.freebase.com/view%1\">"
-                "<img src=\"http://www.freebase.com/favicon.ico\" alt=\"Freebase\" hspace=\"2\"/>Freebase</a>"
-            ).arg(mid);
+                strValue.append("<ul>");
+                foreach( const QVariant & var, list )
+                {
+                    if( var.isNull() ) { ++nulls; continue; }
+                    strValue.append("<li>").append(
+                        attachedTypeInfo ? createSearchLink(t.type_id, t.type_name, var.toString()) : var.toString()
+                    ).append("</li>");
+                }
+                strValue.append("</ul>");
 
-            QString wikipedia = wiki.isEmpty() ? QString() : QString(
-                "<a href=\"http://en.wikipedia.org/wiki/index.html?curid=%1\">"
-                "<img src=\"http://en.wikipedia.org/favicon.ico\" alt=\"Wiki\" hspace=\"2\"/>Wiki</a>"
-            ).arg(wiki);
+                if( nulls == list.count() )
+                    strValue.clear();
+            }
+        }
+        else if( value.type() == QVariant::Map )
+        {
+            QVariantMap m(value.toMap());
+            if( ! m.isEmpty() )
+            {
+                name = m["name"].toString();
+                mid  = m["mid"].toString();
 
-            html += QString("<p>%1 %2</p>").arg(freebase, wikipedia);
+                strValue = mid.isEmpty() ? name : QString("<a href=\"%1\">%2</a>").arg(mid, name);
+            }
+        } else {
+            strValue = attachedTypeInfo
+                    ? createSearchLink(t.type_id, t.type_name, value.toString())
+                    : value.toString();
         }
 
-        html += QString("<h2>%1</h2>").arg(name);
+        if( strValue.isEmpty() )
+            continue;
 
-        foreach( const Tuple & t, schema )
-        {
-            value = vMap[t.property];
-            if( value.isNull() )
-                continue;
-
-            bool attachedTypeInfo( ! (t.type_id.isEmpty() || t.type_name.isEmpty()) );
-
-            QString strValue;
-
-            if( value.type() == QVariant::List )
-            {
-                QVariantList list = value.toList();
-                if( list.count() )
-                {
-                    int nulls(0);
-
-                    strValue.append("<ul>");
-                    foreach( const QVariant & var, list )
-                    {
-                        if( var.isNull() ) { ++nulls; continue; }
-                        strValue.append("<li>").append(
-                            attachedTypeInfo ? createSearchLink(t.type_id, t.type_name, var.toString()) : var.toString()
-                        ).append("</li>");
-                    }
-                    strValue.append("</ul>");
-
-                    if( nulls == list.count() )
-                        strValue.clear();
-                }
-            }
-            else if( value.type() == QVariant::Map )
-            {
-                QVariantMap m(value.toMap());
-                if( ! m.isEmpty() )
-                {
-                    name = m["name"].toString();
-                    mid  = m["mid"].toString();
-
-                    strValue = mid.isEmpty() ? name : QString("<a href=\"%1\">%2</a>").arg(mid, name);
-                }
-            } else {
-                strValue = attachedTypeInfo
-                        ? createSearchLink(t.type_id, t.type_name, value.toString())
-                        : value.toString();
-            }
-
-            if( strValue.isEmpty() )
-                continue;
-
-            html += QString("<p><b>%1:</b> %2</p>").arg(t.name, strValue);
-        }
+        html += QString("<p><b>%1:</b> %2</p>").arg(t.name, strValue);
     }
 
     html += "</body></html>";
+    qDebug() << html;
     return html;
 }
 

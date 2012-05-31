@@ -68,6 +68,13 @@ private:
     // second = -1 -> undefined position
 
     typedef QPair<QString, int> HistoryNode;
+//    struct HistoryNode {
+//        QString searchText;
+//        int limitPos;
+//        QString typeId;
+//        QString typeName;
+//        int resultPos;
+//    };
     QList<HistoryNode> m_history;
 
 protected:
