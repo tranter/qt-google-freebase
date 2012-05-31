@@ -18,7 +18,6 @@ QString HtmlGenerators::createHtmlForPerson(const QVariantMap& map)
 
     // Referencies
     QString s = findNamespaceValue("/wikipedia/en_id",map);
-    qDebug() << "*******************" << s;
     if (!s.isEmpty()) {
         strHtml += QString("<a href=\"http://www.freebase.com/view%1\"><img src=\"http://www.freebase.com/favicon.ico\" alt=\"Freebase\" hspace=\"2\"/>Freebase</a>")
                 .arg(mapLocal["mid"].toString());
@@ -211,7 +210,6 @@ QString HtmlGenerators::createHtmlForPerson(const QVariantMap& map)
 
 QString HtmlGenerators::createHtmlForCountry(const QVariantMap & map)
 {
-    qDebug() << Q_FUNC_INFO;
     QString strHtml = QString("<html><body>");
     QVariantList lst;
     QVariantMap mapLocal =  map["q0"].toMap()["result"].toMap();

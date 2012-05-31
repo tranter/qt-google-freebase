@@ -59,6 +59,7 @@ public:
     void runQuery();
     void startDlgDemo();
     void startDlgDemoCountry();
+    void openFreebaseExplorer();
 
 public slots:
     void onSuggestData(const QString& name,const QString& id,const QString& mid);

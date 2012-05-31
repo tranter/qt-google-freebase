@@ -12,7 +12,7 @@ private:
     QString getCurrentType() const;
     QString createHtml(const QVariantMap & map);
     void getInfo(const QString & id, const QString & /*type = "/people/person"*/);
-    void delegatedRequest(const QVariantMap & );
+    bool delegatedRequest(const QVariantMap & );
     void onLinkClicked(const QUrl &);
 
     void getEventReferencies(const QString & mid);

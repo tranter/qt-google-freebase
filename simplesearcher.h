@@ -21,11 +21,16 @@ public:
 
     void showTypeWidgets(bool);
 
+    virtual void readSettings(const QString & companyName, const QString & appName);
+    virtual void writeSettings(const QString & companyName, const QString & appName);
+
 signals:
     void currentSchemaTypeChanged(const QString & id);
 
 protected slots:
     virtual void onLinkClicked(const QUrl &);
+    void setAwaitingMode();
+    void dropAwaitingMode();
 
 private slots:
     void onJsonReady(int);
@@ -44,7 +49,7 @@ protected:
     virtual QString getCurrentType() const;
     virtual QString createHtml(const QVariantMap & map);
     virtual void getInfo(const QString & id, const QString &type);
-    virtual void delegatedRequest(const QVariantMap & ) {}
+    virtual bool delegatedRequest(const QVariantMap & ) { return false; }
 
     void delegateRequests() { m_delegateMQLrequest = true; }
     class QWebView * webView() const;

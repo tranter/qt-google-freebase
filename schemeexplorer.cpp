@@ -196,8 +196,6 @@ loadProperties(const QString & id)
 void SchemeExplorer::
 updateData(int r)
 {
-    //qDebug() << m_dataManager->getJsonData();
-
     ui->previousButton->setEnabled( m_requestedType != DOMAINS );
     QList<QVariantList> dataList;
 

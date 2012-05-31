@@ -28,7 +28,7 @@ QString PeopleSearcher::createHtml(const QVariantMap & map)
     return HtmlGenerators::createHtmlForPerson(map);
 }
 
-void PeopleSearcher::delegatedRequest(const QVariantMap & jsonMap)
+bool PeopleSearcher::delegatedRequest(const QVariantMap & jsonMap)
 {
     QVariantMap key = jsonMap["q0"].toMap()["result"].toMap()["key"].toMap();
 
@@ -36,14 +36,16 @@ void PeopleSearcher::delegatedRequest(const QVariantMap & jsonMap)
     {
         QString url = "http://en.wikipedia.org/wiki/index.html?curid=" + key["value"].toString();
         QDesktopServices::openUrl(QUrl(url));
-        return;
+        return true;
     }
 
-    webView()->setHtml( createHtml(jsonMap) );
+    return false;
 }
 
 void PeopleSearcher::getInfo(const QString & id, const QString & /*type*/)
 {
+    setAwaitingMode();
+
     QString type = getCurrentType();
     QStringList list;
 
@@ -119,7 +121,7 @@ void PeopleSearcher::onLinkClicked(const QUrl & url)
     {
         QStringList list = url.toString().split("@");
         //getEventReferencies(list[1]);
-        qDebug() << list[1];
+        //qDebug() << list[1];
         int pos = addItemToResultsList(list[2], list[1]);
         appendToHistory( list[1], pos );
         getInfo(list[1], getCurrentType());
@@ -128,7 +130,7 @@ void PeopleSearcher::onLinkClicked(const QUrl & url)
 
 void PeopleSearcher::getEventReferencies(const QString& mid)
 {
-//    qDebug() << Q_FUNC_INFO;
+    setAwaitingMode();
 
     QVariantMap key;
     key["namespace"] = "/wikipedia/en_id";

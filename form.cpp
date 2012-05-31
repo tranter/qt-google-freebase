@@ -17,6 +17,11 @@
 
 #include <QJson/Serializer>
 
+#include "freebaseexplorer.h"
+
+#include <QDialog>
+#include <QVBoxLayout>
+
 Form::Form(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Form)
@@ -528,4 +533,18 @@ QString Form::createImageHtml()
             .arg(id,QString::number(imageHeight),QString::number(imageWidth));
     ret += "</body></html>";
     return ret;
+}
+
+void Form::openFreebaseExplorer()
+{
+    QDialog dialog(this);
+    dialog.setLayout(new QVBoxLayout);
+
+    FreebaseExplorer * fe = new FreebaseExplorer();
+    fe->readSettings(m_strCompanyName, m_strAppName);
+
+    dialog.layout()->addWidget(fe);
+    dialog.exec();
+
+    fe->writeSettings(m_strCompanyName, m_strAppName);
 }

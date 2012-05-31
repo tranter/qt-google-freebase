@@ -5,10 +5,6 @@
 #include "form.h"
 
 #include "schemeexplorerdialog.h"
-#include "freebaseexplorer.h"
-
-#include <QDialog>
-#include <QVBoxLayout>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -95,8 +91,5 @@ void MainWindow::openSchemeExplorer()
 
 void MainWindow::openFreebaseExplorer()
 {
-    QDialog dialog(this);
-    dialog.setLayout(new QVBoxLayout);
-    dialog.layout()->addWidget(new FreebaseExplorer);
-    dialog.exec();
+    m_pForm->openFreebaseExplorer();
 }

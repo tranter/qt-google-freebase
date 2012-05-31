@@ -13,7 +13,7 @@ private slots:
     void getSchema(const QString & id);
 
 private:
-    void delegatedRequest(const QVariantMap & );
+    bool delegatedRequest(const QVariantMap & );
     QString createHtml(const QVariantMap & );
     void getInfo(const QString & id, const QString & type);
 

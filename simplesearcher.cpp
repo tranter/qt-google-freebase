@@ -9,6 +9,7 @@
 #include <QNetworkReply>
 #include <QDebug>
 
+#include <QSettings>
 #include <QDesktopServices>
 #include <QKeyEvent>
 
@@ -61,10 +62,20 @@ void SimpleSearcher::onLinkClicked(const QUrl & url)
         QDesktopServices::openUrl(url);
 }
 
+void SimpleSearcher::setAwaitingMode()
+{
+    setEnabled(false);
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+}
+
+void SimpleSearcher::dropAwaitingMode()
+{
+    QApplication::restoreOverrideCursor();
+    setEnabled(true);
+}
+
 void SimpleSearcher::onJsonReady(int rt)
 {
-    qDebug() << Q_FUNC_INFO << " rt=" << rt;
-
     QVariantMap jsonMap( m_pManager->getJsonData().toMap() );
 
     if (rt == freebase_data_manager::REQ_SEARCH)
@@ -100,14 +111,16 @@ void SimpleSearcher::onJsonReady(int rt)
     {
         qDebug() << "Some info from MQL arrived";
 
-        if(m_delegateMQLrequest)
+        if( m_delegateMQLrequest && delegatedRequest(jsonMap) )
         {
-            delegatedRequest(jsonMap);
+            dropAwaitingMode();
             return;
         }
 
         ui->webView->setHtml( createHtml(jsonMap) );
     }
+
+    dropAwaitingMode();
 }
 
 void SimpleSearcher::addSchemeType()
@@ -185,6 +198,8 @@ void SimpleSearcher::search()
 
     if( ! query.isEmpty() )
     {
+        setAwaitingMode();
+
         m_historyPos = -1;
         m_history.clear();
 
@@ -195,8 +210,6 @@ void SimpleSearcher::search()
 
 void SimpleSearcher::showPosition(int pos)
 {
-    qDebug() << Q_FUNC_INFO;
-
     appendToHistory(ui->resultComboBox->itemData(pos).toString(), pos);
 
     getInfo(
@@ -222,6 +235,8 @@ QString SimpleSearcher::createHtml(const QVariantMap & /*map*/)
 
 void SimpleSearcher::getInfo(const QString & id, const QString & type)
 {
+    setAwaitingMode();
+
     QVariantMap query;
     if (id.startsWith("/m/"))
         query["mid"] = id;
@@ -259,4 +274,42 @@ int SimpleSearcher::addItemToResultsList(const QString & item, const QVariant & 
     ui->resultComboBox->addItem(item, itemData);
     ui->resultComboBox->setCurrentIndex(pos);
     return pos;
+}
+
+void SimpleSearcher::writeSettings(const QString & companyName, const QString & appName)
+{
+    QSettings settings(companyName, appName);
+    settings.beginGroup("TypeItems");
+
+    int count = ui->typeComboBox->count();
+    QStringList items;
+    for(int i(0); i < count; ++i)
+    {
+        items << ui->typeComboBox->itemText(i);
+        items << ui->typeComboBox->itemData(i).toString();
+    }
+
+    settings.setValue("items", items);
+    settings.setValue("pos", ui->typeComboBox->currentIndex());
+
+    settings.endGroup();
+}
+
+void SimpleSearcher::readSettings(const QString & companyName, const QString & appName)
+{
+    QSettings settings(companyName, appName);
+    settings.beginGroup("TypeItems");
+
+    QStringList items = settings.value("items").toStringList();
+
+    if( items.isEmpty() || items.count() & 1 )
+        return;
+
+    int count = items.size();
+    for(int i(0); i < count; i += 2)
+        ui->typeComboBox->addItem( items.at(i), items.at(i+1) );
+
+    ui->typeComboBox->setCurrentIndex( settings.value("pos", -1).toInt() );
+
+    settings.endGroup();
 }

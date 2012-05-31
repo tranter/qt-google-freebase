@@ -20,10 +20,10 @@ void FreebaseExplorer::
 getSchema(const QString & id)
 {
     m_gettingScheme = true;
-    setEnabled(false);
+    qDebug() << Q_FUNC_INFO;
+    setAwaitingMode();
+
     schema.clear();
-//    schema.append(Tuple("Name", "name"));
-//    schema.append(Tuple("Mid", "mid"));
 
     QVariantMap query;
     query["id"]   = id;
@@ -45,9 +45,7 @@ getSchema(const QString & id)
     m_pManager->runMqlQuery( QJson::Serializer().serialize(query) );
 }
 
-#include <QTimer>
-
-void FreebaseExplorer::
+bool FreebaseExplorer::
 delegatedRequest(const QVariantMap & data)
 {
     if(m_gettingScheme)
@@ -69,11 +67,9 @@ delegatedRequest(const QVariantMap & data)
 
         metaObject()->invokeMethod(this, "search"); //;-)
 
-    } else {
-        webView()->setHtml( createHtml(data) );
+        return true;
     }
-
-    setEnabled(true);
+    return false;
 }
 
 QString FreebaseExplorer::createHtml(const QVariantMap & map)
@@ -167,6 +163,8 @@ QString FreebaseExplorer::createHtml(const QVariantMap & map)
 
 void FreebaseExplorer::getInfo(const QString & id, const QString & type)
 {
+    setAwaitingMode();
+
     QVariantMap query;
     if (id.startsWith("/m/"))
         query["mid"] = id;

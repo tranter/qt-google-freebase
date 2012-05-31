@@ -23,6 +23,8 @@ QString CountrySearcher::createHtml(const QVariantMap & map)
 
 void CountrySearcher::getInfo(const QString & id, const QString & /*type = "/location/country"*/)
 {
+    setAwaitingMode();
+
     QVariantMap query;
     if (id.startsWith("/m/"))
         query["mid"] = id;
