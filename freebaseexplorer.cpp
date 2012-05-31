@@ -88,7 +88,7 @@ QString FreebaseExplorer::createSearchLink(QString type, QString typeName, QStri
 //    QString _text(text);
 //    text.replace(':', "\\:");
 
-    return QString("<a href=\"search:%1:%2:%3\">%3</a>").arg(type, typeName, text);
+    return type.startsWith("/type") ? text : QString("<a href=\"search:%1:%2:%3\">%3</a>").arg(type, typeName, text);
 }
 
 QString FreebaseExplorer::createHtml(const QVariantMap & map)
@@ -115,7 +115,7 @@ QString FreebaseExplorer::createHtml(const QVariantMap & map)
                 "</script></head><body onload=\"loadText()\">"
                 "<img src=\"https://usercontent.googleapis.com/freebase/v1-sandbox/image"
             "%1"
-                "?maxheight=400&maxwidth=200\" align=\"right\"/>"
+                "?maxheight=400&maxwidth=200\" align=\"right\" style=\"margin: 1em\"/>"
                 "<p><a href=\"http://www.freebase.com/view"
             "%1"
                 "\"><img src=\"http://www.freebase.com/favicon.ico\" alt=\"Freebase\" hspace=\"2\"/>Freebase</a>"
@@ -140,7 +140,7 @@ QString FreebaseExplorer::createHtml(const QVariantMap & map)
         html.append( wikipedia.isEmpty() ? "</p>" : wikipedia );
     }
 
-    html += QString("<h2>%1</h2><p id=\"art\"></p>").arg(name);
+    html += QString("<h2>%1</h2><p id=\"art\" style=\"padding: 1em\"></p>").arg(name);
 
     foreach( const Tuple & t, schema )
     {
@@ -196,7 +196,6 @@ QString FreebaseExplorer::createHtml(const QVariantMap & map)
     }
 
     html += "</body></html>";
-    qDebug() << html;
     return html;
 }
 
