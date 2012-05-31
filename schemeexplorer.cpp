@@ -45,7 +45,7 @@ rowCount(const QModelIndex & /*parent*/) const
 int TypeTableModel::
 columnCount(const QModelIndex & /*parent*/) const
 {
-    return m_currentType == SchemeExplorer::PROPERTIES ? 3 : 2;
+    return m_currentType == SchemeExplorer::PROPERTIES ? 5 : 2;
 }
 
 QVariant TypeTableModel::
@@ -58,9 +58,9 @@ headerData(int section, Qt::Orientation orientation, int role) const
     {
     case 0: return tr("Name");
     case 1: return tr("ID");
-//    case 2: return tr("Expected type name");
-//    case 3: return tr("Expected type id");
-    case 2: return tr("Defualt value");
+    case 2: return tr("Expected type name");
+    case 3: return tr("Expected type id");
+    case 4: return tr("Defualt value");
     }
 
     return QVariant();
@@ -237,7 +237,7 @@ updateData(int r)
             list << map["name"] << map["id"];
 
             map = map["expected_type"].toMap();
-//            list << map["name"] << map["id"];
+            list << map["name"] << map["id"];
 
             QVariant defaultValue( map["default_property"] );
             list << (defaultValue.isNull() ? QVariant("null") : defaultValue);

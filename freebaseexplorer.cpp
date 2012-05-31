@@ -19,11 +19,13 @@ FreebaseExplorer(QWidget *parent) :
 void FreebaseExplorer::
 getSchema(const QString & id)
 {
-    m_gettingScheme = true;
-    qDebug() << Q_FUNC_INFO;
-    setAwaitingMode();
+    if( m_currentSchemaTypeId == id )
+        return;
 
+    m_gettingScheme = true;
+    setAwaitingMode();
     schema.clear();
+    m_currentSchemaTypeId = id;
 
     QVariantMap query;
     query["id"]   = id;
@@ -59,22 +61,39 @@ delegatedRequest(const QVariantMap & data)
         foreach(const QVariant & v, properties)
         {
             QVariantMap map(v.toMap());
+
             Tuple tuple;
-            tuple.name = map["name"].toString();
-            tuple.property = map["id"].toString().split('/').last();
+            tuple.name      = map["name"].toString();
+            tuple.property  = map["id"].toString().split('/').last();
+
+            map = map["expected_type"].toMap();
+            tuple.type_id   = map["id"].toString();
+            tuple.type_name = map["name"].toString();
+
             schema.append(tuple);
         }
 
-        metaObject()->invokeMethod(this, "search"); //;-)
+        search();
 
         return true;
     }
     return false;
 }
 
+QString FreebaseExplorer::createSearchLink(QString type, QString typeName, QString text)
+{
+//    type.replace(':', "\\:");
+//    typeName.replace(':', "\\:");
+
+//    QString _text(text);
+//    text.replace(':', "\\:");
+
+    return QString("<a href=\"search:%1:%2:%3\">%3</a>").arg(type, typeName, text);
+}
+
 QString FreebaseExplorer::createHtml(const QVariantMap & map)
 {
-    QString html("<html><body>");
+    QString html("<html><head><style type=\"text/css\">a{color:black}</style></head><body>");
 
     QVariantList results( map["q0"].toMap()["result"].toList() );
     if( results.isEmpty() )
@@ -109,13 +128,15 @@ QString FreebaseExplorer::createHtml(const QVariantMap & map)
             html += QString("<p>%1 %2</p>").arg(freebase, wikipedia);
         }
 
-        html += QString("<p>%1</p>").arg(name);
+        html += QString("<h2>%1</h2>").arg(name);
 
         foreach( const Tuple & t, schema )
         {
             value = vMap[t.property];
             if( value.isNull() )
                 continue;
+
+            bool attachedTypeInfo( ! (t.type_id.isEmpty() || t.type_name.isEmpty()) );
 
             QString strValue;
 
@@ -130,7 +151,9 @@ QString FreebaseExplorer::createHtml(const QVariantMap & map)
                     foreach( const QVariant & var, list )
                     {
                         if( var.isNull() ) { ++nulls; continue; }
-                        strValue.append("<li>").append(var.toString()).append("</li>");
+                        strValue.append("<li>").append(
+                            attachedTypeInfo ? createSearchLink(t.type_id, t.type_name, var.toString()) : var.toString()
+                        ).append("</li>");
                     }
                     strValue.append("</ul>");
 
@@ -146,9 +169,13 @@ QString FreebaseExplorer::createHtml(const QVariantMap & map)
                     name = m["name"].toString();
                     mid  = m["mid"].toString();
 
-                    strValue = mid.isEmpty() ? name : QString("</a href=\"%1\">%2</a>").arg(mid, name);
+                    strValue = mid.isEmpty() ? name : QString("<a href=\"%1\">%2</a>").arg(mid, name);
                 }
-            } else strValue = value.toString();
+            } else {
+                strValue = attachedTypeInfo
+                        ? createSearchLink(t.type_id, t.type_name, value.toString())
+                        : value.toString();
+            }
 
             if( strValue.isEmpty() )
                 continue;
@@ -186,4 +213,28 @@ void FreebaseExplorer::getInfo(const QString & id, const QString & type)
     query["key"] = key;
 
     m_pManager->runMqlQuery( QJson::Serializer().serialize( QVariantList() << QVariant(query) ) );
+}
+
+void FreebaseExplorer::onLinkClicked(const QUrl & _url)
+{
+    QString url( _url.toString() );
+    if( url.isEmpty() ) return;
+
+    if( ! url.startsWith("search:") )
+    {
+        SimpleSearcher::onLinkClicked(_url);
+        return;
+    }
+
+    QStringList searchData( url.split(':') );
+    if( searchData.size() != 4 ) {
+        qDebug() << "Wrong url:" << url;
+        return;
+    }
+
+    setSearchText(searchData.last());
+    addSchemeType(searchData.at(2), searchData.at(1), false);
+
+    if( searchData.at(1) == m_currentSchemaTypeId )
+        search();
 }

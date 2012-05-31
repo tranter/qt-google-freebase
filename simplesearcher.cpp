@@ -137,9 +137,7 @@ void SimpleSearcher::addSchemeType()
     if( list.size() < 2 )
         return;
 
-    int pos = ui->typeComboBox->count();
-    ui->typeComboBox->addItem( QString("%1 (%2)").arg( list.at(0).toString(), list.at(1).toString()), list.at(1) );
-    ui->typeComboBox->setCurrentIndex(pos);
+    addSchemeType( list.at(0).toString(), list.at(1), false );
 }
 
 void SimpleSearcher::previousPage()
@@ -276,6 +274,45 @@ int SimpleSearcher::addItemToResultsList(const QString & item, const QVariant & 
     return pos;
 }
 
+void SimpleSearcher::addSchemeType(const QString & item, const QVariant & itemData, bool blockSignals)
+{
+    int count = ui->typeComboBox->count();
+    for(int i(0); i < count; ++i)
+    {
+        if( ui->typeComboBox->itemData(i).toString() == itemData )
+        {
+            if( blockSignals )
+            {
+                ui->typeComboBox->blockSignals(true);
+                ui->typeComboBox->setCurrentIndex(i);
+                ui->typeComboBox->blockSignals(false);
+            }
+            else {
+                if( i == ui->typeComboBox->currentIndex() )
+                    // we want notify changes cause blockSignals == false
+                    onCurrentTypeChanged(i);
+                else
+                    ui->typeComboBox->setCurrentIndex(i);
+            }
+
+            return;
+        }
+    }
+
+    if( blockSignals ) ui->typeComboBox->blockSignals(true);
+
+    ui->typeComboBox->addItem( QString("%1 (%2)").arg( item, itemData.toString()), itemData);
+    ui->typeComboBox->setItemData(count, item, Qt::UserRole+1);
+    ui->typeComboBox->setCurrentIndex(count);
+
+    if( blockSignals ) ui->typeComboBox->blockSignals(false);
+}
+
+void SimpleSearcher::setSearchText(const QString & text)
+{
+    ui->searchLineEdit->setText(text);
+}
+
 void SimpleSearcher::writeSettings(const QString & companyName, const QString & appName)
 {
     QSettings settings(companyName, appName);
@@ -285,7 +322,7 @@ void SimpleSearcher::writeSettings(const QString & companyName, const QString & 
     QStringList items;
     for(int i(0); i < count; ++i)
     {
-        items << ui->typeComboBox->itemText(i);
+        items << ui->typeComboBox->itemData(i,Qt::UserRole+1).toString();
         items << ui->typeComboBox->itemData(i).toString();
     }
 
@@ -307,7 +344,7 @@ void SimpleSearcher::readSettings(const QString & companyName, const QString & a
 
     int count = items.size();
     for(int i(0); i < count; i += 2)
-        ui->typeComboBox->addItem( items.at(i), items.at(i+1) );
+        addSchemeType( items.at(i), items.at(i+1) );
 
     ui->typeComboBox->setCurrentIndex( settings.value("pos", -1).toInt() );
 

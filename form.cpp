@@ -47,7 +47,7 @@ Form::Form(QWidget *parent) :
     m_pMain->showStatusText("Uknown user email");
     m_pOAuth2 = new OAuth2(this);
 
-    m_strCompanyName = "YOU_COMPANY_NAME_HERE";
+    m_strCompanyName = "YOUR_COMPANY_NAME_HERE";
     m_strAppName = "QtFreebase";
 
     // Load settings

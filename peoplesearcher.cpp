@@ -76,7 +76,7 @@ void PeopleSearcher::getInfo(const QString & id, const QString & /*type*/)
 
     query["type"] = "/event/event";
     list << QJson::Serializer().serialize(query);
-//    //-------------------------------------------
+    //-------------------------------------------
 
 
     query.remove("*");

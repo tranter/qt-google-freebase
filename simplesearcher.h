@@ -31,6 +31,7 @@ protected slots:
     virtual void onLinkClicked(const QUrl &);
     void setAwaitingMode();
     void dropAwaitingMode();
+    void search();
 
 private slots:
     void onJsonReady(int);
@@ -40,7 +41,6 @@ private slots:
     void nextPage();
 
     void sslErrorHandler(class QNetworkReply * qnr, const QList<QSslError> & /*errlist*/);
-    void search();
 
     void showPosition(int pos);
     void onCurrentTypeChanged(int);
@@ -51,10 +51,12 @@ protected:
     virtual void getInfo(const QString & id, const QString &type);
     virtual bool delegatedRequest(const QVariantMap & ) { return false; }
 
-    void delegateRequests() { m_delegateMQLrequest = true; }
     class QWebView * webView() const;
+    void delegateRequests() { m_delegateMQLrequest = true; }
     void appendToHistory(const QString & value, int pos = -1);
-    int addItemToResultsList(const QString & item, const QVariant & itemData = QVariant());
+    int  addItemToResultsList(const QString & item, const QVariant & itemData = QVariant());
+    void addSchemeType(const QString & item, const QVariant & itemData = QVariant(), bool blockSignals = true );
+    void setSearchText(const QString & text);
 
 private:
     Ui::SimpleSearcher * ui;
