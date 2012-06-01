@@ -217,15 +217,19 @@ void Form::onBtnClearClicked()
 
 void Form::onTabQueryTabChanged(int index)
 {
+    bool enableButtons(false);
+
     if (index == indexTabQueryByName("Misc Request")) {
         ui->splitter->setSizes(m_listSplitterSave);
-        ui->btnRun->setEnabled(false);
-    } else if (index == indexTabQueryByName("Suggest")) {
-        ui->btnRun->setEnabled(false);
-    } else {
-        ui->splitter->setSizes(m_listSplitterSave);
-        ui->btnRun->setEnabled(true);
     }
+    else if (index != indexTabQueryByName("Suggest")) {
+        ui->splitter->setSizes(m_listSplitterSave);
+        enableButtons = true;
+    }
+
+    ui->btnRun->setEnabled(enableButtons);
+    ui->backButton->setEnabled(enableButtons);
+    ui->forwButton->setEnabled(enableButtons);
 }
 
 int Form::indexTabQueryByName(const QString& name)
