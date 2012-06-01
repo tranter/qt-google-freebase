@@ -11,6 +11,8 @@ namespace Ui {
 class SimpleSearcher;
 }
 
+class SimpleSearcherHistory;
+
 class SimpleSearcher : public QWidget
 {
     Q_OBJECT
@@ -35,47 +37,30 @@ protected slots:
 
 private slots:
     void onJsonReady(int);
-
     void addSchemeType();
-    void previousPage();
-    void nextPage();
-
     void sslErrorHandler(class QNetworkReply * qnr, const QList<QSslError> & /*errlist*/);
 
     void showPosition(int pos);
     void onCurrentTypeChanged(int);
 
 protected:
-    virtual QString getCurrentType() const;
+    QString getCurrentType() const;
     virtual QString createHtml(const QVariantMap & map);
     virtual void getInfo(const QString & id, const QString &type);
     virtual bool delegatedRequest(const QVariantMap & ) { return false; }
 
     class QWebView * webView() const;
     void delegateRequests() { m_delegateMQLrequest = true; }
-    void appendToHistory(const QString & value, int pos = -1);
-    int  addItemToResultsList(const QString & item, const QVariant & itemData = QVariant());
+    int  addItemToResultsList(const QString & item, const QVariant & itemData = QVariant(), bool blockSignals = false );
     void addSchemeType(const QString & item, const QVariant & itemData = QVariant(), bool blockSignals = true );
     void setSearchText(const QString & text);
 
 private:
     Ui::SimpleSearcher * ui;
-
-    int m_historyPos;
     bool m_delegateMQLrequest;
 
-    // first: mid, second: result position in comboBox
-    // second = -1 -> undefined position
-
-    typedef QPair<QString, int> HistoryNode;
-//    struct HistoryNode {
-//        QString searchText;
-//        int limitPos;
-//        QString typeId;
-//        QString typeName;
-//        int resultPos;
-//    };
-    QList<HistoryNode> m_history;
+    friend class SimpleSearcherHistory;
+    SimpleSearcherHistory * m_history;
 
 protected:
     class freebase_data_manager * m_pManager;

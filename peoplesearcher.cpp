@@ -16,11 +16,7 @@ PeopleSearcher::PeopleSearcher(QWidget * p) :
 {
     showTypeWidgets(false);
     delegateRequests();
-}
-
-QString PeopleSearcher::getCurrentType() const
-{
-    return "/people/person";
+    addSchemeType(tr("Person"), "/people/person");
 }
 
 QString PeopleSearcher::createHtml(const QVariantMap & map)
@@ -105,40 +101,18 @@ void PeopleSearcher::getInfo(const QString & id, const QString & /*type*/)
 
 void PeopleSearcher::onLinkClicked(const QUrl & url)
 {
-    qDebug() << Q_FUNC_INFO << " url=" << url;
-    if (url.toString().contains("http://"))
-    {
-        QDesktopServices::openUrl(url);
-    }
-//    else if (url.toString().startsWith("/m/"))
+    SimpleSearcher::onLinkClicked(url);
+
+//    qDebug() << Q_FUNC_INFO << " url=" << url;
+//    if (url.toString().contains("http://"))
 //    {
-//        appendToHistory( url.toString() );
-//        getInfo(url.toString(), getCurrentType());
+//        QDesktopServices::openUrl(url);
 //    }
-//    else if (url.toString().startsWith("event@"))
+//    else if (url.toString().startsWith("data@"))
 //    {
-    else if (url.toString().startsWith("data@"))
-    {
-        QStringList list = url.toString().split("@");
-        //getEventReferencies(list[1]);
-        //qDebug() << list[1];
-        int pos = addItemToResultsList(list[2], list[1]);
-        appendToHistory( list[1], pos );
-        getInfo(list[1], getCurrentType());
-    }
-}
+//        QStringList list = url.toString().split("@");
 
-void PeopleSearcher::getEventReferencies(const QString& mid)
-{
-    setAwaitingMode();
-
-    QVariantMap key;
-    key["namespace"] = "/wikipedia/en_id";
-    key["value"] = QVariant();
-
-    QVariantMap query;
-    query["mid"] = mid;
-    query["key"] = key;
-
-    m_pManager->runMqlQueryMultiple( QStringList( QJson::Serializer().serialize(query) ) );
+//        addItemToResultsList(list[2], list[1], false);
+//        getInfo(list[1], getCurrentType());
+//    }
 }

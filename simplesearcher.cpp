@@ -1,5 +1,6 @@
 #include "simplesearcher.h"
 #include "ui_simplesearcher.h"
+#include "simplesearcherhistory.h"
 
 #include "freebase_data_manager.h"
 #include "schemeexplorerdialog.h"
@@ -13,12 +14,13 @@
 #include <QDesktopServices>
 #include <QKeyEvent>
 
+
+
 SimpleSearcher::SimpleSearcher(QWidget *p) :
     QWidget(p),
     ui(new Ui::SimpleSearcher),
-    m_historyPos(-1),
     m_delegateMQLrequest(false),
-    m_history(),
+    m_history(new SimpleSearcherHistory(this)),
     m_pManager(new freebase_data_manager(this))
 {
     ui->setupUi(this);
@@ -33,13 +35,16 @@ SimpleSearcher::SimpleSearcher(QWidget *p) :
               SLOT(sslErrorHandler(QNetworkReply*, const QList<QSslError> & )));
     connect(ui->webView,SIGNAL(linkClicked(QUrl)),this,SLOT(onLinkClicked(QUrl)));
 
-    connect(ui->prevPageButton, SIGNAL(clicked()), this, SLOT(previousPage()));
-    connect(ui->nextPageButton, SIGNAL(clicked()), this, SLOT(nextPage()));
-    connect(ui->findButton,     SIGNAL(clicked()), this, SLOT(search()));
-    connect(ui->searchLineEdit, SIGNAL(returnPressed()), this, SLOT(search()));
-    connect(ui->resultComboBox, SIGNAL(activated(int)), this, SLOT(showPosition(int)));
-    connect(ui->schemeTypeButton,  SIGNAL(clicked()), this, SLOT(addSchemeType()));
-    connect(ui->typeComboBox,   SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentTypeChanged(int)));
+    connect(ui->prevPageButton,     SIGNAL(clicked()),  m_history, SLOT(loadPreviousData()));
+    connect(ui->nextPageButton,     SIGNAL(clicked()),  m_history, SLOT(loadNextData()));
+
+    connect(ui->findButton,         SIGNAL(clicked()),          this,       SLOT(search()));
+    connect(ui->searchLineEdit,     SIGNAL(returnPressed()),    this,       SLOT(search()));
+
+    connect(ui->resultComboBox,     SIGNAL(currentIndexChanged(int)),   this, SLOT(showPosition(int)));
+
+    connect(ui->schemeTypeButton,   SIGNAL(clicked()),                  this, SLOT(addSchemeType()));
+    connect(ui->typeComboBox,       SIGNAL(currentIndexChanged(int)),   this, SLOT(onCurrentTypeChanged(int)));
 }
 
 SimpleSearcher::~SimpleSearcher()
@@ -80,6 +85,7 @@ void SimpleSearcher::onJsonReady(int rt)
 
     if (rt == freebase_data_manager::REQ_SEARCH)
     {
+        ui->resultComboBox->blockSignals(true);
         ui->resultComboBox->clear();
 
         QString mapKey;
@@ -98,11 +104,7 @@ void SimpleSearcher::onJsonReady(int rt)
                 ui->resultComboBox->addItem( mapKey, map["mid"] );
             }
         }
-
-        //if( jsonMap.contains("hits") )
-        //{
-            //m_resultsCount = jsonMap["hits"].toInt();
-        //} else m_resultsCount = 0;
+        ui->resultComboBox->blockSignals(false);
 
         if( list.size() )
             showPosition(0);
@@ -118,6 +120,8 @@ void SimpleSearcher::onJsonReady(int rt)
         }
 
         ui->webView->setHtml( createHtml(jsonMap) );
+
+        m_history->saveData();
     }
 
     dropAwaitingMode();
@@ -126,6 +130,7 @@ void SimpleSearcher::onJsonReady(int rt)
 void SimpleSearcher::addSchemeType()
 {
     SchemeExplorerDialog dialog(this);
+    dialog.setWindowTitle("Add scheme type");
     dialog.setSelectionMode(SchemeExplorer::TYPES);
     dialog.resize(600, 400);
 
@@ -138,42 +143,6 @@ void SimpleSearcher::addSchemeType()
         return;
 
     addSchemeType( list.at(0).toString(), list.at(1), false );
-}
-
-void SimpleSearcher::previousPage()
-{
-    --m_historyPos;
-
-    getInfo(
-        m_history[m_historyPos].first,
-        getCurrentType()
-    );
-    int pos = m_history[m_historyPos].second;
-    if( -1 < pos && pos < ui->resultComboBox->count() )
-        ui->resultComboBox->setCurrentIndex(pos);
-    else
-        ui->resultComboBox->setCurrentIndex(-1);
-
-    ui->prevPageButton->setEnabled( 0 < m_historyPos );
-    ui->nextPageButton->setEnabled(true);
-}
-
-void SimpleSearcher::nextPage()
-{
-    ++m_historyPos;
-
-    getInfo(
-        m_history[m_historyPos].first,
-        getCurrentType()
-    );
-    int pos = m_history[m_historyPos].second;
-    if( -1 < pos && pos < ui->resultComboBox->count() )
-        ui->resultComboBox->setCurrentIndex(pos);
-    else
-        ui->resultComboBox->setCurrentIndex(-1);
-
-    ui->nextPageButton->setEnabled( m_historyPos < m_history.count()-1 );
-    ui->prevPageButton->setEnabled(true);
 }
 
 void SimpleSearcher::sslErrorHandler(QNetworkReply* qnr, const QList<QSslError> & /*errlist*/)
@@ -192,26 +161,21 @@ void SimpleSearcher::sslErrorHandler(QNetworkReply* qnr, const QList<QSslError> 
 void SimpleSearcher::search()
 {
     QString query = ui->searchLineEdit->text().trimmed();
+    QString type = getCurrentType();
+
     ui->webView->setHtml("<html/>");
 
-    if( ! query.isEmpty() )
-    {
-        setAwaitingMode();
+    if( query.isEmpty() || type.isEmpty() )
+        return;
 
-        m_historyPos = -1;
-        m_history.clear();
-
-        QString type = getCurrentType();
-        m_pManager->runSearchQuery(query+"&type="+type, ui->limitComboBox->currentText(), "0");
-    }
+    setAwaitingMode();
+    m_pManager->runSearchQuery(query+"&type="+type, ui->limitComboBox->currentText(), "0");
 }
 
 void SimpleSearcher::showPosition(int pos)
 {
-    appendToHistory(ui->resultComboBox->itemData(pos).toString(), pos);
-
     getInfo(
-        m_history.last().first,
+        ui->resultComboBox->itemData(pos).toString(),
         getCurrentType()
     );
 }
@@ -250,27 +214,13 @@ void SimpleSearcher::getInfo(const QString & id, const QString & type)
 
 QWebView * SimpleSearcher::webView() const { return ui->webView; }
 
-
-void SimpleSearcher::appendToHistory(const QString & value, int pos)
-{
-    if( m_historyPos != m_history.count()-1 )
-    {
-        int count = m_history.count()-m_historyPos-1;
-        for(int i(0); i < count; ++i)
-            m_history.removeLast();
-    }
-
-    m_history << HistoryNode(value, pos);
-    m_historyPos = m_history.count()-1;
-    ui->prevPageButton->setEnabled(m_historyPos);
-    ui->nextPageButton->setEnabled(false);
-}
-
-int SimpleSearcher::addItemToResultsList(const QString & item, const QVariant & itemData)
+int SimpleSearcher::addItemToResultsList(const QString & item, const QVariant & itemData, bool blockSignals)
 {
     int pos = ui->resultComboBox->count();
+    if(blockSignals) ui->resultComboBox->blockSignals(true);
     ui->resultComboBox->addItem(item, itemData);
     ui->resultComboBox->setCurrentIndex(pos);
+    if(blockSignals) ui->resultComboBox->blockSignals(false);
     return pos;
 }
 
@@ -316,18 +266,18 @@ void SimpleSearcher::setSearchText(const QString & text)
 void SimpleSearcher::writeSettings(const QString & companyName, const QString & appName)
 {
     QSettings settings(companyName, appName);
-    settings.beginGroup("TypeItems");
+    settings.beginGroup( objectName() );
 
     int count = ui->typeComboBox->count();
+
     QStringList items;
-    for(int i(0); i < count; ++i)
+    for(int i( 10 < count ? count-10 : 0 ); i < count; ++i)
     {
         items << ui->typeComboBox->itemData(i,Qt::UserRole+1).toString();
         items << ui->typeComboBox->itemData(i).toString();
     }
 
     settings.setValue("items", items);
-    settings.setValue("pos", ui->typeComboBox->currentIndex());
 
     settings.endGroup();
 }
@@ -335,7 +285,7 @@ void SimpleSearcher::writeSettings(const QString & companyName, const QString & 
 void SimpleSearcher::readSettings(const QString & companyName, const QString & appName)
 {
     QSettings settings(companyName, appName);
-    settings.beginGroup("TypeItems");
+    settings.beginGroup( objectName() );
 
     QStringList items = settings.value("items").toStringList();
 
@@ -345,8 +295,6 @@ void SimpleSearcher::readSettings(const QString & companyName, const QString & a
     int count = items.size();
     for(int i(0); i < count; i += 2)
         addSchemeType( items.at(i), items.at(i+1) );
-
-    ui->typeComboBox->setCurrentIndex( settings.value("pos", -1).toInt() );
 
     settings.endGroup();
 }

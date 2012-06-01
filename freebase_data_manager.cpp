@@ -98,7 +98,6 @@ void freebase_data_manager::replyFinished(QNetworkReply *reply)
     QString url = reply->url().toString();
 
     qDebug() << "URL=" << url;
-//    qDebug() << "json=" << json;
 
 //    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     if(reply->error()) {

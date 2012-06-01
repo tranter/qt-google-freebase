@@ -9,6 +9,8 @@ class FreebaseExplorer : public SimpleSearcher
 public:
     explicit FreebaseExplorer(QWidget *parent = 0);
     
+    void readSettings(const QString & companyName, const QString & appName);
+
 private slots:
     void getSchema(const QString & id);
 

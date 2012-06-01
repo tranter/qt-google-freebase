@@ -330,7 +330,6 @@ void Form::onTextLinkClicked(const QUrl& url)
 
 void Form::onBacwardAction()
 {
-    qDebug() << Q_FUNC_INFO;
     int len;
     QString tabName = ui->tabQuery->tabText(ui->tabQuery->currentIndex());
     if (tabName == "MQL Request") {
@@ -352,7 +351,6 @@ void Form::onBacwardAction()
 
 void Form::onForwardAction()
 {
-    qDebug() << Q_FUNC_INFO;
     QString tabName = ui->tabQuery->tabText(ui->tabQuery->currentIndex());
     if (tabName == "MQL Request") {
         if (m_historyPos["MQL Request"] > 0) {
@@ -378,9 +376,8 @@ void Form::runQuery()
 
 void Form::startDlgDemo()
 {
-    qDebug() << Q_FUNC_INFO;
-
     QDialog dialog(this);
+    dialog.setWindowTitle("Demo - People searcher");
     dialog.setLayout(new QVBoxLayout);
     dialog.layout()->addWidget(new PeopleSearcher);
     dialog.exec();
@@ -388,9 +385,8 @@ void Form::startDlgDemo()
 
 void Form::startDlgDemoCountry()
 {
-    qDebug() << Q_FUNC_INFO;
-
     QDialog dialog(this);
+    dialog.setWindowTitle("Demo - Country searcher");
     dialog.setLayout(new QVBoxLayout);
     dialog.layout()->addWidget(new CountrySearcher);
     dialog.exec();
@@ -437,6 +433,7 @@ QString Form::createImageHtml()
 void Form::openFreebaseExplorer()
 {
     QDialog dialog(this);
+    dialog.setWindowTitle("Demo - Freebase Explorer");
     dialog.setLayout(new QVBoxLayout);
 
     FreebaseExplorer * fe = new FreebaseExplorer();

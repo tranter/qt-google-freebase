@@ -17,6 +17,15 @@ FreebaseExplorer(QWidget *parent) :
 }
 
 void FreebaseExplorer::
+readSettings(const QString & companyName, const QString & appName)
+{
+    SimpleSearcher::readSettings(companyName, appName);
+    if( getCurrentType().isEmpty() ) return;
+
+    getSchema( getCurrentType() );
+}
+
+void FreebaseExplorer::
 getSchema(const QString & id)
 {
     if( m_currentSchemaTypeId == id )
@@ -228,24 +237,26 @@ void FreebaseExplorer::getInfo(const QString & id, const QString & type)
 
 void FreebaseExplorer::onLinkClicked(const QUrl & _url)
 {
-    QString url( _url.toString() );
-    if( url.isEmpty() ) return;
+    SimpleSearcher::onLinkClicked(_url);
 
-    if( ! url.startsWith("search:") )
-    {
-        SimpleSearcher::onLinkClicked(_url);
-        return;
-    }
+//    QString url( _url.toString() );
+//    if( url.isEmpty() ) return;
 
-    QStringList searchData( url.split(':') );
-    if( searchData.size() != 4 ) {
-        qDebug() << "Wrong url:" << url;
-        return;
-    }
+//    if( ! url.startsWith("search:") )
+//    {
+//        SimpleSearcher::onLinkClicked(_url);
+//        return;
+//    }
 
-    setSearchText(searchData.last());
-    addSchemeType(searchData.at(2), searchData.at(1), false);
+//    QStringList searchData( url.split(':') );
+//    if( searchData.size() != 4 ) {
+//        qDebug() << "Wrong url:" << url;
+//        return;
+//    }
 
-    if( searchData.at(1) == m_currentSchemaTypeId )
-        search();
+//    setSearchText(searchData.last());
+//    addSchemeType(searchData.at(2), searchData.at(1), false);
+
+//    if( searchData.at(1) == m_currentSchemaTypeId )
+//        search();
 }

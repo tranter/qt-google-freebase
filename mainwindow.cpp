@@ -60,6 +60,7 @@ void MainWindow::showStatusText(const QString& msg)
 void MainWindow::openSchemeExplorer()
 {
     SchemeExplorerDialog dialog(this);
+    dialog.setWindowTitle( "Scheme explorer" );
     dialog.resize(600, 400);
     dialog.exec();
 }
