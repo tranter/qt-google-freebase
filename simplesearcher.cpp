@@ -120,7 +120,6 @@ void SimpleSearcher::onJsonReady(int rt)
         }
 
         ui->webView->setHtml( createHtml(jsonMap) );
-
         m_history->saveData();
     }
 

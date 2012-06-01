@@ -237,26 +237,25 @@ void FreebaseExplorer::getInfo(const QString & id, const QString & type)
 
 void FreebaseExplorer::onLinkClicked(const QUrl & _url)
 {
-    SimpleSearcher::onLinkClicked(_url);
+    QString url( _url.toString() );
+    if( url.isEmpty() ) return;
 
-//    QString url( _url.toString() );
-//    if( url.isEmpty() ) return;
+    if( ! url.startsWith("search:") )
+    {
+        SimpleSearcher::onLinkClicked(_url);
+        return;
+    }
 
-//    if( ! url.startsWith("search:") )
-//    {
-//        SimpleSearcher::onLinkClicked(_url);
-//        return;
-//    }
+    QStringList searchData( url.split(':') );
+    if( searchData.size() != 4 ) {
+        qDebug() << "Wrong url:" << url;
+        return;
+    }
 
-//    QStringList searchData( url.split(':') );
-//    if( searchData.size() != 4 ) {
-//        qDebug() << "Wrong url:" << url;
-//        return;
-//    }
+    setSearchText(searchData.last());
 
-//    setSearchText(searchData.last());
-//    addSchemeType(searchData.at(2), searchData.at(1), false);
-
-//    if( searchData.at(1) == m_currentSchemaTypeId )
-//        search();
+    if( searchData.at(1) == m_currentSchemaTypeId )
+        search();
+    else
+        addSchemeType(searchData.at(2), searchData.at(1), false);
 }
