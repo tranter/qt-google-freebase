@@ -47,6 +47,7 @@ private:
 
     int m_requestedType;
     DataType m_selection;
+    QString m_previousDomainId;
     QString m_currentId;
 
     QVariantList m_selectedData;

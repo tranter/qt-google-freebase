@@ -147,6 +147,7 @@ void SchemeExplorer::
 loadDomains()
 {
     m_requestedType = DOMAINS;
+
     m_dataManager->runMqlQuery(
         "[{\n\t\"id\": null,\n\t\"name\": null,\n\t\"sort\": \"name\",\n\t\"type\": \"/type/domain\","
         "\n\t\"!/freebase/domain_category/domains\": {\n\t\t\"id\": \"/category/commons\"\n\t}\n}]"
@@ -156,6 +157,7 @@ loadDomains()
 void SchemeExplorer::
 loadTypes(const QString & id)
 {
+    m_previousDomainId = id;
     m_currentId = id;
 
     m_requestedType = TYPES;
@@ -296,7 +298,7 @@ previous()
 
     switch(m_requestedType)
     {
-    case PROPERTIES: loadTypes( m_currentId.left(m_currentId.indexOf('/', 1)) ); break;
+    case PROPERTIES: loadTypes( m_previousDomainId ); break;
     case TYPES:      loadDomains();
     }
 }
