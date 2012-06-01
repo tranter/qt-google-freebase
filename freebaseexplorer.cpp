@@ -140,7 +140,7 @@ QString FreebaseExplorer::createHtml(const QVariantMap & map)
         html.append( wikipedia.isEmpty() ? "</p>" : wikipedia );
     }
 
-    html += QString("<h2>%1</h2><p id=\"art\" style=\"padding: 1em\"></p>").arg(name);
+    html += QString("<h2>%1</h2><p id=\"art\" style=\"padding: 1em\"><img src=\"qrc:/images/ajax-loader\"/></p>").arg(name);
 
     foreach( const Tuple & t, schema )
     {

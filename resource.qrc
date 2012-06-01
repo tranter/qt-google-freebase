@@ -10,6 +10,7 @@
         <file alias="find">images/edit-find.png</file>
         <file alias="fschema">images/fschema.png</file>
         <file alias="close">images/dialog-close.png</file>
+        <file alias="ajax-loader">images/ajax-loader.gif</file>
     </qresource>
     <qresource prefix="/html">
         <file alias="suggest-basic.html">suggest-basic.html</file>
