@@ -307,10 +307,19 @@ void Form::onTextLinkClicked(const QUrl& url)
     QString value = url.toString();
     ui->textMqlReply->clear();
 
-    if( value.startsWith("/m/") )
-        m_pManager->runSearchQuery(value);
-    else if( value.startsWith("/en/") )
-        m_pManager->runTextQuery(value);
+//    if( value.startsWith("/m/") )
+//        m_pManager->runSearchQuery(value);
+//    else if( value.startsWith("/en/") )
+//        m_pManager->runTextQuery(value);
+
+    if( value.startsWith("/m/") || value.startsWith("/en/") )
+    {
+        ui->tabQuery->setCurrentIndex( ui->tabQuery->indexOf(ui->tabMisc) );
+        ui->lineEditImage->setText(value);
+        ui->lineEditText->setText(value);
+        ui->pushButtonImageGo->click();
+        ui->pushButtonTextGo->click();
+    }
 
     m_pManager->runSearchQuery(value);
 }

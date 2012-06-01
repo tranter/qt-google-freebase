@@ -108,7 +108,7 @@
             <widget class="QLabel" name="label_2">
              <property name="minimumSize">
               <size>
-               <width>70</width>
+               <width>80</width>
                <height>0</height>
               </size>
              </property>
@@ -156,7 +156,7 @@
             <widget class="QLabel" name="label_3">
              <property name="minimumSize">
               <size>
-               <width>70</width>
+               <width>80</width>
                <height>0</height>
               </size>
              </property>
@@ -353,7 +353,7 @@
        <item row="0" column="0" colspan="2">
         <widget class="QTabWidget" name="tabReply">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="tabTree">
           <attribute name="title">

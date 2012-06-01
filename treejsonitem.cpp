@@ -13,18 +13,14 @@ TreeJsonItem::~TreeJsonItem()
 
 void TreeJsonItem::clear()
 {
-    foreach (TreeJsonItem* pItem,m_itemChildren) {
-        delete pItem;
-    }
+    qDeleteAll(m_itemChildren);
     m_itemChildren.clear();
     m_itemData.clear();
 }
 
 void TreeJsonItem::clearChildren()
 {
-    foreach (TreeJsonItem* pItem,m_itemChildren) {
-        delete pItem;
-    }
+    qDeleteAll(m_itemChildren);
     m_itemChildren.clear();
 }
 
