@@ -12,7 +12,7 @@ class TreeJsonModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    TreeJsonModel(const QVariant& data, QObject* parent = 0);
+    TreeJsonModel(QObject * parent = 0);
     ~TreeJsonModel();
 
     QVariant data(const QModelIndex &index, int role) const;

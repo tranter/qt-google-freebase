@@ -6,7 +6,7 @@
 
 #include "freebase_data_manager.h"
 
-freebase_data_manager::freebase_data_manager(QObject* parent) : QObject(parent)
+freebase_data_manager::freebase_data_manager(QObject* p) : QObject(p)
 {
 //    m_webServer = "https://www.googleapis.com/freebase/v1-sandbox";
 //    m_webServer = "http://api.freebase.com/api/service";
@@ -59,7 +59,7 @@ void freebase_data_manager::runSearchQuery(const QString& query, const QString& 
     m_pNetworkAccessManager->get(QNetworkRequest(QUrl(s)));
 }
 
-void freebase_data_manager::runWriteQuery(const QString& query, const QString& access_token, const QString& key)
+void freebase_data_manager::runWriteQuery(const QString& query, const QString& access_token, const QString& /*key*/)
 {
     QString s = QString("https://www.googleapis.com/freebase/v1-sandbox/mqlwrite?key=%1").arg(access_token);
     QByteArray content = query.toLatin1();
@@ -295,7 +295,7 @@ QString freebase_data_manager::modifySearchReply()
     return ret;
 }
 
-void freebase_data_manager::onSslError(QNetworkReply* reply,QList<QSslError> listErr)
+void freebase_data_manager::onSslError(QNetworkReply* reply,QList<QSslError> /*listErr*/)
 {
     reply->ignoreSslErrors();
 }

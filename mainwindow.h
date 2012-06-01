@@ -7,9 +7,6 @@ namespace Ui {
     class MainWindow;
 }
 
-class Form;
-class QLabel;
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -19,23 +16,17 @@ public:
     ~MainWindow();
     
     void startLoginDefault();
-    void showStatusText(const QString& msg);
 
-public slots:
+private slots:
     void startLogin();
     void startFreebaseLogin();
-    void goBackward();
-    void goForward();
-    void onRun();
-    void startDlgDemo();
-    void startDlgDemoCountry();
     void openSchemeExplorer();
-    void openFreebaseExplorer();
+    void showStatusText(const QString& msg);
 
 private:
-    Ui::MainWindow *ui;
-    Form* m_pForm;
-    QLabel* m_pStatusLabel;
+    Ui::MainWindow * ui;
+    class QLabel * m_pStatusLabel;
+    class Form * m_pForm;
 };
 
 #endif // MAINWINDOW_H

@@ -3,12 +3,13 @@
 #include "treejsonitem.h"
 #include "treejsonmodel.h"
 
-TreeJsonModel::TreeJsonModel(const QVariant& data, QObject* parent) : QAbstractItemModel(parent)
+TreeJsonModel::TreeJsonModel(QObject* o) :
+    QAbstractItemModel(o)
 {
     QList<QVariant> rootData;
     rootData << "Key" << "Value";
     m_rootItem = new TreeJsonItem(rootData);
-    setupModelData(data, m_rootItem);
+    setupModelData(QVariant(), m_rootItem);
 }
 
 TreeJsonModel::~TreeJsonModel()

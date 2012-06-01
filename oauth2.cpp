@@ -11,16 +11,17 @@
 #include "logindialog.h"
 #include "oauth2.h"
 
-OAuth2::OAuth2(QWidget* parent)
+OAuth2::OAuth2(QWidget * p) :
+    QObject(p)
 {
     m_strEndPoint = "https://accounts.google.com/o/oauth2/auth";
     m_strScope = "https://www.googleapis.com/auth/freebase"
             "+https://www.googleapis.com/auth/userinfo.email"
             ;
 
-    m_strClientID = "YOUR_CLIENT_ID_HERE";
+    m_strClientID     = "YOUR_CLIENT_ID_HERE";
     m_strClientSecret = "YOUR_CLIENT_SECRET_HERE";
-    m_strRedirectURI = "YOUR_REDIRECT_URI_HERE";
+    m_strRedirectURI  = "YOUR_REDIRECT_URI_HERE";
     m_strSimpleAPIKey = "YOUR_SIMPLE_API_KEY_HERE";
 
     m_pNetworkAccessManager = new QNetworkAccessManager(this);
@@ -28,7 +29,7 @@ OAuth2::OAuth2(QWidget* parent)
             this, SLOT(replyFinished(QNetworkReply*)));
 
     m_pLoginDialog = NULL;
-    m_pParent = parent;
+    m_pParent = p;
     m_pSettings = NULL;
 }
 

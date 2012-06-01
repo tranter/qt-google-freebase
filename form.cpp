@@ -9,91 +9,86 @@
 #include "form.h"
 #include "ui_form.h"
 #include "oauth2.h"
-#include "mainwindow.h"
 #include "treejsonmodel.h"
 #include "treejsonitem.h"
 #include "countrysearcher.h"
 #include "peoplesearcher.h"
+#include "freebaseexplorer.h"
+#include "freebase_data_manager.h"
 
 #include <QJson/Serializer>
-
-#include "freebaseexplorer.h"
 
 #include <QDialog>
 #include <QVBoxLayout>
 
-Form::Form(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::Form)
+
+Form::Form(QWidget * p) :
+    QWidget(p),
+    ui(new Ui::Form),
+    m_pOAuth2(new OAuth2(this)),
+    m_pManager(new freebase_data_manager(this)),
+    m_pModel(0),
+    m_pSettings(0)
 {
     ui->setupUi(this);
-
     ui->tabQuery->setCurrentIndex(0);
+    ui->tabReply->setCurrentIndex(0);
+
+    m_strCompanyName = "YOUR_COMPANY_NAME_HERE";
+    m_strAppName     = "QtFreebase";
+
+    m_pSettings = new QSettings(m_strCompanyName, m_strAppName);
+
+    m_pOAuth2->setAccessToken(m_pSettings->value("access_token").toString());
+    m_pOAuth2->setRefreshToken(m_pSettings->value("refresh_token").toString());
+    m_pOAuth2->setSettings(m_pSettings);
 
     int ind = indexTabQueryByName("Write Request");
     if (ind >= 0) {
         ui->tabQuery->removeTab(ind);
     }
-    connect(ui->pushButtonTextGo,SIGNAL(clicked()),this,SLOT(onBtnTextGoClicked()));
-    connect(ui->pushButtonImageGo,SIGNAL(clicked()),this,SLOT(onBtnImageGoClicked()));
-    connect(ui->tabQuery,SIGNAL(currentChanged(int)),this,SLOT(onTabQueryTabChanged(int)));
 
     m_listSplitterSave << 250;
     m_listSplitterSave << 300;
     ui->splitter->setSizes(m_listSplitterSave);
-    connect(ui->splitter,SIGNAL(splitterMoved(int,int)),this,SLOT(onSplitterMoved(int,int)));
 
-    m_pMain = (MainWindow*)parent;
-    m_pMain->showStatusText("Uknown user email");
-    m_pOAuth2 = new OAuth2(this);
-
-    m_strCompanyName = "YOUR_COMPANY_NAME_HERE";
-    m_strAppName = "QtFreebase";
-
-    // Load settings
-    m_pSettings = new QSettings(m_strCompanyName,m_strAppName);
-    m_pOAuth2->setAccessToken(m_pSettings->value("access_token").toString());
-    m_pOAuth2->setRefreshToken(m_pSettings->value("refresh_token").toString());
-    m_pOAuth2->setSettings(m_pSettings);
-
-    connect(m_pOAuth2, SIGNAL(loginDone()), this, SLOT(onLoginDone()));
-    connect(m_pOAuth2, SIGNAL(sigErrorOccured(QString)),this,SLOT(onErrorOccured(QString)));
-
-    m_pManager = new freebase_data_manager(this);
-    connect(m_pManager, SIGNAL(sigErrorOccured(QString)),this,SLOT(onErrorOccured(QString)));
-    connect(m_pManager, SIGNAL(sigUserEmailReady()),this,SLOT(onUserEmailReady()));
-
-    connect(m_pManager, SIGNAL(sigMqlReplyReady(int)),this,SLOT(onMqlReplyReady(int)));
-    connect(m_pManager, SIGNAL(sigSearchReplyReady(int)),this,SLOT(onSearchReplyReady(int)));
-    connect(m_pManager, SIGNAL(sigJsonReady(int)),this,SLOT(onJsonReady(int)));
-    connect(m_pManager, SIGNAL(sigImageReady(QPixmap,int)),this,SLOT(onImageReady(QPixmap,int)));
-
-    connect(ui->btnRun,SIGNAL(clicked()),this,SLOT(onBtnRunClicked()));
-    connect(ui->btnClear,SIGNAL(clicked()),this,SLOT(onBtnClearClicked()));
-
-    initSuggestPage();
-    connect(ui->webViewImage->page()->networkAccessManager(),
-              SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )),
-              this,
-              SLOT(sslImageErrorHandler(QNetworkReply*, const QList<QSslError> & )));
-
-    ui->tabReply->setCurrentIndex(indexTabReplyByName("Json"));
-
-    m_pModel = new TreeJsonModel(QVariant(),ui->treeMqlReply);
+    m_pModel = new TreeJsonModel(ui->treeMqlReply);
     ui->treeMqlReply->setModel(m_pModel);
-    ui->treeMqlReply->setHeaderHidden(false);
-    connect(ui->treeMqlReply,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(onTreeGoToItem(QModelIndex)));
 
     ui->webViewText->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-    connect(ui->webViewText->page()->networkAccessManager(),SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError>& )),
-              this,SLOT(sslTextErrorHandler(QNetworkReply*, const QList<QSslError>& )));
-    connect(ui->webViewText,SIGNAL(linkClicked(QUrl)),this,SLOT(onTextLinkClicked(QUrl)));
+
+    connect(ui->backButton, SIGNAL(clicked()), this,SLOT(onBacwardAction()));
+    connect(ui->forwButton, SIGNAL(clicked()), this,SLOT(onForwardAction()));
+    connect(ui->btnRun,     SIGNAL(clicked()), this,SLOT(onBtnRunClicked()));
+    connect(ui->btnClear,   SIGNAL(clicked()), this,SLOT(onBtnClearClicked()));
+
+    connect(ui->pushButtonTextGo, SIGNAL(clicked()),          this,SLOT(onBtnTextGoClicked()));
+    connect(ui->pushButtonImageGo,SIGNAL(clicked()),          this,SLOT(onBtnImageGoClicked()));
+    connect(ui->tabQuery,         SIGNAL(currentChanged(int)),this,SLOT(onTabQueryTabChanged(int)));
+
+    connect(ui->splitter, SIGNAL(splitterMoved(int,int)), this, SLOT(onSplitterMoved(int,int)));
+
+    connect(m_pOAuth2,  SIGNAL(loginDone()),             this,SLOT(onLoginDone()));
+    connect(m_pOAuth2,  SIGNAL(sigErrorOccured(QString)),this,SLOT(onErrorOccured(QString)));
+
+    connect(m_pManager, SIGNAL(sigErrorOccured(QString)),this,SLOT(onErrorOccured(QString)));
+    connect(m_pManager, SIGNAL(sigMqlReplyReady(int)),   this,SLOT(onMqlReplyReady(int)));
+    connect(m_pManager, SIGNAL(sigSearchReplyReady(int)),this,SLOT(onSearchReplyReady(int)));
+    connect(m_pManager, SIGNAL(sigJsonReady(int)),       this,SLOT(onJsonReady(int)));
+    connect(m_pManager, SIGNAL(sigUserEmailReady()),     this,SLOT(onUserEmailReady()));
+
+    connect( ui->webViewImage->page()->networkAccessManager(), SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )),
+             this, SLOT(sslImageErrorHandler(QNetworkReply*, const QList<QSslError> & ))
+    );
+    connect(ui->webViewText, SIGNAL(linkClicked(QUrl)), this, SLOT(onTextLinkClicked(QUrl)));
 
     m_historyMax = 20;
     m_historyPos["MQL Request"] = 0;
     m_historyPos["Search Request"] = 0;
     m_history["MQL Request"].insert(0,ui->editMqlQuery->toPlainText());
     m_history["Search Request"].insert(0,ui->editSearchQuery->toPlainText()+"@"+ui->editSearchFilter->toPlainText());
+
+    initSuggestPage();
 }
 
 Form::~Form()
@@ -137,39 +132,30 @@ void Form::saveSettings()
 
 void Form::onUserEmailReady()
 {
-    m_pMain->showStatusText(m_pManager->getUserEmail());
+    emit showStatusText(m_pManager->getUserEmail());
 }
 
-void Form::onMqlReplyReady(const int rt)
+void Form::onMqlReplyReady(const int /*rt*/)
 {
-    qDebug() << Q_FUNC_INFO;
     ui->textMqlReply->setPlainText(m_pManager->getReplyStr());
     ui->webViewText->setHtml(m_pManager->getRichTextReplyStr());
 }
 
-void Form::onSearchReplyReady(const int rt)
+void Form::onSearchReplyReady(const int /*rt*/)
 {
-    qDebug() << Q_FUNC_INFO;
     ui->textMqlReply->setPlainText(m_pManager->getReplyStr());
     ui->webViewText->setHtml(m_pManager->getRichTextReplyStr());
 }
 
-void Form::onJsonReady(const int rt)
+void Form::onJsonReady(const int /*rt*/)
 {
     m_pModel->setNewModelData(m_pManager->getJsonData());
-}
-
-void Form::onImageReady(const QPixmap& px, const int rt)
-{
-//    QGraphicsPixmapItem *item = new QGraphicsPixmapItem(px);
-//    m_pScene->addItem(item);
-//    ui->graphicsViewImage->fitInView(item,Qt::KeepAspectRatio);
 }
 
 void Form::onBtnRunClicked()
 {
     ui->textMqlReply->clear();
-    clearReplyImage();
+
     int index = ui->tabQuery->currentIndex();
     if (ui->tabQuery->tabText(index) == "MQL Request") {
         m_historyPos["MQL Request"] = 0;
@@ -217,12 +203,6 @@ void Form::onBtnTextGoClicked()
 
 void Form::onBtnImageGoClicked()
 {
-//    m_requestForDomainList = false;
-//    ui->tabReply->setCurrentIndex(indexTabReplyByName("Image"));
-//    clearReplyImage();
-//    m_pManager->runImageQuery(ui->lineEditImage->text()
-//                              ,ui->graphicsViewImage->size().height()
-//                              ,ui->graphicsViewImage->size().width());
     QString strHtml = createImageHtml();
     ui->webViewImage->setHtml(strHtml);
 }
@@ -230,41 +210,17 @@ void Form::onBtnImageGoClicked()
 void Form::onBtnClearClicked()
 {
     ui->textMqlReply->clear();
-//    ui->textBrowserText->clear();
     ui->webViewText->setHtml(QString());
     ui->webViewImage->setHtml(QString());
-    clearReplyImage();
     clearTreeJson();
 }
 
-void Form::listDomains()
+void Form::onTabQueryTabChanged(int index)
 {
-    m_historyPos["MQL Request"] = 0;
-    QString curValue = "[{\n\t\"id\": null,\n\t\"name\": null,\n\t\"sort\": \"name\",\n\t\"type\": \"/type/domain\",\n\t\"!/freebase/domain_category/domains\": {\n\t\t\"id\": \"/category/commons\"\n\t}\n}]";
-    QString oldValue = m_history["MQL Request"].value(0);
-    if (curValue != oldValue) {
-        m_history["MQL Request"].insert(0,curValue);
-        if (m_history["MQL Request"].size()>m_historyMax) {
-            m_history["MQL Request"].removeLast();
-        }
-    }
-    //ui->tabReply->setCurrentIndex(indexTabReplyByName("Json"));
-    ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
-    ui->textMqlReply->clear();
-    m_pManager->runMqlQuery(curValue);
-
-//    ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
-//    ui->textMqlReply->clear();
-//    QString query = "[{\"id\": null,\"name\": null,\"type\": \"/type/domain\",\"!/freebase/domain_category/domains\": {\"id\": \"/category/commons\"}}]";
-//    m_pManager->runMqlQuery(query);
-}
-
-void Form::onTabQueryTabChanged(int pos)
-{
-    if (pos == indexTabQueryByName("Misc Request")) {
+    if (index == indexTabQueryByName("Misc Request")) {
         ui->splitter->setSizes(m_listSplitterSave);
         ui->btnRun->setEnabled(false);
-    } else if (pos == indexTabQueryByName("Suggest")) {
+    } else if (index == indexTabQueryByName("Suggest")) {
         ui->btnRun->setEnabled(false);
     } else {
         ui->splitter->setSizes(m_listSplitterSave);
@@ -298,25 +254,18 @@ int Form::indexTabReplyByName(const QString& name)
     return ret;
 }
 
-void Form::clearReplyImage()
-{
-//    QList<QGraphicsItem*> list = ui->graphicsViewImage->scene()->items();
-//    foreach (QGraphicsItem* p, list) {
-//        ui->graphicsViewImage->scene()->removeItem(p);
-//    }
-}
-
 void Form::clearTreeJson()
 {
     m_pModel->clear();
 }
 
-void Form::onSplitterMoved(int pos, int index)
+void Form::onSplitterMoved(int /*pos*/, int /*index*/)
 {
-    if (ui->tabQuery->currentIndex()!=indexTabQueryByName("Suggest")) {
+    if (ui->tabQuery->currentIndex() != indexTabQueryByName("Suggest")) {
         m_listSplitterSave = ui->splitter->sizes();
     }
 }
+
 /** \brief Load MyWebPage as a current page
  *
  *  Main purpose: init Form object in a page's javascript context
@@ -344,75 +293,12 @@ void Form::onNewPage()
     frame->addToJavaScriptWindowObject("appForm",this);
 }
 
-void Form::onSuggestData(const QString& name,const QString& id,const QString& mid)
+void Form::onSuggestData(const QString & /*name*/,const QString & id,const QString & /*mid*/)
 {
     ui->tabReply->setCurrentIndex(indexTabReplyByName("Text"));
     ui->textMqlReply->clear();
     m_pManager->runSearchQuery(id);
-
-//    clearReplyImage();
-//    m_pManager->runImageQuery(id
-//        ,ui->graphicsViewImage->size().height()
-//        ,ui->graphicsViewImage->size().width());
 }
-
-void Form::onTreeGoToItem(const QModelIndex& index)
-{
-//    if (!index.isValid()) {
-//        return;
-//    }
-//    TreeJsonItem* pNode = static_cast<TreeJsonItem*>(index.internalPointer());
-//    TreeJsonItem* pParentNode = index.parent().isValid() ? static_cast<TreeJsonItem*>(index.parent().internalPointer()) : NULL;
-//    QString key = pNode->data(0).toString();
-//    QString keyParent = pParentNode ? pParentNode->data(0).toString() : "";
-//    QString value = pNode->data(1).toString();
-//    int height = ui->graphicsViewImage->size().height();
-//    int width = ui->graphicsViewImage->size().width();
-//    if (value.startsWith("/m/")) {
-//        ui->textMqlReply->clear();
-//        m_pManager->runSearchQuery(value);
-
-//        clearReplyImage();
-//        m_pManager->runImageQuery(value
-//            ,height
-//            ,width);
-//    } else if (key == "guid" || keyParent == "guid") {
-//        QString str = "/guid/";
-//        str += value;
-//        ui->textMqlReply->clear();
-//        m_pManager->runSearchQuery(str);
-
-//        clearReplyImage();
-//        m_pManager->runImageQuery(str
-//            ,height
-//            ,width);
-//    } else if (key == "id" || keyParent == "id") {
-//        ui->textMqlReply->clear();
-//        m_pManager->runSearchQuery(value);
-
-//        clearReplyImage();
-//        m_pManager->runImageQuery(value
-//            ,height
-//            ,width);
-//    }
-}
-
-//void Form::onTextBrowserAnchorClicked(const QUrl& url)
-//{
-//    QString value = url.toString();
-//    qDebug() << Q_FUNC_INFO << " url=" << url;
-
-//    ui->textMqlReply->clear();
-//    m_pManager->runSearchQuery(value);
-////    int height = ui->graphicsViewImage->size().height();
-////    int width = ui->graphicsViewImage->size().width();
-////    if (value.startsWith('/')) {
-////        clearReplyImage();
-////        m_pManager->runImageQuery(value
-////            ,height
-////            ,width);
-////    }
-//}
 
 void Form::onTextLinkClicked(const QUrl& url)
 {

@@ -3,8 +3,8 @@
 
 #include <QWebView>
 
-LoginDialog::LoginDialog(QWidget *parent) :
-    QDialog(parent),
+LoginDialog::LoginDialog(QWidget * p) :
+    QDialog(p),
     ui(new Ui::LoginDialog)
 {
     ui->setupUi(this);
